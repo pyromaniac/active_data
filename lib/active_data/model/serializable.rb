@@ -10,7 +10,7 @@ module ActiveData
       end
 
       def deserialize value
-        value.respond_to? :demodelize ? value.demodelize : value.to_s
+        value.demodelize
       end
 
     end

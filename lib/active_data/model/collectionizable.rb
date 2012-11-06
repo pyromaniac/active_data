@@ -6,13 +6,12 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
-        collectionize
+        collectionize Array
       end
 
       module ClassMethods
 
         def collectionize collection_superclass = nil
-          collection_superclass ||= Array
           collection = Class.new(collection_superclass) do
             include ActiveData::Model::Collectionizable::Proxy
           end

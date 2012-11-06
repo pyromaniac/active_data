@@ -1,9 +1,14 @@
+require 'active_data/model/extensions'
 require 'active_data/model/collectionizable'
 require 'active_data/model/attributable'
-require 'active_data/model/extensions'
+require 'active_data/model/associations'
+require 'active_data/model/nested_attributes'
+require 'active_data/model/parameterizable'
 
 module ActiveData
   module Model
+    class NotFound < ::StandardError
+    end
 
     extend ActiveSupport::Concern
 
@@ -18,6 +23,9 @@ module ActiveData
 
       include Attributable
       include Collectionizable
+      include Associations
+      include NestedAttributes
+      include Parameterizable
       extend ActiveModel::Callbacks
       extend ActiveModel::Naming
       extend ActiveModel::Translation
@@ -36,8 +44,7 @@ module ActiveData
     end
 
     module ClassMethods
-      def instantiate attributes = nil
-        attributes ||= {}
+      def instantiate attributes
         return attributes if attributes.instance_of? self
 
         instance = allocate

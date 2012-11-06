@@ -53,9 +53,9 @@ module ActiveData
           end
         end
 
-        def attribute_default name
+        def attribute_default name, instance = nil
           default = _attributes[name][:default]
-          default.respond_to?(:call) ? default.call : default
+          default.respond_to?(:call) ? default.call(instance) : default
         end
 
         def initialize_attributes
@@ -67,9 +67,13 @@ module ActiveData
       end
 
       def read_attribute name
-        @attributes[name].nil? ? attribute_default(name) : @attributes[name]
+        @attributes[name].nil? ? attribute_default(name, self) : @attributes[name]
       end
       alias_method :[], :read_attribute
+
+      def has_attribute? name
+        @attributes.key? name
+      end
 
       def read_attribute_before_type_cast name
         deserialize(send(name))
@@ -104,11 +108,22 @@ module ActiveData
         self.attributes = attributes
       end
 
+      def reverse_update_attributes attributes
+        reverse_assign_attributes(attributes)
+      end
+
     private
 
       def assign_attributes attributes
         (attributes.presence || {}).each do |(name, value)|
           send("#{name}=", value) if respond_to?("#{name}=")
+        end
+        self.attributes
+      end
+
+      def reverse_assign_attributes attributes
+        (attributes.presence || {}).each do |(name, value)|
+          send("#{name}=", value) if respond_to?("#{name}=") && respond_to?(name) && send(name).blank?
         end
         self.attributes
       end

@@ -4,6 +4,10 @@ module ActiveData
       module Date
         extend ActiveSupport::Concern
 
+        def demodelize
+          to_s
+        end
+
         module ClassMethods
           def modelize value
             case value

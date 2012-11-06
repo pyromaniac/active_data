@@ -4,6 +4,10 @@ module ActiveData
       module String
         extend ActiveSupport::Concern
 
+        def demodelize
+          self
+        end
+
         module ClassMethods
           def modelize value
             value.to_s if value.present?

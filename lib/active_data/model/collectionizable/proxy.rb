@@ -31,6 +31,10 @@ module ActiveData
           result
         end
 
+        def demodelize
+          ''
+        end
+
         module ClassMethods
           def modelize value
             new value
