@@ -1,7 +1,7 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-describe ActiveData::Model::Serializable do
+describe 'typecasting' do
 
   let(:klass) do
     Class.new do
@@ -10,6 +10,8 @@ describe ActiveData::Model::Serializable do
 
       attribute :string, type: String
       attribute :integer, type: Integer
+      attribute :float, type: Float
+      attribute :big_decimal, type: BigDecimal
       attribute :boolean, type: Boolean
       attribute :array, type: Array
 
@@ -32,9 +34,35 @@ describe ActiveData::Model::Serializable do
     specify{subject.tap{|s| s.integer = 'hello'}.integer.should == nil}
     specify{subject.tap{|s| s.integer = '123hello'}.integer.should == nil}
     specify{subject.tap{|s| s.integer = '123'}.integer.should == 123}
+    specify{subject.tap{|s| s.integer = '123.5'}.integer.should == 123}
     specify{subject.tap{|s| s.integer = 123}.integer.should == 123}
+    specify{subject.tap{|s| s.integer = 123.5}.integer.should == 123}
     specify{subject.tap{|s| s.integer = nil}.integer.should == nil}
     specify{subject.tap{|s| s.integer = [123]}.integer.should == nil}
+  end
+
+  context 'float' do
+    specify{subject.tap{|s| s.float = 'hello'}.float.should == nil}
+    specify{subject.tap{|s| s.float = '123hello'}.float.should == nil}
+    specify{subject.tap{|s| s.float = '123'}.float.should == 123.0}
+    specify{subject.tap{|s| s.float = '123.'}.float.should == 123.0}
+    specify{subject.tap{|s| s.float = '123.5'}.float.should == 123.5}
+    specify{subject.tap{|s| s.float = 123}.float.should == 123.0}
+    specify{subject.tap{|s| s.float = 123.5}.float.should == 123.5}
+    specify{subject.tap{|s| s.float = nil}.float.should == nil}
+    specify{subject.tap{|s| s.float = [123.5]}.float.should == nil}
+  end
+
+  context 'big_decimal' do
+    specify{subject.tap{|s| s.big_decimal = 'hello'}.big_decimal.should == nil}
+    specify{subject.tap{|s| s.big_decimal = '123hello'}.big_decimal.should == nil}
+    specify{subject.tap{|s| s.big_decimal = '123'}.big_decimal.should == BigDecimal.new('123.0')}
+    specify{subject.tap{|s| s.big_decimal = '123.'}.big_decimal.should == BigDecimal.new('123.0')}
+    specify{subject.tap{|s| s.big_decimal = '123.5'}.big_decimal.should == BigDecimal.new('123.5')}
+    specify{subject.tap{|s| s.big_decimal = 123}.big_decimal.should == BigDecimal.new('123.0')}
+    specify{subject.tap{|s| s.big_decimal = 123.5}.big_decimal.should == BigDecimal.new('123.5')}
+    specify{subject.tap{|s| s.big_decimal = nil}.big_decimal.should == nil}
+    specify{subject.tap{|s| s.big_decimal = [123.5]}.big_decimal.should == nil}
   end
 
   context 'boolean' do

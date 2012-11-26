@@ -1,61 +1,44 @@
-require 'active_data/model/serializable'
-
 module ActiveData
   module Model
     module Attributable
-      include Serializable
       extend ActiveSupport::Concern
 
       included do
         class_attribute :_attributes, :instance_reader => false, :instance_writer => false
         self._attributes = ActiveSupport::HashWithIndifferentAccess.new
 
+        extend generated_class_attributes_methods
+        include generated_instance_attributes_methods
+
         delegate :attribute_default, :to => 'self.class'
       end
 
       module ClassMethods
-        def attribute name, options = {}, &block
-          default = options.is_a?(Hash) ? options[:default] : options
-          type = options.is_a?(Hash) ? normalize_type(options[:type]) : String
-          self._attributes = self._attributes.merge(name => {
-            default: (block || default),
-            type: type
-          })
-
-          define_method name do
-            read_attribute(name)
-          end
-          define_method "#{name}_before_type_cast" do
-            read_attribute_before_type_cast(name)
-          end
-          define_method "#{name}?" do
-            read_attribute(name).present?
-          end
-          define_method "#{name}=" do |value|
-            write_attribute(name, value)
-          end
-
-          if options.is_a?(Hash) && options[:in]
-            define_singleton_method "#{name}_values" do
-              options[:in].dup
-            end
-          end
-        end
-
-        def normalize_type type
-          case type
-          when String, Symbol then
-            type.to_s.camelize.safe_constantize
-          when nil then
-            String
+        def build_attribute name, options = {}, &block
+          klass = case options[:type].to_s
+          when 'Localized'
+            ActiveData::Attributes::Localized
           else
-            type
+            ActiveData::Attributes::Base
           end
+          klass.new name, options, &block
         end
 
-        def attribute_default name, instance = nil
-          default = _attributes[name][:default]
-          default.respond_to?(:call) ? default.call(instance) : default
+        def attribute name, options = {}, &block
+          attribute = build_attribute(name, options, &block)
+          self._attributes = _attributes.merge(attribute.name => attribute)
+
+          attribute.generate_instance_methods generated_instance_attributes_methods
+          attribute.generate_singleton_methods generated_class_attributes_methods
+          attribute
+        end
+
+        def generated_class_attributes_methods
+          @generated_class_attributes_methods ||= Module.new
+        end
+
+        def generated_instance_attributes_methods
+          @generated_instance_attributes_methods ||= Module.new
         end
 
         def initialize_attributes
@@ -67,7 +50,9 @@ module ActiveData
       end
 
       def read_attribute name
-        @attributes[name].nil? ? attribute_default(name, self) : @attributes[name]
+        attribute = self.class._attributes[name]
+        source = @attributes[name].nil? ? attribute.default_value(self) : @attributes[name]
+        attribute.type_cast source
       end
       alias_method :[], :read_attribute
 
@@ -76,12 +61,11 @@ module ActiveData
       end
 
       def read_attribute_before_type_cast name
-        deserialize(send(name))
+        @attributes[name]
       end
 
       def write_attribute name, value
-        type = self.class._attributes[name][:type]
-        @attributes[name] = serialize(value, type)
+        @attributes[name] = value
       end
       alias_method :[]=, :write_attribute
 

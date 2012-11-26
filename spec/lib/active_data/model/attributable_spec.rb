@@ -9,8 +9,9 @@ describe ActiveData::Model::Attributable do
       attr_reader :name
 
       attribute :hello
-      attribute :count, type: :integer, default: 10
-      attribute(:calc, type: :integer) {2 + 3}
+      attribute :count, type: Integer, default: 10
+      attribute(:calc, type: Integer) { 2 + 3 }
+      attribute :enum, type: Integer, in: [1, 2, 3]
 
       def initialize name = nil
         @attributes = self.class.initialize_attributes
@@ -20,16 +21,17 @@ describe ActiveData::Model::Attributable do
   end
 
   context do
-    subject{klass.new('world')}
-    its(:attributes){should == {"hello"=>nil, "count"=>10, "calc"=>5}}
-    its(:present_attributes){should == {"count"=>10, "calc"=>5}}
-    its(:name){should == 'world'}
-    its(:hello){should be_nil}
-    its(:count){should == 10}
-    its(:calc){should == 5}
-    specify{expect{subject.hello = 'worlds'}.to change{subject.hello}.from(nil).to('worlds')}
-    specify{expect{subject.count = 20}.to change{subject.count}.from(10).to(20)}
-    specify{expect{subject.calc = 15}.to change{subject.calc}.from(5).to(15)}
+    subject { klass.new('world') }
+    specify { klass.enum_values == [1, 2, 3] }
+    its(:attributes) { should ==  { "hello"=>nil, "count"=>10, "calc"=>5, "enum" => nil }  }
+    its(:present_attributes) { should ==  { "count"=>10, "calc"=>5 }  }
+    its(:name) { should == 'world' }
+    its(:hello) { should be_nil }
+    its(:count) { should == 10 }
+    its(:calc) { should == 5 }
+    specify { expect { subject.hello = 'worlds' } .to change { subject.hello } .from(nil).to('worlds') }
+    specify { expect { subject.count = 20 } .to change { subject.count } .from(10).to(20) }
+    specify { expect { subject.calc = 15 } .to change { subject.calc } .from(5).to(15) }
   end
 
 end

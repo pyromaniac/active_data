@@ -1,9 +1,13 @@
 require 'active_data/model/extensions'
 require 'active_data/model/collectionizable'
 require 'active_data/model/attributable'
+require 'active_data/model/localizable'
 require 'active_data/model/associations'
 require 'active_data/model/nested_attributes'
 require 'active_data/model/parameterizable'
+
+require 'active_data/attributes/base'
+require 'active_data/attributes/localized'
 
 module ActiveData
   module Model
@@ -22,6 +26,7 @@ module ActiveData
       include ActiveModel::Serializers::Xml
 
       include Attributable
+      include Localizable
       include Collectionizable
       include Associations
       include NestedAttributes

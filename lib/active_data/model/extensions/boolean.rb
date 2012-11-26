@@ -5,21 +5,29 @@ module ActiveData
         extend ActiveSupport::Concern
 
         MAPPING = {
-          "1" => true,
-          "0" => false,
-          "t" => true,
-          "f" => false,
-          "T" => true,
-          "F" => false,
-          "true" => true,
-          "false" => false,
-          "TRUE" => true,
-          "FALSE" => false
+          1 => true,
+          0 => false,
+          '1' => true,
+          '0' => false,
+          't' => true,
+          'f' => false,
+          'T' => true,
+          'F' => false,
+          true => true,
+          false => false,
+          'true' => true,
+          'false' => false,
+          'TRUE' => true,
+          'FALSE' => false,
+          'y' => true,
+          'n' => false,
+          'yes' => true,
+          'no' => false,
         }
 
         module ClassMethods
-          def modelize value
-            MAPPING[value.to_s]
+          def active_data_type_cast value
+            MAPPING[value]
           end
         end
       end

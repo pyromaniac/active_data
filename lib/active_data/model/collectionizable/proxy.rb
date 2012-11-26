@@ -31,12 +31,8 @@ module ActiveData
           result
         end
 
-        def demodelize
-          ''
-        end
-
         module ClassMethods
-          def modelize value
+          def active_data_type_cast value
             new value
           end
         end

@@ -1,17 +1,12 @@
 module ActiveData
   module Model
     module Extensions
-      module Hash
+      module Float
         extend ActiveSupport::Concern
 
         module ClassMethods
           def active_data_type_cast value
-            case value
-            when Hash then
-              value
-            else
-              nil
-            end
+            value.try(:to_f) if value.to_s =~ /\A\d+(?:\.\d*)?\Z/
           end
         end
       end
@@ -19,4 +14,4 @@ module ActiveData
   end
 end
 
-Hash.send :include, ActiveData::Model::Extensions::Hash
+Float.send :include, ActiveData::Model::Extensions::Float

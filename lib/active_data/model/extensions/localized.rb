@@ -1,16 +1,14 @@
 module ActiveData
   module Model
     module Extensions
-      module Array
+      module Localized
         extend ActiveSupport::Concern
 
         module ClassMethods
           def active_data_type_cast value
             case value
-            when String then
-              value.split(',').map(&:strip)
-            when Array then
-              value
+            when Hash then
+              value.stringify_keys!
             else
               nil
             end
@@ -21,4 +19,4 @@ module ActiveData
   end
 end
 
-Array.send :include, ActiveData::Model::Extensions::Array
+Localized.send :include, ActiveData::Model::Extensions::Localized

@@ -4,12 +4,8 @@ module ActiveData
       module Date
         extend ActiveSupport::Concern
 
-        def demodelize
-          to_s
-        end
-
         module ClassMethods
-          def modelize value
+          def active_data_type_cast value
             case value
             when String then
               Date.parse(value.to_s) rescue nil

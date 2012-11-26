@@ -4,13 +4,9 @@ module ActiveData
       module Integer
         extend ActiveSupport::Concern
 
-        def demodelize
-          to_s
-        end
-
         module ClassMethods
-          def modelize value
-            value.try(:to_i) if value.to_s =~ /\A\d+\Z/
+          def active_data_type_cast value
+            value.try(:to_i) if value.to_s =~ /\A\d+(?:\.\d*)?\Z/
           end
         end
       end
