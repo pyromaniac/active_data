@@ -10,7 +10,7 @@ module ActiveData
             when ::String then
               ::DateTime.parse value
             when ::Date, ::DateTime, ::Time then
-              value.to_date_time
+              value.to_datetime
             else
               nil
             end
