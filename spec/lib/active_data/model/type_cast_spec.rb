@@ -14,6 +14,7 @@ describe 'typecasting' do
       attribute :big_decimal, type: BigDecimal
       attribute :boolean, type: Boolean
       attribute :array, type: Array
+      attribute :date, type: Date
 
       def initialize name = nil
         @attributes = self.class.initialize_attributes
@@ -83,6 +84,13 @@ describe 'typecasting' do
     specify{subject.tap{|s| s.array = [1, 2, 3]}.array.should == [1, 2, 3]}
     specify{subject.tap{|s| s.array = 'hello, world'}.array.should == ['hello', 'world']}
     specify{subject.tap{|s| s.array = 10}.array.should == nil}
+  end
+
+  context 'date' do
+    let(:date) { Date.new(2013, 06, 13) }
+    specify{subject.tap{|s| s.date = nil}.date.should == nil}
+    specify{subject.tap{|s| s.date = '2013-06-13'}.date.should == date}
+    specify{subject.tap{|s| s.date = DateTime.new(2013, 06, 13, 23, 00)}.date.should == date}
   end
 
 end

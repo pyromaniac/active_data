@@ -7,7 +7,7 @@ module ActiveData
         module ClassMethods
           def active_data_type_cast value
             case value
-            when Hash then
+            when ::Hash then
               value
             else
               nil

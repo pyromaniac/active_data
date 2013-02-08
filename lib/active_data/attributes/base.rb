@@ -10,7 +10,7 @@ module ActiveData
       end
 
       def type
-        @type ||= options[:type] || String
+        @type ||= options[:type] || Object
       end
 
       def values
