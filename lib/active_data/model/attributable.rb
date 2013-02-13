@@ -51,8 +51,8 @@ module ActiveData
 
       def read_attribute name
         attribute = self.class._attributes[name]
-        source = @attributes[name].nil? ? attribute.default_value(self) : @attributes[name]
-        attribute.type_cast source
+        @attributes[name] = attribute.default_value(self) if @attributes[name].nil?
+        attribute.type_cast @attributes[name]
       end
       alias_method :[], :read_attribute
 
