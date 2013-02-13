@@ -34,4 +34,21 @@ describe ActiveData::Model::Attributable do
     specify { expect { subject.calc = 15 } .to change { subject.calc } .from(5).to(15) }
   end
 
+  context 'calculating default values' do
+    let(:klass) do
+      Class.new do
+        include ActiveData::Model::Attributable
+
+        attribute(:rand, type: Integer) { rand 1000000 }
+
+        def initialize
+          @attributes = self.class.initialize_attributes
+        end
+      end
+    end
+
+    subject { klass.new }
+    specify { subject.rand.should == subject.rand }
+  end
+
 end
