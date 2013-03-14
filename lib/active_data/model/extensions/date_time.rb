@@ -6,14 +6,7 @@ module ActiveData
 
         module ClassMethods
           def active_data_type_cast value
-            case value
-            when ::String then
-              ::DateTime.parse value
-            when ::Date, ::DateTime, ::Time then
-              value.to_datetime
-            else
-              nil
-            end
+            value.to_datetime rescue nil
           end
         end
       end

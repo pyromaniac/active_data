@@ -91,6 +91,7 @@ describe 'typecasting' do
     let(:date) { Date.new(2013, 6, 13) }
     specify{subject.tap{|s| s.date = nil}.date.should == nil}
     specify{subject.tap{|s| s.date = '2013-06-13'}.date.should == date}
+    specify{subject.tap{|s| s.date = '2013-55-55'}.date.should == nil}
     specify{subject.tap{|s| s.date = DateTime.new(2013, 6, 13, 23, 13)}.date.should == date}
   end
 
@@ -98,6 +99,7 @@ describe 'typecasting' do
     let(:datetime) { DateTime.new(2013, 6, 13, 23, 13) }
     specify{subject.tap{|s| s.datetime = nil}.datetime.should == nil}
     specify{subject.tap{|s| s.datetime = '2013-06-13 23:13'}.datetime.should == datetime}
+    specify{subject.tap{|s| s.datetime = '2013-55-55 55:55'}.datetime.should == nil}
     specify{subject.tap{|s| s.datetime = Date.new(2013, 6, 13)}.datetime.should == DateTime.new(2013, 6, 13, 0, 0)}
   end
 
