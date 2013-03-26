@@ -26,7 +26,9 @@ module ActiveData
         end
 
         def method_missing method, *args, &block
-          current_scope.send(method, *args, &block) if collection_class.superclass.method_defined?(method)
+          collection_class.superclass.method_defined?(method) ?
+            current_scope.send(method, *args, &block) :
+            super
         end
 
         def collection source = nil

@@ -12,10 +12,11 @@ describe ActiveData::Model do
     end
   end
 
-  specify{model.i18n_scope.should == :active_data}
-  specify{model.new.should_not be_persisted}
-  specify{model.instantiate({}).should be_an_instance_of model}
-  specify{model.instantiate({}).should be_persisted}
+  specify { expect { model.blablabla }.to raise_error NoMethodError }
+  specify { model.i18n_scope.should == :active_data }
+  specify { model.new.should_not be_persisted }
+  specify { model.instantiate({}).should be_an_instance_of model }
+  specify { model.instantiate({}).should be_persisted }
 
   context 'Fault tolerance' do
     specify{ expect { model.new(:foo => 'bar') }.not_to raise_error }
