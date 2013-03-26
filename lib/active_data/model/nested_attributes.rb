@@ -43,9 +43,15 @@ module ActiveData
 
         reflection = self.class.reflect_on_association association_name
 
-        send("#{association_name}=", attributes_collection.map do |attributes|
-          reflection.klass.new attributes
-        end)
+        send "#{association_name}=", attributes_collection
+      end
+
+      def assign_nested_attributes_for_one_to_one_association(association_name, attributes, assignment_opts = {})
+        unless attributes.is_a?(Hash)
+          raise ArgumentError, "Hash expected, got #{attributes.class.name} (#{attributes.inspect})"
+        end
+
+        send "#{association_name}=", attributes
       end
     end
   end
