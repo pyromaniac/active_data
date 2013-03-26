@@ -1,4 +1,6 @@
-require 'active_data/model/associations/many'
+require 'active_data/model/associations/association'
+require 'active_data/model/associations/embeds_many'
+require 'active_data/model/associations/embeds_one'
 
 module ActiveData
   module Model
@@ -8,6 +10,14 @@ module ActiveData
       included do
         class_attribute :_associations, :instance_reader => false, :instance_writer => false
         self._associations = ActiveSupport::HashWithIndifferentAccess.new
+
+        { embeds_many: EmbedsMany, embeds_one: EmbedsOne }.each do |(name, association_class)|
+          define_singleton_method name do |*args|
+            association = association_class.new *args
+            association.define_accessor self
+            self._associations = _associations.merge!(association.name => association)
+          end
+        end
       end
 
       module ClassMethods
@@ -23,26 +33,6 @@ module ActiveData
         def association_names
           _associations.keys
         end
-
-        def embeds_many name, options = {}
-          association = Many.new name, options
-          define_collection_reader association
-          define_collection_writer association
-          self._associations = _associations.merge!(association.name => association)
-        end
-
-        def define_collection_reader association
-          define_method association.name do
-            instance_variable_get("@#{association.name}") || association.klass.collection([])
-          end
-        end
-
-        def define_collection_writer association
-          define_method "#{association.name}=" do |value|
-            instance_variable_set "@#{association.name}", association.klass.collection(value)
-          end
-        end
-
       end
     end
   end

@@ -1,7 +1,7 @@
 module ActiveData
   module Model
     module Associations
-      class Many
+      class Association
         attr_reader :name, :klass, :options
 
         def initialize name, options = {}
@@ -14,10 +14,16 @@ module ActiveData
           klass.to_s
         end
 
-        def collection?
-          true
+        def define_accessor klass
+          define_reader klass
+          define_writer klass
         end
 
+        def define_reader klass
+        end
+
+        def define_writer klass
+        end
       end
     end
   end
