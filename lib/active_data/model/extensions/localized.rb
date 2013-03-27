@@ -8,7 +8,7 @@ module ActiveData
           def active_data_type_cast value
             case value
             when ::Hash then
-              value.stringify_keys!
+              value.stringify_keys
             else
               nil
             end

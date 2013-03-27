@@ -5,7 +5,7 @@ module ActiveData
 
       included do
         class_attribute :_attributes, :instance_reader => false, :instance_writer => false
-        self._attributes = ActiveSupport::HashWithIndifferentAccess.new
+        self._attributes = {}
 
         extend generated_class_attributes_methods
         include generated_instance_attributes_methods
@@ -42,7 +42,7 @@ module ActiveData
         end
 
         def initialize_attributes
-          _attributes.inject(ActiveSupport::HashWithIndifferentAccess.new) do |result, (name, value)|
+          _attributes.inject({}) do |result, (name, value)|
             result[name] = nil
             result
           end
@@ -50,6 +50,7 @@ module ActiveData
       end
 
       def read_attribute name
+        name = name.to_s
         attribute = self.class._attributes[name]
         @attributes[name] = attribute.default_value(self) if @attributes[name].nil?
         attribute.type_cast @attributes[name]
@@ -57,15 +58,15 @@ module ActiveData
       alias_method :[], :read_attribute
 
       def has_attribute? name
-        @attributes.key? name
+        @attributes.key? name.to_s
       end
 
       def read_attribute_before_type_cast name
-        @attributes[name]
+        @attributes[name.to_s]
       end
 
       def write_attribute name, value
-        @attributes[name] = value
+        @attributes[name.to_s] = value
       end
       alias_method :[]=, :write_attribute
 
@@ -102,14 +103,12 @@ module ActiveData
         (attributes.presence || {}).each do |(name, value)|
           send("#{name}=", value) if respond_to?("#{name}=")
         end
-        self.attributes
       end
 
       def reverse_assign_attributes attributes
         (attributes.presence || {}).each do |(name, value)|
           send("#{name}=", value) if respond_to?("#{name}=") && respond_to?(name) && send(name).blank?
         end
-        self.attributes
       end
 
     end

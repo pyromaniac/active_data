@@ -9,7 +9,7 @@ module ActiveData
 
       included do
         class_attribute :_associations, :instance_reader => false, :instance_writer => false
-        self._associations = ActiveSupport::HashWithIndifferentAccess.new
+        self._associations = {}
 
         { embeds_many: EmbedsMany, embeds_one: EmbedsOne }.each do |(name, association_class)|
           define_singleton_method name do |*args|
@@ -23,7 +23,7 @@ module ActiveData
       module ClassMethods
 
         def reflect_on_association name
-          _associations[name]
+          _associations[name.to_s]
         end
 
         def associations
