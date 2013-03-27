@@ -18,7 +18,6 @@ module ActiveData
 
     included do
       include ActiveModel::Conversion
-      include ActiveModel::Dirty
       include ActiveModel::Validations
       include ActiveModel::MassAssignmentSecurity
       include ActiveModel::Serialization
@@ -31,7 +30,6 @@ module ActiveData
       include Associations
       include NestedAttributes
       include Parameterizable
-      extend ActiveModel::Callbacks
       extend ActiveModel::Naming
       extend ActiveModel::Translation
 
