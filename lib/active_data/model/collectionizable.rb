@@ -17,8 +17,12 @@ module ActiveData
           end
           collection.collectible = self
 
-          remove_const :Collection if const_defined? :Collection
-          const_set :Collection, collection
+          if anonymous?
+            @collection_class = collection
+          else
+            remove_const :Collection if collection_class
+            const_set :Collection, collection
+          end
         end
 
         def respond_to? method
@@ -36,7 +40,11 @@ module ActiveData
         end
 
         def collection_class
-          @collection_class ||= const_get(:Collection)
+          @collection_class ||= collection_class_name.safe_constantize
+        end
+
+        def collection_class_name
+          "::#{name}::Collection"
         end
 
         def current_scope= value
