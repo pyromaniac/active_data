@@ -50,10 +50,16 @@ module ActiveData
       def instantiate data
         return data if data.instance_of? self
 
+        data = data.stringify_keys
         instance = allocate
 
         attributes = initialize_attributes
-        attributes.merge!(data.stringify_keys.slice(*attributes.keys))
+        attributes.merge!(data.slice(*attributes.keys))
+
+        data.slice(*association_names).each do |association, data|
+          instance.send(:"#{association}=", data)
+        end
+
         instance.instance_variable_set(:@attributes, attributes)
         instance.instance_variable_set(:@new_record, false)
 

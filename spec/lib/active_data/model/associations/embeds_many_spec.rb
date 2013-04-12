@@ -39,4 +39,10 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { instance.many_assocs[0].name.should == 'foo' }
     specify { instance.many_assocs[1].name.should == 'bar' }
   end
+
+  describe '#instantiate' do
+    subject(:instance) { klass.instantiate name: 'Root', many_assocs: [{ name: 'foo' }, { name: 'bar' }] }
+
+    its('many_assocs.count') { should == 2 }
+  end
 end
