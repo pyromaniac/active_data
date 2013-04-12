@@ -22,7 +22,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
 
   context do
     specify { instance.many_assocs.should be_empty }
-    specify { instance.many_assocs.should be_instance_of ManyAssoc::Collection }
+    specify { instance.many_assocs.should be_instance_of ManyAssoc.collection_class }
     specify { instance.many_assocs.count.should == 0 }
   end
 

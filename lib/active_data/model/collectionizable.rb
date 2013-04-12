@@ -6,26 +6,21 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
-        collectionize Array
+        collectionize
       end
 
       module ClassMethods
 
-        def collectionize collection_superclass = nil
-          collection = Class.new(collection_superclass) do
+        def collectionize collection_superclass = Array
+          collection_class = Class.new(collection_superclass) do
             include ActiveData::Model::Collectionizable::Proxy
           end
-          collection.collectible = self
+          collection_class.collectible = self
 
-          if anonymous?
-            @collection_class = collection
-          else
-            remove_const :Collection if collection_class
-            const_set :Collection, collection
-          end
+          @collection_class = collection_class
         end
 
-        def respond_to? method
+        def respond_to_missing? method, include_private
           super || collection_class.superclass.method_defined?(method)
         end
 
@@ -40,11 +35,7 @@ module ActiveData
         end
 
         def collection_class
-          @collection_class ||= collection_class_name.safe_constantize
-        end
-
-        def collection_class_name
-          "::#{name}::Collection"
+          @collection_class
         end
 
         def current_scope= value

@@ -27,7 +27,7 @@ describe ActiveData::Model::Collectionizable do
   specify { klass.collection_class.should_not be_nil }
   specify { klass.collection_class.collectible.should == klass }
   specify { klass.collection_class.new.should be_empty }
-  specify { CollectionizableTest.collection_class.should == CollectionizableTest::Collection }
+  specify { CollectionizableTest.collection_class.should < Array }
 
   specify { collection.should be_instance_of klass.collection_class }
   specify { collection.except_first.should be_instance_of klass.collection_class }
