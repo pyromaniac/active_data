@@ -42,10 +42,7 @@ module ActiveData
         end
 
         def initialize_attributes
-          _attributes.inject({}) do |result, (name, value)|
-            result[name] = nil
-            result
-          end
+          Hash[_attributes.map { |(name, _)| [name, nil] }]
         end
       end
 

@@ -51,10 +51,8 @@ module ActiveData
         return attributes if attributes.instance_of? self
 
         instance = allocate
-
-        instance.instance_variable_set(:@attributes, initialize_attributes)
+        instance.instance_variable_set(:@attributes, initialize_attributes.merge(attributes.stringify_keys))
         instance.instance_variable_set(:@new_record, false)
-        instance.attributes = attributes
 
         instance
       end
