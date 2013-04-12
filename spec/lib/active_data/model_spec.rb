@@ -19,6 +19,12 @@ describe ActiveData::Model do
   specify { model.instantiate({}).should be_persisted }
 
   context 'Fault tolerance' do
-    specify{ expect { model.new(:foo => 'bar') }.not_to raise_error }
+    specify{ expect { model.new(foo: 'bar') }.not_to raise_error }
+  end
+
+  describe '#instantiate' do
+    subject(:instance) { model.instantiate(name: 'Hello', foo: 'Bar') }
+
+    specify { subject.instance_variable_get(:@attributes).should == { 'name' => 'Hello', 'count' => nil } }
   end
 end

@@ -47,11 +47,14 @@ module ActiveData
     end
 
     module ClassMethods
-      def instantiate attributes
-        return attributes if attributes.instance_of? self
+      def instantiate data
+        return data if data.instance_of? self
 
         instance = allocate
-        instance.instance_variable_set(:@attributes, initialize_attributes.merge(attributes.stringify_keys))
+
+        attributes = initialize_attributes
+        attributes.merge!(data.stringify_keys.slice(*attributes.keys))
+        instance.instance_variable_set(:@attributes, attributes)
         instance.instance_variable_set(:@new_record, false)
 
         instance
