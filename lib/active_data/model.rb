@@ -48,7 +48,7 @@ module ActiveData
 
     module ClassMethods
       def instantiate data
-        return data if data.instance_of? self
+        return data if data.class.include? ActiveData::Model
 
         data = data.stringify_keys
         instance = allocate
