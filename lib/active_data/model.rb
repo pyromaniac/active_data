@@ -75,6 +75,10 @@ module ActiveData
       !@new_record
     end
 
+    def inspect
+      "#<#{self.class} #{attributes.map { |name, value| "#{name}: #{value.inspect}" }.join(' ')}>"
+    end
+
     def == other
       other.instance_of?(self.class) && other.attributes == attributes
     end
