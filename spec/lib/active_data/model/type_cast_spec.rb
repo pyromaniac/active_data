@@ -16,6 +16,7 @@ describe 'typecasting' do
       attribute :array, type: Array
       attribute :date, type: Date
       attribute :datetime, type: DateTime
+      attribute :time, type: Time
 
       def initialize name = nil
         @attributes = self.class.initialize_attributes
@@ -92,7 +93,10 @@ describe 'typecasting' do
     specify{subject.tap{|s| s.date = nil}.date.should == nil}
     specify{subject.tap{|s| s.date = '2013-06-13'}.date.should == date}
     specify{subject.tap{|s| s.date = '2013-55-55'}.date.should == nil}
+    specify{subject.tap{|s| s.date = '1371165180'}.date.should == date}
+    specify{subject.tap{|s| s.date = 1371165180}.date.should == date}
     specify{subject.tap{|s| s.date = DateTime.new(2013, 6, 13, 23, 13)}.date.should == date}
+    specify{subject.tap{|s| s.date = Time.new(2013, 6, 13, 23, 13)}.date.should == date}
   end
 
   context 'datetime' do
@@ -100,7 +104,21 @@ describe 'typecasting' do
     specify{subject.tap{|s| s.datetime = nil}.datetime.should == nil}
     specify{subject.tap{|s| s.datetime = '2013-06-13 23:13'}.datetime.should == datetime}
     specify{subject.tap{|s| s.datetime = '2013-55-55 55:55'}.datetime.should == nil}
+    specify{subject.tap{|s| s.datetime = '1371165180'}.datetime.should == datetime}
+    specify{subject.tap{|s| s.datetime = 1371165180}.datetime.should == datetime}
     specify{subject.tap{|s| s.datetime = Date.new(2013, 6, 13)}.datetime.should == DateTime.new(2013, 6, 13, 0, 0)}
+    specify{subject.tap{|s| s.datetime = Time.utc_time(2013, 6, 13, 23, 13).utc}.datetime.should == DateTime.new(2013, 6, 13, 23, 13)}
+  end
+
+  context 'time' do
+    let(:time) { Time.utc_time(2013, 6, 13, 23, 13) }
+    specify{subject.tap{|s| s.time = nil}.time.should == nil}
+    specify{subject.tap{|s| s.time = '2013-06-13 23:13'}.time.should == time}
+    specify{subject.tap{|s| s.time = '2013-55-55 55:55'}.time.should == nil}
+    specify{subject.tap{|s| s.time = '1371165180'}.time.should == time}
+    specify{subject.tap{|s| s.time = 1371165180}.time.should == time}
+    specify{subject.tap{|s| s.time = Date.new(2013, 6, 13)}.time.should == Time.new(2013, 6, 13, 0, 0)}
+    specify{subject.tap{|s| s.time = DateTime.new(2013, 6, 13, 23, 13)}.time.should == time}
   end
 
 end
