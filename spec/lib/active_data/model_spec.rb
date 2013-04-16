@@ -11,22 +11,6 @@ describe ActiveData::Model do
     end
   end
 
-  let(:model2) do
-    Class.new(model) do
-      attribute :additional
-    end
-  end
-
-  let(:model3) do
-    ancestor = Class.new do
-      include ActiveData::Model
-    end
-
-    Class.new(ancestor) do
-      attribute :name, type: String
-    end
-  end
-
   specify { expect { model.blablabla }.to raise_error NoMethodError }
   specify { model.i18n_scope.should == :active_data }
   specify { model.new.should_not be_persisted }
@@ -35,20 +19,6 @@ describe ActiveData::Model do
 
   context 'Fault tolerance' do
     specify{ expect { model.new(foo: 'bar') }.not_to raise_error }
-  end
-
-  describe '#initialize' do
-    context do
-      subject(:instance) { model2.new(name: 'Hello', foo: 'Bar', additional: 'Baz') }
-
-      specify { subject.attributes.should == { 'name' => 'Hello', 'count' => 0, 'additional' => 'Baz' } }
-    end
-
-    context do
-      subject(:instance) { model3.new(name: 'Hello') }
-
-      specify { subject.attributes.should == { 'name' => 'Hello' } }
-    end
   end
 
   describe '#instantiate' do

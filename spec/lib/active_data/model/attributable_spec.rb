@@ -51,4 +51,36 @@ describe ActiveData::Model::Attributable do
     specify { subject.rand.should == subject.rand }
   end
 
+  context 'inheritance' do
+    let!(:ancestor) do
+      Class.new do
+        include ActiveData::Model::Attributable
+        attribute :foo
+      end
+    end
+
+    let!(:descendant1) do
+      Class.new ancestor do
+        attribute :bar
+      end
+    end
+
+    let!(:descendant2) do
+      Class.new ancestor do
+        attribute :baz
+        attribute :moo
+      end
+    end
+
+    specify { ancestor._attributes.keys.should == ['foo'] }
+    specify { ancestor.instance_methods.should include :foo, :foo= }
+    specify { ancestor.instance_methods.should_not include :bar, :bar=, :baz, :baz= }
+    specify { descendant1._attributes.keys.should == ['foo', 'bar'] }
+    specify { descendant1.instance_methods.should include :foo, :foo=, :bar, :bar= }
+    specify { descendant1.instance_methods.should_not include :baz, :baz= }
+    specify { descendant2._attributes.keys.should == ['foo', 'baz', 'moo'] }
+    specify { descendant2.instance_methods.should include :foo, :foo=, :baz, :baz=, :moo, :moo= }
+    specify { descendant2.instance_methods.should_not include :bar, :bar= }
+  end
+
 end

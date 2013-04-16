@@ -7,9 +7,6 @@ module ActiveData
         class_attribute :_attributes, :instance_reader => false, :instance_writer => false
         self._attributes = {}
 
-        extend generated_class_attributes_methods
-        include generated_instance_attributes_methods
-
         delegate :attribute_default, :to => 'self.class'
       end
 
@@ -28,17 +25,20 @@ module ActiveData
           attribute = build_attribute(name, options, &block)
           self._attributes = _attributes.merge(attribute.name => attribute)
 
+          extend generated_class_attributes_methods
+          include generated_instance_attributes_methods
+
           attribute.generate_instance_methods generated_instance_attributes_methods
           attribute.generate_singleton_methods generated_class_attributes_methods
           attribute
         end
 
         def generated_class_attributes_methods
-          @@generated_class_attributes_methods ||= Module.new
+          @generated_class_attributes_methods ||= Module.new
         end
 
         def generated_instance_attributes_methods
-          @@generated_instance_attributes_methods ||= Module.new
+          @generated_instance_attributes_methods ||= Module.new
         end
 
         def initialize_attributes
