@@ -34,11 +34,11 @@ module ActiveData
         end
 
         def generated_class_attributes_methods
-          @generated_class_attributes_methods ||= Module.new
+          @@generated_class_attributes_methods ||= Module.new
         end
 
         def generated_instance_attributes_methods
-          @generated_instance_attributes_methods ||= Module.new
+          @@generated_instance_attributes_methods ||= Module.new
         end
 
         def initialize_attributes

@@ -2,13 +2,28 @@
 require 'spec_helper'
 
 describe ActiveData::Model do
-
   let(:model) do
     Class.new do
       include ActiveData::Model
 
       attribute :name
       attribute :count, default: 0
+    end
+  end
+
+  let(:model2) do
+    Class.new(model) do
+      attribute :additional
+    end
+  end
+
+  let(:model3) do
+    ancestor = Class.new do
+      include ActiveData::Model
+    end
+
+    Class.new(ancestor) do
+      attribute :name, type: String
     end
   end
 
@@ -22,9 +37,25 @@ describe ActiveData::Model do
     specify{ expect { model.new(foo: 'bar') }.not_to raise_error }
   end
 
-  describe '#instantiate' do
-    subject(:instance) { model.instantiate(name: 'Hello', foo: 'Bar') }
+  describe '#initialize' do
+    context do
+      subject(:instance) { model2.new(name: 'Hello', foo: 'Bar', additional: 'Baz') }
 
-    specify { subject.instance_variable_get(:@attributes).should == { 'name' => 'Hello', 'count' => nil } }
+      specify { subject.attributes.should == { 'name' => 'Hello', 'count' => 0, 'additional' => 'Baz' } }
+    end
+
+    context do
+      subject(:instance) { model3.new(name: 'Hello') }
+
+      specify { subject.attributes.should == { 'name' => 'Hello' } }
+    end
+  end
+
+  describe '#instantiate' do
+    context do
+      subject(:instance) { model.instantiate(name: 'Hello', foo: 'Bar') }
+
+      specify { subject.instance_variable_get(:@attributes).should == { 'name' => 'Hello', 'count' => nil } }
+    end
   end
 end
