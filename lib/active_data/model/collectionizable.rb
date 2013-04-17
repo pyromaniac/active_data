@@ -6,18 +6,14 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
+        class_attribute :_collection_superclass
         collectionize
       end
 
       module ClassMethods
 
         def collectionize collection_superclass = Array
-          collection_class = Class.new(collection_superclass) do
-            include ActiveData::Model::Collectionizable::Proxy
-          end
-          collection_class.collectible = self
-
-          @collection_class = collection_class
+          self._collection_superclass = collection_superclass
         end
 
         def respond_to_missing? method, include_private
@@ -35,7 +31,11 @@ module ActiveData
         end
 
         def collection_class
-          @collection_class
+          @collection_class ||= begin
+            Class.new(_collection_superclass) do
+              include ActiveData::Model::Collectionizable::Proxy
+            end.tap { |klass| klass.collectible = self }
+          end
         end
 
         def current_scope= value

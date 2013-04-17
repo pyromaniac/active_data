@@ -36,4 +36,25 @@ describe ActiveData::Model::Collectionizable do
   specify { collection.no_mars.should == klass.collection([{ name: 'Hello' }, { name: 'World' }]) }
   specify { collection.except_first.no_mars.should == klass.collection([{ name: 'World' }]) }
   specify { collection.no_mars.except_first.should == klass.collection([{ name: 'World' }]) }
+
+  context do
+    let!(:ancestor) do
+      Class.new do
+        include ActiveData::Model
+      end
+    end
+
+    let!(:descendant1) do
+      Class.new ancestor
+    end
+
+    let!(:descendant2) do
+      Class.new ancestor
+    end
+
+    specify { descendant1.collection_class.should < Array }
+    specify { descendant2.collection_class.should < Array }
+    specify { ancestor.collection_class.should_not == descendant1.collection_class }
+    specify { descendant1.collection_class.should_not == descendant2.collection_class }
+  end
 end
