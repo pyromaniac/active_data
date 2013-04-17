@@ -35,4 +35,9 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { instance.one_assoc.should be_instance_of OneAssoc }
     specify { instance.one_assoc.name.should == 'foo' }
   end
+
+  context 'accessor with nothing' do
+    before { instance.one_assoc = nil }
+    specify { instance.one_assoc.should be_nil }
+  end
 end

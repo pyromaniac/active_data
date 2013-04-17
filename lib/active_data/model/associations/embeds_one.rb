@@ -19,7 +19,7 @@ module ActiveData
           target.class_eval <<-EOS
             def #{name}= value
               association = self.class.reflect_on_association('#{name}')
-              @#{name} = association.klass.instantiate(value)
+              @#{name} = association.klass.instantiate(value) if value
             end
           EOS
         end
