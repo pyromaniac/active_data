@@ -8,7 +8,6 @@ describe ActiveData::Validations do
       end
 
       include ActiveData::Model
-      include ActiveModel::Validations
       include ActiveData::Validations
 
       attribute :name
@@ -25,7 +24,6 @@ describe ActiveData::Validations do
 
   class ValidatedAssoc
     include ActiveData::Model
-    include ActiveModel::Validations
 
     attribute :name
 
