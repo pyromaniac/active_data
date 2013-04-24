@@ -114,4 +114,18 @@ describe ActiveData::Model::Attributable do
     specify { descendant2.instance_methods.should_not include :bar, :bar= }
   end
 
+  context '#write_attributes' do
+    subject { klass.new('world') }
+
+    context do
+      before { subject.write_attributes('hello' => 'blabla', 'count' => 20) }
+      specify { subject.attributes.should == { 'hello' => 'blabla', 'count' => 20, 'calc' => 5, 'enum' => nil } }
+    end
+
+    context do
+      before { subject.write_attributes(hello: 'blabla', count: 20, 'some_other' => 'foo') }
+      specify { subject.attributes.should == { 'hello' => nil, 'count' => 10, 'calc' => 5, 'enum' => nil } }
+    end
+  end
+
 end

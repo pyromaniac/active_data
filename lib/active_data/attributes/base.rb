@@ -26,7 +26,7 @@ module ActiveData
       end
 
       def type_cast value
-        type.active_data_type_cast value
+        value.instance_of?(type) ? value : type.active_data_type_cast(value)
       end
 
       def generate_instance_methods context

@@ -93,6 +93,10 @@ module ActiveData
         reverse_assign_attributes(attributes)
       end
 
+      def write_attributes attributes
+        @attributes.merge! attributes.slice(*attribute_names)
+      end
+
     private
 
       def _read_attribute name
