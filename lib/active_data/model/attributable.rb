@@ -48,9 +48,11 @@ module ActiveData
 
       def read_attribute name
         name = name.to_s
-        attribute = self.class._attributes[name]
-        @attributes[name] = attribute.default_value(self) if @attributes[name].nil?
-        attribute.type_cast @attributes[name]
+        cache_attribute name do
+          attribute = self.class._attributes[name]
+          @attributes[name] = attribute.default_value(self) if @attributes[name].nil?
+          attribute.type_cast @attributes[name]
+        end
       end
       alias_method :[], :read_attribute
 
@@ -63,7 +65,9 @@ module ActiveData
       end
 
       def write_attribute name, value
-        @attributes[name.to_s] = value
+        name = name.to_s
+        attribute_cache_clear name
+        @attributes[name] = value
       end
       alias_method :[]=, :write_attribute
 
@@ -95,6 +99,22 @@ module ActiveData
       end
 
     private
+
+      def cache_attribute name, &block
+        if attributes_cache.key? name
+          attributes_cache[name]
+        else
+          attributes_cache[name] = block.call
+        end
+      end
+
+      def attributes_cache
+        @attributes_cache ||= {}
+      end
+
+      def attribute_cache_clear name
+        attributes_cache.delete name
+      end
 
       def assign_attributes attributes
         (attributes.presence || {}).each do |(name, value)|
