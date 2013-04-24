@@ -47,10 +47,7 @@ module ActiveData
       end
 
       def read_attribute name
-        name = name.to_s
-        cache_attribute name do
-          _read_attribute name
-        end
+        _cached_attribute name.to_s
       end
       alias_method :[], :read_attribute
 
@@ -104,25 +101,22 @@ module ActiveData
         attribute.type_cast @attributes[name]
       end
 
-      def cache_attribute name, &block
-        if attributes_cache.key? name
-          attributes_cache[name]
+      def _cached_attribute name, &block
+        @attributes_cache ||= {}
+        if @attributes_cache.key? name
+          @attributes_cache[name]
         else
-          attributes_cache[name] = block.call
+          @attributes_cache[name] = _read_attribute name
         end
       end
 
-      def attributes_cache
-        @attributes_cache ||= {}
-      end
-
       def attribute_cache_clear name
-        attributes_cache.delete name
+        (@attributes_cache ||= {}).delete name
       end
 
       def assign_attributes attributes
         (attributes.presence || {}).each do |(name, value)|
-          send("#{name}=", value) if respond_to?("#{name}=")
+          send("#{name}=", value) if has_attribute?(name) || respond_to?("#{name}=")
         end
       end
 
