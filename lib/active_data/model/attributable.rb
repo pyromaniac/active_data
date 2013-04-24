@@ -94,7 +94,7 @@ module ActiveData
       end
 
       def write_attributes attributes
-        @attributes.merge! attributes.slice(*attribute_names)
+        attributes.each { |(name, value)| send("#{name}=", value) }
       end
 
     private

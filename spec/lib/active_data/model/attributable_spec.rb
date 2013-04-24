@@ -117,14 +117,11 @@ describe ActiveData::Model::Attributable do
   context '#write_attributes' do
     subject { klass.new('world') }
 
-    context do
-      before { subject.write_attributes('hello' => 'blabla', 'count' => 20) }
-      specify { subject.attributes.should == { 'hello' => 'blabla', 'count' => 20, 'calc' => 5, 'enum' => nil } }
-    end
+    specify { expect { subject.write_attributes(strange: 'value') }.to raise_error NoMethodError }
 
     context do
-      before { subject.write_attributes(hello: 'blabla', count: 20, 'some_other' => 'foo') }
-      specify { subject.attributes.should == { 'hello' => nil, 'count' => 10, 'calc' => 5, 'enum' => nil } }
+      before { subject.write_attributes('hello' => 'blabla', count: 20) }
+      specify { subject.attributes.should == { 'hello' => 'blabla', 'count' => 20, 'calc' => 5, 'enum' => nil } }
     end
   end
 
