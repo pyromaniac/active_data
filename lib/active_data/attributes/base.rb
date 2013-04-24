@@ -18,11 +18,11 @@ module ActiveData
       end
 
       def default
-        @default ||= options[:default].respond_to?(:call) ? options[:default] : proc { options[:default] }
+        @options[:default]
       end
 
       def default_value instance
-        default.call instance
+        default.respond_to?(:call) ? default.call(instance) : default
       end
 
       def type_cast value

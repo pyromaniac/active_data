@@ -51,6 +51,37 @@ describe ActiveData::Model::Attributable do
     specify { subject.rand.should == subject.rand }
   end
 
+  context 'attribute caching' do
+    subject { klass.new('world') }
+
+    context do
+      before do
+        subject.should_receive(:_read_attribute).with('hello').once
+      end
+
+      specify { subject.hello }
+    end
+
+    context do
+      before do
+        subject.hello
+        subject.should_not_receive(:_read_attribute)
+      end
+
+      specify { subject.hello }
+    end
+
+    context 'attribute cache reset' do
+      before do
+        subject.hello = 'blabla'
+        subject.hello
+        subject.hello = 'newnewnew'
+      end
+
+      specify { subject.hello.should == 'newnewnew' }
+    end
+  end
+
   context 'inheritance' do
     let!(:ancestor) do
       Class.new do
