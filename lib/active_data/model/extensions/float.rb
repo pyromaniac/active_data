@@ -6,7 +6,7 @@ module ActiveData
 
         module ClassMethods
           def active_data_type_cast value
-            value.try(:to_f) if value.to_s =~ /\A\d+(?:\.\d*)?\Z/
+            Float(value) rescue nil if value
           end
         end
       end

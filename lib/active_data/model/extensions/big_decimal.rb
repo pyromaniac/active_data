@@ -6,7 +6,7 @@
 
         module ClassMethods
           def active_data_type_cast value
-            ::BigDecimal.new value.to_s if value.to_s =~ /\A\d+(?:\.\d*)?\Z/
+            ::BigDecimal.new Float(value).to_s rescue nil if value
           end
         end
       end

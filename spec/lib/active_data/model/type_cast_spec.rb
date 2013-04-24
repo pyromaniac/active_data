@@ -48,7 +48,7 @@ describe 'typecasting' do
     specify{subject.tap{|s| s.float = 'hello'}.float.should == nil}
     specify{subject.tap{|s| s.float = '123hello'}.float.should == nil}
     specify{subject.tap{|s| s.float = '123'}.float.should == 123.0}
-    specify{subject.tap{|s| s.float = '123.'}.float.should == 123.0}
+    specify{subject.tap{|s| s.float = '123.'}.float.should == nil}
     specify{subject.tap{|s| s.float = '123.5'}.float.should == 123.5}
     specify{subject.tap{|s| s.float = 123}.float.should == 123.0}
     specify{subject.tap{|s| s.float = 123.5}.float.should == 123.5}
@@ -60,7 +60,7 @@ describe 'typecasting' do
     specify{subject.tap{|s| s.big_decimal = 'hello'}.big_decimal.should == nil}
     specify{subject.tap{|s| s.big_decimal = '123hello'}.big_decimal.should == nil}
     specify{subject.tap{|s| s.big_decimal = '123'}.big_decimal.should == BigDecimal.new('123.0')}
-    specify{subject.tap{|s| s.big_decimal = '123.'}.big_decimal.should == BigDecimal.new('123.0')}
+    specify{subject.tap{|s| s.big_decimal = '123.'}.big_decimal.should == nil}
     specify{subject.tap{|s| s.big_decimal = '123.5'}.big_decimal.should == BigDecimal.new('123.5')}
     specify{subject.tap{|s| s.big_decimal = 123}.big_decimal.should == BigDecimal.new('123.0')}
     specify{subject.tap{|s| s.big_decimal = 123.5}.big_decimal.should == BigDecimal.new('123.5')}
