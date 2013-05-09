@@ -11,6 +11,15 @@ module ActiveData
       end
 
       module ClassMethods
+        def attribute name, options = {}, &block
+          attribute = build_attribute(name, options, &block)
+          self._attributes = _attributes.merge(attribute.name => attribute)
+
+          attribute.generate_instance_methods generated_instance_attributes_methods
+          attribute.generate_class_methods generated_class_attributes_methods
+          attribute
+        end
+
         def build_attribute name, options = {}, &block
           klass = case options[:type].to_s
           when 'Localized'
@@ -21,24 +30,12 @@ module ActiveData
           klass.new name, options, &block
         end
 
-        def attribute name, options = {}, &block
-          attribute = build_attribute(name, options, &block)
-          self._attributes = _attributes.merge(attribute.name => attribute)
-
-          extend generated_class_attributes_methods
-          include generated_instance_attributes_methods
-
-          attribute.generate_instance_methods generated_instance_attributes_methods
-          attribute.generate_singleton_methods generated_class_attributes_methods
-          attribute
-        end
-
         def generated_class_attributes_methods
-          @generated_class_attributes_methods ||= Module.new
+          @generated_class_attributes_methods ||= Module.new.tap { |proxy| extend proxy }
         end
 
         def generated_instance_attributes_methods
-          @generated_instance_attributes_methods ||= Module.new
+          @generated_instance_attributes_methods ||= Module.new.tap { |proxy| include proxy }
         end
 
         def initialize_attributes
@@ -47,21 +44,26 @@ module ActiveData
       end
 
       def read_attribute name
-        _cached_attribute name.to_s
+        name = name.to_sym
+        if attributes_cache.key? name
+          attributes_cache[name]
+        else
+          attributes_cache[name] = _read_attribute name
+        end
       end
       alias_method :[], :read_attribute
 
       def has_attribute? name
-        @attributes.key? name.to_s
+        @attributes.key? name.to_sym
       end
 
       def read_attribute_before_type_cast name
-        @attributes[name.to_s]
+        @attributes[name.to_sym]
       end
 
       def write_attribute name, value
-        name = name.to_s
-        attribute_cache_clear name
+        name = name.to_sym
+        attributes_cache.delete name
         @attributes[name] = value
       end
       alias_method :[]=, :write_attribute
@@ -84,17 +86,14 @@ module ActiveData
       def attributes= attributes
         assign_attributes(attributes)
       end
+      alias_method :update_attributes, :attributes=
 
-      def update_attributes attributes
-        self.attributes = attributes
+      def write_attributes attributes
+        attributes.each { |(name, value)| send("#{name}=", value) }
       end
 
       def reverse_update_attributes attributes
         reverse_assign_attributes(attributes)
-      end
-
-      def write_attributes attributes
-        attributes.each { |(name, value)| send("#{name}=", value) }
       end
 
     private
@@ -105,17 +104,8 @@ module ActiveData
         attribute.type_cast @attributes[name]
       end
 
-      def _cached_attribute name, &block
+      def attributes_cache
         @attributes_cache ||= {}
-        if @attributes_cache.key? name
-          @attributes_cache[name]
-        else
-          @attributes_cache[name] = _read_attribute name
-        end
-      end
-
-      def attribute_cache_clear name
-        (@attributes_cache ||= {}).delete name
       end
 
       def assign_attributes attributes

@@ -19,10 +19,8 @@ module ActiveData
     included do
       include ActiveModel::Conversion
       include ActiveModel::Validations
-      include ActiveModel::MassAssignmentSecurity
       include ActiveModel::Serialization
       include ActiveModel::Serializers::JSON
-      include ActiveModel::Serializers::Xml
 
       include Attributable
       include Localizable
@@ -44,19 +42,23 @@ module ActiveData
       def self.i18n_scope
         :active_data
       end
+
+      def serializable_hash *args
+        super(*args).stringify_keys!
+      end
     end
 
     module ClassMethods
       def instantiate data
         return data if data.class.include? ActiveData::Model
 
-        data = data.stringify_keys
+        data = data.symbolize_keys
         instance = allocate
 
         attributes = initialize_attributes
         attributes.merge!(data.slice(*attributes.keys))
 
-        data.slice(*association_names).each do |association, data|
+        data.slice(*association_names.map(&:to_sym)).each do |association, data|
           instance.send(:"#{association}=", data)
         end
 
@@ -75,17 +77,12 @@ module ActiveData
       !@new_record
     end
 
-    def inspect
-      "#<#{self.class} #{attributes.map { |name, value| "#{name}: #{value.inspect}" }.join(' ')}>"
-    end
-
     def == other
       other.instance_of?(self.class) && other.attributes == attributes
     end
 
-    def assign_attributes(attributes, options = {})
-      super(sanitize_for_mass_assignment((attributes.presence || {}), options[:as]))
+    def inspect
+      "#<#{self.class} #{attributes.map { |name, value| "#{name}: #{value.inspect}" }.join(' ')}>"
     end
-
   end
 end

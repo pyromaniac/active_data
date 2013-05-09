@@ -7,10 +7,10 @@ module ActiveData
         module ClassMethods
           def active_data_type_cast value
             case value
-            when ::String then
-              value.split(',').map(&:strip)
             when ::Array then
               value
+            when ::String then
+              value.split(',').map(&:strip)
             else
               nil
             end

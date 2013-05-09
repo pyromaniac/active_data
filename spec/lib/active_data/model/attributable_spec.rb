@@ -23,8 +23,8 @@ describe ActiveData::Model::Attributable do
   context do
     subject { klass.new('world') }
     specify { klass.enum_values == [1, 2, 3] }
-    its(:attributes) { should ==  { "hello"=>nil, "count"=>10, "calc"=>5, "enum" => nil }  }
-    its(:present_attributes) { should ==  { "count"=>10, "calc"=>5 }  }
+    its(:attributes) { should ==  { hello: nil, count: 10, calc: 5, enum: nil }  }
+    its(:present_attributes) { should ==  { count: 10, calc: 5 }  }
     its(:name) { should == 'world' }
     its(:hello) { should be_nil }
     its(:count) { should == 10 }
@@ -56,7 +56,7 @@ describe ActiveData::Model::Attributable do
 
     context do
       before do
-        subject.should_receive(:_read_attribute).with('hello').once
+        subject.should_receive(:_read_attribute).with(:hello).once
       end
 
       specify { subject.hello }
@@ -103,13 +103,13 @@ describe ActiveData::Model::Attributable do
       end
     end
 
-    specify { ancestor._attributes.keys.should == ['foo'] }
+    specify { ancestor._attributes.keys.should == [:foo] }
     specify { ancestor.instance_methods.should include :foo, :foo= }
     specify { ancestor.instance_methods.should_not include :bar, :bar=, :baz, :baz= }
-    specify { descendant1._attributes.keys.should == ['foo', 'bar'] }
+    specify { descendant1._attributes.keys.should == [:foo, :bar] }
     specify { descendant1.instance_methods.should include :foo, :foo=, :bar, :bar= }
     specify { descendant1.instance_methods.should_not include :baz, :baz= }
-    specify { descendant2._attributes.keys.should == ['foo', 'baz', 'moo'] }
+    specify { descendant2._attributes.keys.should == [:foo, :baz, :moo] }
     specify { descendant2.instance_methods.should include :foo, :foo=, :baz, :baz=, :moo, :moo= }
     specify { descendant2.instance_methods.should_not include :bar, :bar= }
   end
@@ -121,7 +121,7 @@ describe ActiveData::Model::Attributable do
 
     context do
       before { subject.write_attributes('hello' => 'blabla', count: 20) }
-      specify { subject.attributes.should == { 'hello' => 'blabla', 'count' => 20, 'calc' => 5, 'enum' => nil } }
+      specify { subject.attributes.should == { hello: 'blabla', count: 20, calc: 5, enum: nil } }
     end
   end
 

@@ -25,7 +25,7 @@ describe ActiveData::Model do
     context do
       subject(:instance) { model.instantiate(name: 'Hello', foo: 'Bar') }
 
-      specify { subject.instance_variable_get(:@attributes).should == { 'name' => 'Hello', 'count' => nil } }
+      specify { subject.instance_variable_get(:@attributes).should == { name: 'Hello', count: nil } }
     end
   end
 end
