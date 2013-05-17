@@ -48,7 +48,11 @@ module ActiveData
         if attributes_cache.key? name
           attributes_cache[name]
         else
-          attributes_cache[name] = _read_attribute name
+          attribute = self.class._attributes[name]
+          value = attribute.type_cast @attributes[name]
+          use_default = attribute.default_blank? && value.blank? || value.nil?
+
+          attributes_cache[name] = use_default ? attribute.default_value(self) : value
         end
       end
       alias_method :[], :read_attribute
@@ -97,14 +101,6 @@ module ActiveData
       end
 
     private
-
-      def _read_attribute name
-        attribute = self.class._attributes[name]
-        if attribute.default_blank? && @attributes[name].blank? || @attributes[name].nil?
-          @attributes[name] = attribute.default_value(self)
-        end
-        attribute.type_cast @attributes[name]
-      end
 
       def attributes_cache
         @attributes_cache ||= {}

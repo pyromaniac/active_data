@@ -80,7 +80,7 @@ describe ActiveData::Model::Attributable do
 
     context do
       before do
-        subject.should_receive(:_read_attribute).with(:hello).once
+        subject.send(:attributes_cache).should_not_receive(:[])
       end
 
       specify { subject.hello }
@@ -89,7 +89,7 @@ describe ActiveData::Model::Attributable do
     context do
       before do
         subject.hello
-        subject.should_not_receive(:_read_attribute)
+        subject.send(:attributes_cache).should_receive(:[]).with(:hello).once
       end
 
       specify { subject.hello }
