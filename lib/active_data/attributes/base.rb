@@ -21,6 +21,10 @@ module ActiveData
         @default ||= @options[:default]
       end
 
+      def default_blank?
+        @default_blank ||= !!@options[:default_blank]
+      end
+
       def type_caster
         @type_caster ||= @options[:typecast] || @options[:type_cast]
       end

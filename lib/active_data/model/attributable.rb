@@ -100,7 +100,9 @@ module ActiveData
 
       def _read_attribute name
         attribute = self.class._attributes[name]
-        @attributes[name] = attribute.default_value(self) if @attributes[name].nil?
+        if attribute.default_blank? && @attributes[name].blank? || @attributes[name].nil?
+          @attributes[name] = attribute.default_value(self)
+        end
         attribute.type_cast @attributes[name]
       end
 

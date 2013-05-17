@@ -9,6 +9,7 @@ describe ActiveData::Model::Attributable do
       attr_reader :name
 
       attribute :hello
+      attribute :string, type: String, default_blank: true, default: ->(record){ record.name }
       attribute :count, type: Integer, default: 10
       attribute(:calc, type: Integer) { 2 + 3 }
       attribute :enum, type: Integer, in: [1, 2, 3]
@@ -23,8 +24,8 @@ describe ActiveData::Model::Attributable do
   context do
     subject { klass.new('world') }
     specify { klass.enum_values == [1, 2, 3] }
-    its(:attributes) { should ==  { hello: nil, count: 10, calc: 5, enum: nil }  }
-    its(:present_attributes) { should ==  { count: 10, calc: 5 }  }
+    its(:attributes) { should ==  { hello: nil, count: 10, calc: 5, enum: nil, string: 'world' }  }
+    its(:present_attributes) { should ==  { count: 10, calc: 5, string: 'world' }  }
     its(:name) { should == 'world' }
     its(:hello) { should be_nil }
     its(:count) { should == 10 }
@@ -49,6 +50,29 @@ describe ActiveData::Model::Attributable do
 
     subject { klass.new }
     specify { subject.rand.should == subject.rand }
+  end
+
+  context 'default_blank' do
+    let(:klass) do
+      Class.new do
+        include ActiveData::Model::Attributable
+
+        attribute :string1, type: String, default_blank: true, default: 'default'
+        attribute :string2, type: String, default: 'default'
+
+        def initialize attributes = {}
+          @attributes = self.class.initialize_attributes
+          self.attributes = attributes
+        end
+      end
+    end
+
+    specify { klass.new.string1.should == 'default' }
+    specify { klass.new.string2.should == 'default' }
+    specify { klass.new(string1: '').string1.should == 'default' }
+    specify { klass.new(string2: '').string2.should == '' }
+    specify { klass.new(string1: 'hello').string1.should == 'hello' }
+    specify { klass.new(string2: 'hello').string2.should == 'hello' }
   end
 
   context 'attribute caching' do
@@ -121,7 +145,7 @@ describe ActiveData::Model::Attributable do
 
     context do
       before { subject.write_attributes('hello' => 'blabla', count: 20) }
-      specify { subject.attributes.should == { hello: 'blabla', count: 20, calc: 5, enum: nil } }
+      specify { subject.attributes.should == { hello: 'blabla', count: 20, calc: 5, enum: nil, string: 'world' } }
     end
   end
 
