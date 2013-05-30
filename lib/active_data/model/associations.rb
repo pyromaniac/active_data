@@ -8,14 +8,14 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
-        cattr_accessor :_associations
+        class_attribute :_associations, instance_reader: false, instance_writer: false
         self._associations = {}
 
         { embeds_many: EmbedsMany, embeds_one: EmbedsOne }.each do |(name, association_class)|
           define_singleton_method name do |*args|
             association = association_class.new *args
             association.define_accessor self
-            self._associations = _associations.merge!(association.name => association)
+            self._associations = _associations.merge(association.name => association)
           end
         end
       end
