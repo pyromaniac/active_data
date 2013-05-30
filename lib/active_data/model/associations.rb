@@ -8,7 +8,7 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
-        class_attribute :_associations, :instance_reader => false, :instance_writer => false
+        cattr_accessor :_associations
         self._associations = {}
 
         { embeds_many: EmbedsMany, embeds_one: EmbedsOne }.each do |(name, association_class)|

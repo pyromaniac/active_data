@@ -9,12 +9,27 @@ describe ActiveData::Model::Associations::EmbedsMany do
     attribute :name
   end
 
-  let(:klass) do
+  let(:noassoc) do
     Class.new do
       include ActiveData::Model
 
       attribute :name
+    end
+  end
+
+  let(:klass) do
+    Class.new(noassoc) do
+      include ActiveData::Model
+
       embeds_many :many_assocs
+    end
+  end
+
+  let(:inherited) do
+    Class.new(klass) do
+      include ActiveData::Model
+
+      embeds_many :many_assocs_inherited, class_name: ManyAssoc
     end
   end
 
@@ -38,6 +53,12 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { subject.many_assocs.count.should == 2 }
     specify { subject.many_assocs[0].name.should == 'foo' }
     specify { subject.many_assocs[1].name.should == 'bar' }
+  end
+
+  context 'inheritance' do
+    specify { noassoc.association_names.should == [] }
+    specify { klass.association_names.should == %w(many_assocs) }
+    specify { inherited.association_names.should == %w(many_assocs many_assocs_inherited) }
   end
 
   describe '#instantiate' do
