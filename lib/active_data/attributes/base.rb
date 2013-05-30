@@ -25,17 +25,13 @@ module ActiveData
         @default_blank ||= !!@options[:default_blank]
       end
 
-      def type_caster
-        @type_caster ||= @options[:typecast] || @options[:type_cast]
-      end
-
       def default_value instance
         default.respond_to?(:call) ? default.call(instance) : default unless default.nil?
       end
 
       def type_cast value
         return value if value.instance_of?(type)
-        type_caster ? type_caster.call(value) : type.active_data_type_cast(value)
+        type.active_data_type_cast(value)
       end
 
       def generate_instance_methods context
