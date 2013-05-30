@@ -28,4 +28,15 @@ describe ActiveData::Model do
       specify { subject.instance_variable_get(:@attributes).should == { name: 'Hello', count: nil } }
     end
   end
+
+  describe '#==' do
+    subject { model.new name: 'hello', count: 42 }
+    it { should_not == nil }
+    it { should_not == 'hello' }
+    it { should_not == Object.new }
+    it { should_not == model.new }
+    it { should_not == model.new(name: 'hello1', count: 42) }
+    it { should_not == model.new(name: 'hello', count: 42.1) }
+    it { should == model.new(name: 'hello', count: 42) }
+  end
 end

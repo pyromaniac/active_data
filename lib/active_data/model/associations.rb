@@ -34,6 +34,13 @@ module ActiveData
           _associations.keys
         end
       end
+
+      def == other
+        super(other) && self.class.association_names.all? do |association|
+          send(association) == other.send(association)
+        end
+      end
+
     end
   end
 end

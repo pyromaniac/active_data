@@ -18,26 +18,40 @@ describe ActiveData::Model::Associations::EmbedsMany do
     end
   end
 
-  let(:instance) { klass.new(:name => 'world') }
+  subject { klass.new(name: 'world') }
 
-  context do
-    specify { instance.one_assoc.should be_nil }
-  end
+  its(:one_assoc) { should be_nil }
 
   context 'accessor with objects' do
-    before { instance.one_assoc = OneAssoc.new(name: 'foo') }
-    specify { instance.one_assoc.should be_instance_of OneAssoc }
-    specify { instance.one_assoc.name.should == 'foo' }
+    before { subject.one_assoc = OneAssoc.new(name: 'foo') }
+    specify { subject.one_assoc.should be_instance_of OneAssoc }
+    specify { subject.one_assoc.name.should == 'foo' }
   end
 
   context 'accessor with attributes' do
-    before { instance.one_assoc = { name: 'foo' } }
-    specify { instance.one_assoc.should be_instance_of OneAssoc }
-    specify { instance.one_assoc.name.should == 'foo' }
+    before { subject.one_assoc = { name: 'foo' } }
+    specify { subject.one_assoc.should be_instance_of OneAssoc }
+    specify { subject.one_assoc.name.should == 'foo' }
   end
 
   context 'accessor with nothing' do
-    before { instance.one_assoc = nil }
-    specify { instance.one_assoc.should be_nil }
+    before { subject.one_assoc = nil }
+    specify { subject.one_assoc.should be_nil }
+  end
+
+  describe '#==' do
+    let(:instance) { klass.new(name: 'world') }
+    before { subject.one_assoc = { name: 'foo' } }
+    specify { subject.should_not == instance }
+
+    context do
+      before { instance.one_assoc = { name: 'foo1' } }
+      specify { subject.should_not == instance }
+    end
+
+    context do
+      before { instance.one_assoc = { name: 'foo' } }
+      specify { subject.should == instance }
+    end
   end
 end

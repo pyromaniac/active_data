@@ -18,31 +18,52 @@ describe ActiveData::Model::Associations::EmbedsMany do
     end
   end
 
-  let(:instance) { klass.new(:name => 'world') }
+  subject { klass.new(name: 'world') }
 
   context do
-    specify { instance.many_assocs.should be_empty }
-    specify { instance.many_assocs.should be_instance_of ManyAssoc.collection_class }
-    specify { instance.many_assocs.count.should == 0 }
+    specify { subject.many_assocs.should be_empty }
+    specify { subject.many_assocs.should be_instance_of ManyAssoc.collection_class }
+    specify { subject.many_assocs.count.should == 0 }
   end
 
   context 'accessor with objects' do
-    before { instance.many_assocs = [ManyAssoc.new(name: 'foo'), ManyAssoc.new(name: 'bar')] }
-    specify { instance.many_assocs.count.should == 2 }
-    specify { instance.many_assocs[0].name.should == 'foo' }
-    specify { instance.many_assocs[1].name.should == 'bar' }
+    before { subject.many_assocs = [ManyAssoc.new(name: 'foo'), ManyAssoc.new(name: 'bar')] }
+    specify { subject.many_assocs.count.should == 2 }
+    specify { subject.many_assocs[0].name.should == 'foo' }
+    specify { subject.many_assocs[1].name.should == 'bar' }
   end
 
   context 'accessor with attributes' do
-    before { instance.many_assocs = [{ name: 'foo' }, { name: 'bar' }] }
-    specify { instance.many_assocs.count.should == 2 }
-    specify { instance.many_assocs[0].name.should == 'foo' }
-    specify { instance.many_assocs[1].name.should == 'bar' }
+    before { subject.many_assocs = [{ name: 'foo' }, { name: 'bar' }] }
+    specify { subject.many_assocs.count.should == 2 }
+    specify { subject.many_assocs[0].name.should == 'foo' }
+    specify { subject.many_assocs[1].name.should == 'bar' }
   end
 
   describe '#instantiate' do
-    subject(:instance) { klass.instantiate name: 'Root', many_assocs: [{ name: 'foo' }, { name: 'bar' }] }
+    subject { klass.instantiate name: 'Root', many_assocs: [{ name: 'foo' }, { name: 'bar' }] }
 
     its('many_assocs.count') { should == 2 }
+  end
+
+  describe '#==' do
+    let(:instance) { klass.new(name: 'world') }
+    before { subject.many_assocs = [ManyAssoc.new(name: 'foo'), ManyAssoc.new(name: 'bar')] }
+    specify { subject.should_not == instance }
+
+    context do
+      before { instance.many_assocs = [ManyAssoc.new(name: 'foo')] }
+      specify { subject.should_not == instance }
+    end
+
+    context do
+      before { instance.many_assocs = [ManyAssoc.new(name: 'foo1'), ManyAssoc.new(name: 'bar')] }
+      specify { subject.should_not == instance }
+    end
+
+    context do
+      before { instance.many_assocs = [ManyAssoc.new(name: 'foo'), ManyAssoc.new(name: 'bar')] }
+      specify { subject.should == instance }
+    end
   end
 end
