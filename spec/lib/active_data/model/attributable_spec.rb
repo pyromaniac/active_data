@@ -40,7 +40,7 @@ describe ActiveData::Model::Attributable do
       Class.new do
         include ActiveData::Model::Attributable
 
-        attribute(:rand, type: Integer) { rand 1000000 }
+        attribute(:rand, type: String) { SecureRandom.uuid }
 
         def initialize
           @attributes = self.class.initialize_attributes
@@ -50,6 +50,7 @@ describe ActiveData::Model::Attributable do
 
     subject { klass.new }
     specify { subject.rand.should == subject.rand }
+    specify { subject.rand.should_not == klass.new.rand }
   end
 
   context 'default_blank' do
