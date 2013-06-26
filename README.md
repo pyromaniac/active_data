@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/pyromaniac/active_data.png?branch=master)](https://travis-ci.org/pyromaniac/active_data)
+
 # ActiveData
 
 TODO: Write a gem description
