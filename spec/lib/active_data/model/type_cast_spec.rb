@@ -109,7 +109,7 @@ describe 'typecasting' do
     let(:time) { Time.utc(2013, 6, 13, 23, 13) }
     specify{subject.tap{|s| s.time = nil}.time.should == nil}
     # specify{subject.tap{|s| s.time = '2013-06-13 23:13'}.time.should == time}
-    # specify{subject.tap{|s| s.time = '2013-55-55 55:55'}.time.should == nil}
+    specify{subject.tap{|s| s.time = '2013-55-55 55:55'}.time.should == nil}
     specify{subject.tap{|s| s.time = Date.new(2013, 6, 13)}.time.should == Time.new(2013, 6, 13, 0, 0)}
     specify{subject.tap{|s| s.time = DateTime.new(2013, 6, 13, 23, 13)}.time.should == time}
   end
