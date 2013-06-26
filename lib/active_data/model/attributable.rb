@@ -80,7 +80,7 @@ module ActiveData
         Hash[attribute_names.map do |name|
           value = send(name)
           [name, value] if value.present?
-        end]
+        end.compact]
       end
 
       def attribute_names

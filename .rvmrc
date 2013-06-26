@@ -1,1 +1,1 @@
-rvm use --create 1.9.3@active_data
+rvm use --create 2.0.0@active_data
