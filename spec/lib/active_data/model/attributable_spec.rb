@@ -13,6 +13,7 @@ describe ActiveData::Model::Attributable do
       attribute :count, type: Integer, default: 10
       attribute(:calc, type: Integer) { 2 + 3 }
       attribute :enum, type: Integer, in: [1, 2, 3]
+      attribute :foo, type: Boolean, default: false
 
       def initialize name = nil
         @attributes = self.class.initialize_attributes
@@ -23,9 +24,9 @@ describe ActiveData::Model::Attributable do
 
   context do
     subject { klass.new('world') }
-    specify { klass.enum_values == [1, 2, 3] }
-    its(:attributes) { should ==  { hello: nil, count: 10, calc: 5, enum: nil, string: 'world' }  }
-    its(:present_attributes) { should ==  { count: 10, calc: 5, string: 'world' }  }
+    specify { klass.enum_values.should == [1, 2, 3] }
+    its(:attributes) { should ==  { hello: nil, count: 10, calc: 5, enum: nil, string: 'world', foo: false }  }
+    its(:present_attributes) { should ==  { count: 10, calc: 5, string: 'world', foo: false }  }
     its(:name) { should == 'world' }
     its(:hello) { should be_nil }
     its(:count) { should == 10 }
@@ -74,6 +75,41 @@ describe ActiveData::Model::Attributable do
     specify { klass.new(string2: '').string2.should == '' }
     specify { klass.new(string1: 'hello').string1.should == 'hello' }
     specify { klass.new(string2: 'hello').string2.should == 'hello' }
+  end
+
+  context 'default_blank with boolean' do
+    let(:klass) do
+      Class.new do
+        include ActiveData::Model::Attributable
+
+        attribute :boolean1, type: Boolean, default_blank: true, default: true
+        attribute :boolean2, type: Boolean, default: true
+        attribute :boolean3, type: Boolean, default_blank: true, default: false
+        attribute :boolean4, type: Boolean, default: false
+
+        def initialize attributes = {}
+          @attributes = self.class.initialize_attributes
+          self.attributes = attributes
+        end
+      end
+    end
+
+    specify { klass.new.boolean1.should == true }
+    specify { klass.new.boolean2.should == true }
+    specify { klass.new.boolean3.should == false }
+    specify { klass.new.boolean4.should == false }
+    specify { klass.new(boolean1: '').boolean1.should == true }
+    specify { klass.new(boolean2: '').boolean2.should == true }
+    specify { klass.new(boolean3: '').boolean3.should == false }
+    specify { klass.new(boolean4: '').boolean4.should == false }
+    specify { klass.new(boolean1: false).boolean1.should == false }
+    specify { klass.new(boolean2: false).boolean2.should == false }
+    specify { klass.new(boolean3: false).boolean3.should == false }
+    specify { klass.new(boolean4: false).boolean4.should == false }
+    specify { klass.new(boolean1: true).boolean1.should == true }
+    specify { klass.new(boolean2: true).boolean2.should == true }
+    specify { klass.new(boolean3: true).boolean3.should == true }
+    specify { klass.new(boolean4: true).boolean4.should == true }
   end
 
   context 'attribute caching' do
@@ -146,7 +182,9 @@ describe ActiveData::Model::Attributable do
 
     context do
       before { subject.write_attributes('hello' => 'blabla', count: 20) }
-      specify { subject.attributes.should == { hello: 'blabla', count: 20, calc: 5, enum: nil, string: 'world' } }
+      specify do
+        subject.attributes.should == { hello: 'blabla', count: 20, calc: 5, enum: nil, string: 'world', foo: false }
+      end
     end
   end
 
