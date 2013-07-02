@@ -50,8 +50,7 @@ module ActiveData
         else
           attribute = self.class._attributes[name]
           value = attribute.type_cast @attributes[name]
-          use_default = attribute.default_blank? && value.blank? || value.nil?
-
+          use_default = attribute.default_blank? && value.respond_to?(:empty?) ? value.empty? : value.nil?
           attributes_cache[name] = use_default ? attribute.default_value(self) : value
         end
       end
@@ -79,7 +78,7 @@ module ActiveData
       def present_attributes
         Hash[attribute_names.map do |name|
           value = send(name)
-          [name, value] if value.present?
+          [name, value] unless value.respond_to?(:empty?) ? value.empty? : value.nil?
         end.compact]
       end
 
