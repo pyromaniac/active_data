@@ -50,6 +50,7 @@ module ActiveData
         else
           attribute = self.class._attributes[name]
           value = attribute.type_cast @attributes[name]
+          value = nil if attribute.values && !attribute.values.include?(value)
           use_default = attribute.default_blank? && value.respond_to?(:empty?) ? value.empty? : value.nil?
           attributes_cache[name] = use_default ? attribute.default_value(self) : value
         end

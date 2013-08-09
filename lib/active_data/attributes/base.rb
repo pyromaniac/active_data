@@ -14,7 +14,7 @@ module ActiveData
       end
 
       def values
-        @values ||= options[:in].dup if options[:in]
+        @values ||= Set.new(options[:in]) if options[:in]
       end
 
       def default

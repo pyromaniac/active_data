@@ -13,6 +13,7 @@ describe ActiveData::Model::Attributable do
       attribute :count, type: Integer, default: 10
       attribute(:calc, type: Integer) { 2 + 3 }
       attribute :enum, type: Integer, in: [1, 2, 3]
+      attribute :enum_with_default, type: Integer, in: [1, 2, 3], default: 2
       attribute :foo, type: Boolean, default: false
 
       def initialize name = nil
@@ -24,9 +25,9 @@ describe ActiveData::Model::Attributable do
 
   context do
     subject { klass.new('world') }
-    specify { klass.enum_values.should == [1, 2, 3] }
-    its(:attributes) { should ==  { hello: nil, count: 10, calc: 5, enum: nil, string: 'world', foo: false }  }
-    its(:present_attributes) { should ==  { count: 10, calc: 5, string: 'world', foo: false }  }
+    specify { klass.enum_values.should == Set.new([1, 2, 3]) }
+    its(:attributes) { should ==  { hello: nil, count: 10, calc: 5, enum: nil, string: 'world', foo: false, enum_with_default: 2 }  }
+    its(:present_attributes) { should ==  { count: 10, calc: 5, string: 'world', foo: false, enum_with_default: 2 }  }
     its(:name) { should == 'world' }
     its(:hello) { should be_nil }
     its(:count) { should == 10 }
@@ -34,6 +35,17 @@ describe ActiveData::Model::Attributable do
     specify { expect { subject.hello = 'worlds' } .to change { subject.hello } .from(nil).to('worlds') }
     specify { expect { subject.count = 20 } .to change { subject.count } .from(10).to(20) }
     specify { expect { subject.calc = 15 } .to change { subject.calc } .from(5).to(15) }
+  end
+
+  context 'enums' do
+    subject { klass.new('world') }
+
+    specify { subject.enum = 3; subject.enum.should == 3 }
+    specify { subject.enum = '3'; subject.enum.should == 3 }
+    specify { subject.enum = 10; subject.enum.should == nil }
+    specify { subject.enum = 'hello'; subject.enum.should == nil }
+    specify { subject.enum_with_default = 3; subject.enum_with_default.should == 3 }
+    specify { subject.enum_with_default = 10; subject.enum_with_default.should == 2 }
   end
 
   context 'calculating default values' do
@@ -183,7 +195,7 @@ describe ActiveData::Model::Attributable do
     context do
       before { subject.write_attributes('hello' => 'blabla', count: 20) }
       specify do
-        subject.attributes.should == { hello: 'blabla', count: 20, calc: 5, enum: nil, string: 'world', foo: false }
+        subject.attributes.should == { hello: 'blabla', count: 20, calc: 5, enum: nil, string: 'world', foo: false, enum_with_default: 2 }
       end
     end
   end
