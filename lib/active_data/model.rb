@@ -33,12 +33,6 @@ module ActiveData
 
       self.include_root_in_json = false
 
-      def initialize attributes = {}
-        @attributes = self.class.initialize_attributes
-        @new_record = true
-        assign_attributes attributes
-      end
-
       def self.i18n_scope
         :active_data
       end
@@ -67,6 +61,12 @@ module ActiveData
 
         instance
       end
+    end
+
+    def initialize attributes = {}
+      @attributes = self.class.initialize_attributes
+      @new_record = true
+      assign_attributes attributes
     end
 
     def errors
