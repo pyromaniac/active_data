@@ -44,7 +44,7 @@ module ActiveData
       end
 
       def read_attribute name
-        name = name.to_sym
+        name = name.to_s
         if attributes_cache.key? name
           attributes_cache[name]
         else
@@ -58,15 +58,15 @@ module ActiveData
       alias_method :[], :read_attribute
 
       def has_attribute? name
-        @attributes.key? name.to_sym
+        @attributes.key? name.to_s
       end
 
       def read_attribute_before_type_cast name
-        @attributes[name.to_sym]
+        @attributes[name.to_s]
       end
 
       def write_attribute name, value
-        name = name.to_sym
+        name = name.to_s
         attributes_cache.delete name
         @attributes[name] = value
       end
@@ -91,10 +91,6 @@ module ActiveData
         assign_attributes(attributes)
       end
       alias_method :update_attributes, :attributes=
-
-      def write_attributes attributes
-        attributes.each { |(name, value)| send("#{name}=", value) }
-      end
 
       def reverse_update_attributes attributes
         reverse_assign_attributes(attributes)

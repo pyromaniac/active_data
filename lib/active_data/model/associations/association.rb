@@ -5,7 +5,7 @@ module ActiveData
         attr_reader :name, :klass, :options
 
         def initialize name, options = {}
-          @name, @options = name.to_s, options
+          @name, @options = name.to_sym, options
           @klass ||= options[:class] || (options[:class_name].to_s.presence || name.to_s.classify).safe_constantize
           raise "Can not determine class for `#{name}` association" unless @klass
         end

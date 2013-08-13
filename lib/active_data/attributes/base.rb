@@ -4,7 +4,7 @@ module ActiveData
       attr_reader :name, :options
 
       def initialize name, options = {}, &block
-        @name = name.to_sym
+        @name = name.to_s
         @options = options
         @options[:default] = block if block
       end
@@ -37,19 +37,19 @@ module ActiveData
       def generate_instance_methods context
         context.class_eval <<-EOS
           def #{name}
-            read_attribute(:#{name})
+            read_attribute('#{name}')
           end
 
           def #{name}= value
-            write_attribute(:#{name}, value)
+            write_attribute('#{name}', value)
           end
 
           def #{name}?
-            read_attribute(:#{name}).present?
+            read_attribute('#{name}').present?
           end
 
           def #{name}_before_type_cast
-            read_attribute_before_type_cast(:#{name})
+            read_attribute_before_type_cast('#{name}')
           end
         EOS
       end
@@ -58,7 +58,7 @@ module ActiveData
         if values
           context.class_eval <<-EOS
             def #{name}_values
-              _attributes[:#{name}].values
+              _attributes['#{name}'].values
             end
           EOS
         end

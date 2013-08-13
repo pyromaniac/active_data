@@ -26,8 +26,8 @@ describe ActiveData::Model::Attributable do
   context do
     subject { klass.new('world') }
     specify { klass.enum_values.should == Set.new([1, 2, 3]) }
-    its(:attributes) { should ==  { hello: nil, count: 10, calc: 5, enum: nil, string: 'world', foo: false, enum_with_default: 2 }  }
-    its(:present_attributes) { should ==  { count: 10, calc: 5, string: 'world', foo: false, enum_with_default: 2 }  }
+    its(:attributes) { should ==  { hello: nil, count: 10, calc: 5, enum: nil, string: 'world', foo: false, enum_with_default: 2 }.stringify_keys  }
+    its(:present_attributes) { should ==  { count: 10, calc: 5, string: 'world', foo: false, enum_with_default: 2 }.stringify_keys  }
     its(:name) { should == 'world' }
     its(:hello) { should be_nil }
     its(:count) { should == 10 }
@@ -138,7 +138,7 @@ describe ActiveData::Model::Attributable do
     context do
       before do
         subject.hello
-        subject.send(:attributes_cache).should_receive(:[]).with(:hello).once
+        subject.send(:attributes_cache).should_receive(:[]).with('hello').once
       end
 
       specify { subject.hello }
@@ -176,28 +176,14 @@ describe ActiveData::Model::Attributable do
       end
     end
 
-    specify { ancestor._attributes.keys.should == [:foo] }
+    specify { ancestor._attributes.keys.should == ['foo'] }
     specify { ancestor.instance_methods.should include :foo, :foo= }
     specify { ancestor.instance_methods.should_not include :bar, :bar=, :baz, :baz= }
-    specify { descendant1._attributes.keys.should == [:foo, :bar] }
+    specify { descendant1._attributes.keys.should == ['foo', 'bar'] }
     specify { descendant1.instance_methods.should include :foo, :foo=, :bar, :bar= }
     specify { descendant1.instance_methods.should_not include :baz, :baz= }
-    specify { descendant2._attributes.keys.should == [:foo, :baz, :moo] }
+    specify { descendant2._attributes.keys.should == ['foo', 'baz', 'moo'] }
     specify { descendant2.instance_methods.should include :foo, :foo=, :baz, :baz=, :moo, :moo= }
     specify { descendant2.instance_methods.should_not include :bar, :bar= }
   end
-
-  context '#write_attributes' do
-    subject { klass.new('world') }
-
-    specify { expect { subject.write_attributes(strange: 'value') }.to raise_error NoMethodError }
-
-    context do
-      before { subject.write_attributes('hello' => 'blabla', count: 20) }
-      specify do
-        subject.attributes.should == { hello: 'blabla', count: 20, calc: 5, enum: nil, string: 'world', foo: false, enum_with_default: 2 }
-      end
-    end
-  end
-
 end

@@ -59,9 +59,9 @@ describe ActiveData::Model::Associations::EmbedsMany do
 
   context 'inheritance' do
     specify { noassoc.association_names.should == [] }
-    specify { klass.association_names.should == %w(many_assocs) }
-    specify { inherited1.association_names.should == %w(many_assocs many_assocs_inherited1) }
-    specify { inherited2.association_names.should == %w(many_assocs_inherited2) }
+    specify { klass.association_names.should == [:many_assocs] }
+    specify { inherited1.association_names.should == [:many_assocs, :many_assocs_inherited1] }
+    specify { inherited2.association_names.should == [:many_assocs_inherited2] }
   end
 
   describe '#instantiate' do

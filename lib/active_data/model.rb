@@ -46,13 +46,13 @@ module ActiveData
       def instantiate data
         return data if data.class.include? ActiveData::Model
 
-        data = data.symbolize_keys
+        data = data.stringify_keys
         instance = allocate
 
         attributes = initialize_attributes
         attributes.merge!(data.slice(*attributes.keys))
 
-        data.slice(*association_names.map(&:to_sym)).each do |association, data|
+        data.slice(*association_names.map(&:to_s)).each do |association, data|
           instance.send(:"#{association}=", data)
         end
 

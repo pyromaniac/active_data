@@ -23,7 +23,7 @@ module ActiveData
       module ClassMethods
 
         def reflect_on_association name
-          _associations[name.to_s]
+          _associations[name.to_sym]
         end
 
         def associations
