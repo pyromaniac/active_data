@@ -7,20 +7,23 @@ module ActiveData
         included do
           class_attribute :collectible
 
-          def initialize source = nil
+          def initialize source = nil, trust = false
             source ||= self.class.superclass.new
-            super source.map { |entity| collectible.instantiate(entity) }
+
+            source.each do |entity|
+              raise IncorrectEntity.new(collectible, entity.class) unless entity.is_a?(collectible)
+            end unless trust && source.is_a?(self.class)
+
+            super source
           end
         end
 
-        def respond_to? method
+        def respond_to_missing? method
           super || collectible.respond_to?(method)
         end
 
         def method_missing method, *args, &block
-          result = with_scope { collectible.send(method, *args, &block) }
-          result = self.class.new result if result.instance_of? self.class.superclass
-          result
+          with_scope { collectible.send(method, *args, &block) }
         end
 
         def with_scope
@@ -29,12 +32,6 @@ module ActiveData
           result = yield
           collectible.current_scope = previous_scope
           result
-        end
-
-        module ClassMethods
-          def active_data_type_cast value
-            new value
-          end
         end
       end
     end

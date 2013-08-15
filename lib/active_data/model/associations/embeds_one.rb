@@ -19,7 +19,11 @@ module ActiveData
           target.class_eval <<-EOS
             def #{name}= value
               association = self.class.reflect_on_association('#{name}')
-              @#{name} = association.klass.instantiate(value) if value
+              if value.nil? || value.is_a?(association.klass)
+                @#{name} = value
+              else
+                raise IncorrectEntity.new(association.klass, value.class)
+              end
             end
           EOS
         end

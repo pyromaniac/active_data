@@ -20,7 +20,7 @@ describe ActiveData::Model::Associations do
         accepts_nested_attributes_for :assoc
       end
     end
-    let(:instance) { klass.new( name: 'world') }
+    let(:instance) { klass.new(name: 'world') }
 
     context do
       before { instance.assoc_attributes = { name: 'foo'} }

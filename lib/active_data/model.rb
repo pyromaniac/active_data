@@ -36,30 +36,34 @@ module ActiveData
       def self.i18n_scope
         :active_data
       end
-
-      def serializable_hash *args
-        super(*args).stringify_keys!
-      end
     end
 
     module ClassMethods
       def instantiate data
-        return data if data.class.include? ActiveData::Model
-
         data = data.stringify_keys
         instance = allocate
 
         attributes = initialize_attributes
         attributes.merge!(data.slice(*attributes.keys))
 
-        data.slice(*association_names.map(&:to_s)).each do |association, data|
-          instance.send(:"#{association}=", data)
+        data.slice(*association_names.map(&:to_s)).each do |name, data|
+          reflection = reflect_on_association(name)
+          data = if reflection.collection?
+            reflection.klass.instantiate_collection data
+          else
+            reflection.klass.instantiate data
+          end
+          instance.send(:"#{name}=", data)
         end
 
         instance.instance_variable_set(:@attributes, attributes)
         instance.instance_variable_set(:@new_record, false)
 
         instance
+      end
+
+      def instantiate_collection data
+        collection(Array.wrap(data).map { |attrs| instantiate attrs }, true)
       end
     end
 

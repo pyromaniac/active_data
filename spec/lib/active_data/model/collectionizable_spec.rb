@@ -22,7 +22,7 @@ describe ActiveData::Model::Collectionizable do
     include ActiveData::Model
   end
 
-  let(:collection) { klass.collection([{ name: 'Hello' }, { name: 'World' }, { name: 'Mars' }]) }
+  let(:collection) { klass.instantiate_collection([{ name: 'Hello' }, { name: 'World' }, { name: 'Mars' }]) }
 
   specify { klass.collection_class.should_not be_nil }
   specify { klass.collection_class.collectible.should == klass }
@@ -32,10 +32,10 @@ describe ActiveData::Model::Collectionizable do
   specify { collection.should be_instance_of klass.collection_class }
   specify { collection.except_first.should be_instance_of klass.collection_class }
   specify { collection.no_mars.should be_instance_of klass.collection_class }
-  specify { collection.except_first.should == klass.collection([{ name: 'World' }, { name: 'Mars' }]) }
-  specify { collection.no_mars.should == klass.collection([{ name: 'Hello' }, { name: 'World' }]) }
-  specify { collection.except_first.no_mars.should == klass.collection([{ name: 'World' }]) }
-  specify { collection.no_mars.except_first.should == klass.collection([{ name: 'World' }]) }
+  specify { collection.except_first.should == klass.instantiate_collection([{ name: 'World' }, { name: 'Mars' }]) }
+  specify { collection.no_mars.should == klass.instantiate_collection([{ name: 'Hello' }, { name: 'World' }]) }
+  specify { collection.except_first.no_mars.should == klass.instantiate_collection([{ name: 'World' }]) }
+  specify { collection.no_mars.except_first.should == klass.instantiate_collection([{ name: 'World' }]) }
 
   context do
     let!(:ancestor) do

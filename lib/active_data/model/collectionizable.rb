@@ -11,9 +11,20 @@ module ActiveData
       end
 
       module ClassMethods
-
         def collectionize collection_superclass = Array
           self._collection_superclass = collection_superclass
+        end
+
+        def collection_class
+          @collection_class ||= begin
+            Class.new(_collection_superclass) do
+              include ActiveData::Model::Collectionizable::Proxy
+            end.tap { |klass| klass.collectible = self }
+          end
+        end
+
+        def collection source = nil, trust = false
+          collection_class.new source, trust
         end
 
         def respond_to_missing? method, include_private
@@ -26,29 +37,14 @@ module ActiveData
             super
         end
 
-        def collection source = nil
-          collection_class.new source
-        end
-
-        def collection_class
-          @collection_class ||= begin
-            Class.new(_collection_superclass) do
-              include ActiveData::Model::Collectionizable::Proxy
-            end.tap { |klass| klass.collectible = self }
-          end
-        end
-
         def current_scope= value
           @current_scope = value
         end
 
         def current_scope
-          @current_scope ||= collection(load)
+          @current_scope ||= collection
         end
         alias :scope :current_scope
-
-        def load; end
-
       end
     end
   end

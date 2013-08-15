@@ -50,24 +50,11 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { subject.many_assocs[1].name.should == 'bar' }
   end
 
-  context 'accessor with attributes' do
-    before { subject.many_assocs = [{ name: 'foo' }, { name: 'bar' }] }
-    specify { subject.many_assocs.count.should == 2 }
-    specify { subject.many_assocs[0].name.should == 'foo' }
-    specify { subject.many_assocs[1].name.should == 'bar' }
-  end
-
   context 'inheritance' do
     specify { noassoc.association_names.should == [] }
     specify { klass.association_names.should == [:many_assocs] }
     specify { inherited1.association_names.should == [:many_assocs, :many_assocs_inherited1] }
     specify { inherited2.association_names.should == [:many_assocs_inherited2] }
-  end
-
-  describe '#instantiate' do
-    subject { klass.instantiate name: 'Root', many_assocs: [{ name: 'foo' }, { name: 'bar' }] }
-
-    its('many_assocs.count') { should == 2 }
   end
 
   describe '#==' do
