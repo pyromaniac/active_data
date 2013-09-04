@@ -55,13 +55,5 @@ describe ActiveData::Model::Associations do
       specify { instance.assocs.first.name.should == 'baz' }
       specify { instance.assocs.last.name.should == 'foo' }
     end
-
-    context do
-      before { instance.assocs_attributes = {1 => { name: 'baz' }, 2 => { name: 'foo' }} }
-      specify { instance.to_params.should == {
-        "name" => "world",
-        "assocs_attributes" => {'0' => {"name" => "baz"}, '1' => {"name" => "foo"}}
-      } }
-    end
   end
 end

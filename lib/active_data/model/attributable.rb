@@ -4,10 +4,10 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
-        class_attribute :_attributes, :instance_reader => false, :instance_writer => false
+        class_attribute :_attributes, instance_reader: false, instance_writer: false
         self._attributes = {}
 
-        delegate :attribute_default, :to => 'self.class'
+        delegate :attribute_default, to: 'self.class'
       end
 
       module ClassMethods
@@ -39,7 +39,7 @@ module ActiveData
         end
 
         def initialize_attributes
-          Hash[_attributes.map { |(name, _)| [name, nil] }]
+          Hash[_attributes.keys.zip]
         end
       end
 

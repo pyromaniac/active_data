@@ -4,7 +4,6 @@ require 'active_data/model/attributable'
 require 'active_data/model/localizable'
 require 'active_data/model/associations'
 require 'active_data/model/nested_attributes'
-require 'active_data/model/parameterizable'
 
 require 'active_data/attributes/base'
 require 'active_data/attributes/localized'
@@ -27,7 +26,6 @@ module ActiveData
       include Collectionizable
       include Associations
       include NestedAttributes
-      include Parameterizable
 
       self.include_root_in_json = ActiveData.include_root_in_json
 
