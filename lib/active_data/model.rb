@@ -11,12 +11,12 @@ require 'active_data/attributes/localized'
 
 module ActiveData
   module Model
-    class NotFound < ::StandardError
-    end
-
     extend ActiveSupport::Concern
 
     included do
+      extend ActiveModel::Naming
+      extend ActiveModel::Translation
+
       include ActiveModel::Conversion
       include ActiveModel::Validations
       include ActiveModel::Serialization
@@ -28,10 +28,8 @@ module ActiveData
       include Associations
       include NestedAttributes
       include Parameterizable
-      extend ActiveModel::Naming
-      extend ActiveModel::Translation
 
-      self.include_root_in_json = false
+      self.include_root_in_json = ActiveData.include_root_in_json
 
       def self.i18n_scope
         :active_data
