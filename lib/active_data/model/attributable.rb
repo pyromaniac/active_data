@@ -51,8 +51,7 @@ module ActiveData
           attribute = self.class._attributes[name]
           value = attribute.type_cast @attributes[name]
           value = nil if attribute.values && !attribute.values.include?(value)
-          use_default = attribute.default_blank? && value.respond_to?(:empty?) ? value.empty? : value.nil?
-          attributes_cache[name] = use_default ? attribute.default_value(self) : value
+          attributes_cache[name] = value_or_default value, attribute
         end
       end
       alias_method :[], :read_attribute
@@ -62,7 +61,8 @@ module ActiveData
       end
 
       def read_attribute_before_type_cast name
-        @attributes[name.to_s]
+        name = name.to_s
+        value_or_default @attributes[name], self.class._attributes[name]
       end
 
       def write_attribute name, value
@@ -97,6 +97,11 @@ module ActiveData
       end
 
     private
+
+      def value_or_default value, attribute
+        use_default = attribute.default_blank? && value.respond_to?(:empty?) ? value.empty? : value.nil?
+        use_default ? attribute.default_value(self) : value
+      end
 
       def attributes_cache
         @attributes_cache ||= {}

@@ -82,11 +82,17 @@ describe ActiveData::Model::Attributable do
     end
 
     specify { klass.new.string1.should == 'default' }
+    specify { klass.new.string1_before_type_cast.should == 'default' }
     specify { klass.new.string2.should == 'default' }
+    specify { klass.new.string2_before_type_cast.should == 'default' }
     specify { klass.new(string1: '').string1.should == 'default' }
+    specify { klass.new(string1: '').string1_before_type_cast.should == 'default' }
     specify { klass.new(string2: '').string2.should == '' }
+    specify { klass.new(string2: '').string2_before_type_cast.should == '' }
     specify { klass.new(string1: 'hello').string1.should == 'hello' }
+    specify { klass.new(string1: 'hello').string1_before_type_cast.should == 'hello' }
     specify { klass.new(string2: 'hello').string2.should == 'hello' }
+    specify { klass.new(string2: 'hello').string2_before_type_cast.should == 'hello' }
   end
 
   context 'default_blank with boolean' do
