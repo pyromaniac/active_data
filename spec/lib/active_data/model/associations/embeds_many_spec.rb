@@ -1,7 +1,7 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-describe ActiveData::Model::Associations::EmbedsMany do
+describe ActiveData::Model::Associations::Reflections::EmbedsMany do
 
   class ManyAssoc
     include ActiveData::Model
@@ -51,10 +51,10 @@ describe ActiveData::Model::Associations::EmbedsMany do
   end
 
   context 'inheritance' do
-    specify { noassoc.association_names.should == [] }
-    specify { klass.association_names.should == [:many_assocs] }
-    specify { inherited1.association_names.should == [:many_assocs, :many_assocs_inherited1] }
-    specify { inherited2.association_names.should == [:many_assocs_inherited2] }
+    specify { noassoc.reflections.keys.should == [] }
+    specify { klass.reflections.keys.should == [:many_assocs] }
+    specify { inherited1.reflections.keys.should == [:many_assocs, :many_assocs_inherited1] }
+    specify { inherited2.reflections.keys.should == [:many_assocs_inherited2] }
   end
 
   describe '#==' do

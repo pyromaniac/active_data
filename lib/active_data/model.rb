@@ -42,7 +42,7 @@ module ActiveData
         attributes = initialize_attributes
         attributes.merge!(data.slice(*attributes.keys))
 
-        data.slice(*association_names.map(&:to_s)).each do |name, data|
+        data.slice(*reflections.keys.map(&:to_s)).each do |name, data|
           reflection = reflect_on_association(name)
           data = if reflection.collection?
             reflection.klass.instantiate_collection data
