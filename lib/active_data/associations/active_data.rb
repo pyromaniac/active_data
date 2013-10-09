@@ -1,13 +1,11 @@
-require 'active_data/model/associations/reflections/base'
-require 'active_data/model/associations/reflections/embeds_many'
-require 'active_data/model/associations/reflections/embeds_one'
-
 module ActiveData
-  module Model
-    module Associations
+  module Associations
+    module ActiveData
       extend ActiveSupport::Concern
 
       included do
+        include NestedAttributes
+
         class_attribute :_reflections, instance_reader: false, instance_writer: false
         self._reflections = {}
 
@@ -30,12 +28,15 @@ module ActiveData
         end
       end
 
+      def association name
+
+      end
+
       def == other
         super(other) && self.class.reflections.keys.all? do |association|
           send(association) == other.send(association)
         end
       end
-
     end
   end
 end

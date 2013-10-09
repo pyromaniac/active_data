@@ -1,7 +1,7 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-describe ActiveData::Model::Associations do
+describe ActiveData::Associations::ActiveData do
 
   class NestedAssoc
     include ActiveData::Model

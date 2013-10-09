@@ -1,12 +1,4 @@
 require 'active_data/model/extensions'
-require 'active_data/model/collectionizable'
-require 'active_data/model/attributable'
-require 'active_data/model/localizable'
-require 'active_data/model/associations'
-require 'active_data/model/nested_attributes'
-
-require 'active_data/attributes/base'
-require 'active_data/attributes/localized'
 
 module ActiveData
   module Model
@@ -24,13 +16,12 @@ module ActiveData
       include Attributable
       include Localizable
       include Collectionizable
-      include Associations
-      include NestedAttributes
+      include ActiveData::Associations::ActiveData
 
       self.include_root_in_json = ActiveData.include_root_in_json
 
       def self.i18n_scope
-        :active_data
+        ActiveData.i18n_scope
       end
     end
 

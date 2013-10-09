@@ -1,7 +1,7 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-describe ActiveData::Model::Associations::Reflections::EmbedsOne do
+describe ActiveData::Associations::Reflections::EmbedsOne do
 
   class OneAssoc
     include ActiveData::Model

@@ -1,7 +1,7 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-describe ActiveData::Model::Associations::Reflections::EmbedsMany do
+describe ActiveData::Associations::Reflections::EmbedsMany do
 
   class ManyAssoc
     include ActiveData::Model

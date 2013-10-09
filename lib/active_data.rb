@@ -1,10 +1,11 @@
 require 'active_support/concern'
 require 'active_support/core_ext'
+require 'active_support/dependencies'
+
+ActiveSupport::Dependencies.autoload_paths += [File.dirname(__FILE__)]
+
 require 'active_model'
 require 'active_data/version'
-require 'active_data/config'
-require 'active_data/model'
-require 'active_data/validations'
 
 module ActiveData
   class ActiveDataError < StandardError
@@ -24,5 +25,5 @@ module ActiveData
 
   def self.config; Config.instance; end
 
-  singleton_class.delegate :include_root_in_json, :include_root_in_json=, to: :config
+  singleton_class.delegate :include_root_in_json, :include_root_in_json=, :i18n_scope, :i18n_scope=, to: :config
 end
