@@ -87,13 +87,25 @@ module ActiveData
         @attributes.keys
       end
 
-      def attributes= attributes
+      def update_attributes attributes
         assign_attributes(attributes)
       end
-      alias_method :update_attributes, :attributes=
+
+      def assign_attributes attributes
+        (attributes.presence || {}).each do |(name, value)|
+          send("#{name}=", value) if has_attribute?(name) || respond_to?("#{name}=")
+        end
+      end
+      alias_method :attributes=, :assign_attributes
 
       def reverse_update_attributes attributes
         reverse_assign_attributes(attributes)
+      end
+
+      def reverse_assign_attributes attributes
+        (attributes.presence || {}).each do |(name, value)|
+          send("#{name}=", value) if respond_to?("#{name}=") && respond_to?(name) && send(name).blank?
+        end
       end
 
     private
@@ -106,19 +118,6 @@ module ActiveData
       def attributes_cache
         @attributes_cache ||= {}
       end
-
-      def assign_attributes attributes
-        (attributes.presence || {}).each do |(name, value)|
-          send("#{name}=", value) if has_attribute?(name) || respond_to?("#{name}=")
-        end
-      end
-
-      def reverse_assign_attributes attributes
-        (attributes.presence || {}).each do |(name, value)|
-          send("#{name}=", value) if respond_to?("#{name}=") && respond_to?(name) && send(name).blank?
-        end
-      end
-
     end
   end
 end
