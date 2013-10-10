@@ -23,7 +23,7 @@ module ActiveData
     end
   end
 
-  def self.config; Config.instance; end
+  def self.config; ActiveData::Config.instance; end
 
   singleton_class.delegate :include_root_in_json, :include_root_in_json=, :i18n_scope, :i18n_scope=, to: :config
 end

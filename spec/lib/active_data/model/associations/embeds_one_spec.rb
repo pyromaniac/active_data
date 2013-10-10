@@ -21,6 +21,7 @@ describe ActiveData::Associations::Reflections::EmbedsOne do
   subject { klass.new(name: 'world') }
 
   its(:one_assoc) { should be_nil }
+  specify { klass.new(name: 'world', one_assoc: OneAssoc.new(name: 'foo')).to_json(include: :one_assoc).should == {name: 'world', one_assoc: {name: 'foo'}}.to_json }
 
   context 'accessor with objects' do
     before { subject.one_assoc = OneAssoc.new(name: 'foo') }
