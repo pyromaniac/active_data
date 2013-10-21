@@ -1,5 +1,3 @@
-require 'active_data/model/extensions'
-
 module ActiveData
   module Model
     extend ActiveSupport::Concern

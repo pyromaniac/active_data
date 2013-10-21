@@ -13,25 +13,41 @@ module ActiveData
         @type ||= options[:type] || Object
       end
 
-      def values
-        @values ||= Set.new(options[:in]) if options[:in]
+      def type_cast value
+        value.instance_of?(type) ? value : type.active_data_type_cast(value)
+      end
+
+      def enum
+        @enum ||= Array.wrap(options[:enum] || options[:in]).to_set
+      end
+
+      def enumerize value
+        value if enum.none? || enum.include?(value)
       end
 
       def default
-        @default ||= @options[:default]
+        @default ||= options[:default]
       end
 
       def default_blank?
-        @default_blank ||= !!@options[:default_blank]
+        @default_blank ||= !!options[:default_blank]
       end
 
-      def default_value instance
-        default.respond_to?(:call) ? default.call(instance) : default unless default.nil?
+      def default_value context
+        default.respond_to?(:call) ? default.call(context) : default unless default.nil?
       end
 
-      def type_cast value
-        return value if value.instance_of?(type)
-        type.active_data_type_cast(value)
+      def defaultize value, context
+        use_default = default_blank? && value.respond_to?(:empty?) ? value.empty? : value.nil?
+        use_default ? default_value(context) : value
+      end
+
+      def read_value value, context
+        defaultize(enumerize(type_cast(value)), context)
+      end
+
+      def read_value_before_type_cast value, context
+        defaultize(value, context)
       end
 
       def generate_instance_methods context
@@ -55,10 +71,10 @@ module ActiveData
       end
 
       def generate_class_methods context
-        if values
+        if enum
           context.class_eval <<-EOS
             def #{name}_values
-              _attributes['#{name}'].values
+              _attributes['#{name}'].enum
             end
           EOS
         end
