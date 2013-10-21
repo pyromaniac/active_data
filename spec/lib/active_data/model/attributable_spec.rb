@@ -12,8 +12,8 @@ describe ActiveData::Model::Attributable do
       attribute :string, type: String, default_blank: true, default: ->(record){ record.name }
       attribute :count, type: Integer, default: 10
       attribute(:calc, type: Integer) { 2 + 3 }
-      attribute :enum, type: Integer, in: [1, 2, 3]
-      attribute :enum_with_default, type: Integer, in: [1, 2, 3], default: 2
+      attribute :enum, type: Integer, enum: [1, 2, 3]
+      attribute :enum_with_default, type: Integer, enum: [1, 2, 3], default: 2
       attribute :foo, type: Boolean, default: false
 
       def initialize name = nil
@@ -46,88 +46,6 @@ describe ActiveData::Model::Attributable do
     specify { subject.enum = 'hello'; subject.enum.should == nil }
     specify { subject.enum_with_default = 3; subject.enum_with_default.should == 3 }
     specify { subject.enum_with_default = 10; subject.enum_with_default.should == 2 }
-  end
-
-  context 'calculating default values' do
-    let(:klass) do
-      Class.new do
-        include ActiveData::Model::Attributable
-
-        attribute(:rand, type: String) { SecureRandom.uuid }
-
-        def initialize
-          @attributes = self.class.initialize_attributes
-        end
-      end
-    end
-
-    subject { klass.new }
-    specify { subject.rand.should == subject.rand }
-    specify { subject.rand.should_not == klass.new.rand }
-  end
-
-  context 'default_blank' do
-    let(:klass) do
-      Class.new do
-        include ActiveData::Model::Attributable
-
-        attribute :string1, type: String, default_blank: true, default: 'default'
-        attribute :string2, type: String, default: 'default'
-
-        def initialize attributes = {}
-          @attributes = self.class.initialize_attributes
-          self.attributes = attributes
-        end
-      end
-    end
-
-    specify { klass.new.string1.should == 'default' }
-    specify { klass.new.string1_before_type_cast.should == 'default' }
-    specify { klass.new.string2.should == 'default' }
-    specify { klass.new.string2_before_type_cast.should == 'default' }
-    specify { klass.new(string1: '').string1.should == 'default' }
-    specify { klass.new(string1: '').string1_before_type_cast.should == 'default' }
-    specify { klass.new(string2: '').string2.should == '' }
-    specify { klass.new(string2: '').string2_before_type_cast.should == '' }
-    specify { klass.new(string1: 'hello').string1.should == 'hello' }
-    specify { klass.new(string1: 'hello').string1_before_type_cast.should == 'hello' }
-    specify { klass.new(string2: 'hello').string2.should == 'hello' }
-    specify { klass.new(string2: 'hello').string2_before_type_cast.should == 'hello' }
-  end
-
-  context 'default_blank with boolean' do
-    let(:klass) do
-      Class.new do
-        include ActiveData::Model::Attributable
-
-        attribute :boolean1, type: Boolean, default_blank: true, default: true
-        attribute :boolean2, type: Boolean, default: true
-        attribute :boolean3, type: Boolean, default_blank: true, default: false
-        attribute :boolean4, type: Boolean, default: false
-
-        def initialize attributes = {}
-          @attributes = self.class.initialize_attributes
-          self.attributes = attributes
-        end
-      end
-    end
-
-    specify { klass.new.boolean1.should == true }
-    specify { klass.new.boolean2.should == true }
-    specify { klass.new.boolean3.should == false }
-    specify { klass.new.boolean4.should == false }
-    specify { klass.new(boolean1: '').boolean1.should == true }
-    specify { klass.new(boolean2: '').boolean2.should == true }
-    specify { klass.new(boolean3: '').boolean3.should == false }
-    specify { klass.new(boolean4: '').boolean4.should == false }
-    specify { klass.new(boolean1: false).boolean1.should == false }
-    specify { klass.new(boolean2: false).boolean2.should == false }
-    specify { klass.new(boolean3: false).boolean3.should == false }
-    specify { klass.new(boolean4: false).boolean4.should == false }
-    specify { klass.new(boolean1: true).boolean1.should == true }
-    specify { klass.new(boolean2: true).boolean2.should == true }
-    specify { klass.new(boolean3: true).boolean3.should == true }
-    specify { klass.new(boolean4: true).boolean4.should == true }
   end
 
   context 'attribute caching' do

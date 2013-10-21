@@ -61,6 +61,14 @@ describe ActiveData::Attributes::Base do
       specify { field.defaultize('hello', self).should == 'hello' }
       specify { field.defaultize('', self).should == '' }
       specify { field.defaultize(nil, self).should == 'world' }
+
+      context do
+        let(:field) { build_field(type: Boolean, default: true) }
+
+        specify { field.defaultize(nil, self).should == true }
+        specify { field.defaultize(true, self).should == true }
+        specify { field.defaultize(false, self).should == false }
+      end
     end
 
     context 'default_blank: true' do
@@ -69,23 +77,42 @@ describe ActiveData::Attributes::Base do
       specify { field.defaultize('hello', self).should == 'hello' }
       specify { field.defaultize('', self).should == 'world' }
       specify { field.defaultize(nil, self).should == 'world' }
+
+      context do
+        let(:field) { build_field(type: Boolean, default_blank: true, default: true) }
+
+        specify { field.defaultize(nil, self).should == true }
+        specify { field.defaultize(true, self).should == true }
+        specify { field.defaultize(false, self).should == false }
+      end
     end
   end
 
+  describe '#normalizer' do
+    specify { build_field.normalizer.should == nil }
+    specify { build_field(normalizer: ->{}).normalizer.should be_a Proc }
+  end
+
+  describe '#normalize' do
+    specify { build_field.normalize(' hello ').should == ' hello ' }
+    specify { build_field(normalizer: ->(v){ v.strip }).normalize(' hello ').should == 'hello' }
+  end
+
   describe '#read_value' do
-    let(:field) { build_field(type: String, default: 'world', enum: ['hello', '42']) }
+    let(:field) { build_field(type: String, normalizer: ->(v){ v ? v.strip : v }, default: 'world', enum: ['hello', '42']) }
 
     specify { field.read_value(nil, self).should == 'world' }
     specify { field.read_value('hello', self).should == 'hello' }
+    specify { field.read_value(' hello ', self).should == 'hello' }
     specify { field.read_value(42, self).should == '42' }
     specify { field.read_value(43, self).should == 'world' }
     specify { field.read_value('', self).should == 'world' }
   end
 
   describe '#read_value_before_type_cast' do
-    let(:field) { build_field(type: String, default: 'world', enum: ['hello', '42']) }
+    let(:field) { build_field(type: String, normalizer: ->(v){ v.strip }, default: 'world', enum: ['hello', '42']) }
 
-    specify { field.read_value_before_type_cast(nil, self).should == 'world' }
+    specify { field.read_value_before_type_cast(nil, self).should == nil }
     specify { field.read_value_before_type_cast('hello', self).should == 'hello' }
     specify { field.read_value_before_type_cast(42, self).should == 42 }
     specify { field.read_value_before_type_cast(43, self).should == 43 }
