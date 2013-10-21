@@ -14,7 +14,7 @@ describe ActiveData::Attributes::Localized do
     specify { field.read_value({ en: 42 }, self).should == { 'en' => '42' } }
     specify { field.read_value({ en: 43 }, self).should == { 'en' => 'world' } }
     specify { field.read_value({ en: '' }, self).should == { 'en' => 'world' } }
-    specify { field.read_value({ en: 'hello', ru: '42' }, self).should == { 'en' => 'hello', 'ru' => '42' } }
+    specify { field.read_value({ en: 'hello', ru: 42 }, self).should == { 'en' => 'hello', 'ru' => '42' } }
   end
 
   describe '#read_value_before_type_cast' do
@@ -25,7 +25,7 @@ describe ActiveData::Attributes::Localized do
     specify { field.read_value_before_type_cast({ en: 42 }, self).should == { 'en' => 42 } }
     specify { field.read_value_before_type_cast({ en: 43 }, self).should == { 'en' => 43 } }
     specify { field.read_value_before_type_cast({ en: '' }, self).should == { 'en' => '' } }
-    specify { field.read_value({ en: 'hello', ru: '42' }, self).should == { 'en' => 'hello', 'ru' => '42' } }
+    specify { field.read_value_before_type_cast({ en: 'hello', ru: 42 }, self).should == { 'en' => 'hello', 'ru' => 42 } }
   end
 
   context 'integration' do
