@@ -1,6 +1,6 @@
 module ActiveData
   class Config
-    include Singleton
+    include ::Singleton
 
     attr_accessor :include_root_in_json, :i18n_scope
 

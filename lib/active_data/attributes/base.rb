@@ -1,6 +1,9 @@
 module ActiveData
   module Attributes
     class Base
+      module ModeMethods
+      end
+
       attr_reader :name, :options
 
       def initialize name, options = {}, &block

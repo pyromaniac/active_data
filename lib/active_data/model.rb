@@ -8,12 +8,10 @@ module ActiveData
 
       include ActiveModel::Conversion
       include ActiveModel::Validations
-      # include ActiveModel::Serialization
-      include Serialization
+      include ActiveModel::Serialization
       include ActiveModel::Serializers::JSON
 
       include Attributable
-      include Localizable
       include Collectionizable
       include ActiveData::Associations::ActiveData
 

@@ -4,7 +4,7 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
-        class_attribute :_attributes, instance_reader: false, instance_writer: false
+        class_attribute :_attributes, instance_writer: false
         self._attributes = {}
 
         delegate :attribute_default, to: 'self.class'
@@ -15,19 +15,15 @@ module ActiveData
           attribute = build_attribute(name, options, &block)
           self._attributes = _attributes.merge(attribute.name => attribute)
 
+          include attribute.class::ModeMethods
           attribute.generate_instance_methods generated_instance_attributes_methods
           attribute.generate_class_methods generated_class_attributes_methods
           attribute
         end
 
         def build_attribute name, options = {}, &block
-          klass = case options[:type].to_s
-          when 'Localized'
-            ActiveData::Attributes::Localized
-          else
-            ActiveData::Attributes::Base
-          end
-          klass.new name, options, &block
+          class_name = "ActiveData::Attributes::#{(options.delete(:mode).to_s.presence || 'base').classify}"
+          class_name.safe_constantize.new name, options, &block
         end
 
         def generated_class_attributes_methods
@@ -43,12 +39,19 @@ module ActiveData
         end
       end
 
+      def write_attribute name, value
+        name = name.to_s
+        attributes_cache.delete name
+        @attributes[name] = value
+      end
+      alias_method :[]=, :write_attribute
+
       def read_attribute name
         name = name.to_s
         if attributes_cache.key? name
           attributes_cache[name]
         else
-          attributes_cache[name] = self.class._attributes[name].read_value(@attributes[name], self)
+          attributes_cache[name] = _attributes[name].read_value(@attributes[name], self)
         end
       end
       alias_method :[], :read_attribute
@@ -59,15 +62,8 @@ module ActiveData
 
       def read_attribute_before_type_cast name
         name = name.to_s
-        self.class._attributes[name].read_value_before_type_cast(@attributes[name], self)
+        _attributes[name].read_value_before_type_cast(@attributes[name], self)
       end
-
-      def write_attribute name, value
-        name = name.to_s
-        attributes_cache.delete name
-        @attributes[name] = value
-      end
-      alias_method :[]=, :write_attribute
 
       def attributes
         Hash[attribute_names.map { |name| [name, send(name)] }]
