@@ -88,14 +88,37 @@ describe ActiveData::Attributes::Base do
     end
   end
 
-  describe '#normalizer' do
-    specify { build_field.normalizer.should == nil }
-    specify { build_field(normalizer: ->{}).normalizer.should be_a Proc }
+  describe '#normalizers' do
+    specify { build_field.normalizers.should == [] }
+    specify { build_field(normalizer: ->{}).normalizers.should be_a Array }
+    specify { build_field(normalizer: ->{}).normalizers.first.should be_a Proc }
   end
 
   describe '#normalize' do
     specify { build_field.normalize(' hello ').should == ' hello ' }
     specify { build_field(normalizer: ->(v){ v.strip }).normalize(' hello ').should == 'hello' }
+    specify { build_field(normalizer: [->(v){ v.strip }, ->(v){ v.first(4) }]).normalize(' hello ').should == 'hell' }
+    specify { build_field(normalizer: [->(v){ v.first(4) }, ->(v){ v.strip }]).normalize(' hello ').should == 'hel' }
+
+    context 'integration' do
+      before do
+        ActiveData.stub(config: ActiveData::Config.send(:new))
+        ActiveData.normalizer(:strip) do |value|
+          value.strip
+        end
+        ActiveData.normalizer(:trim) do |value, options|
+          value.first(options[:length] || 2)
+        end
+      end
+
+      specify { build_field(normalizer: :strip).normalize(' hello ').should == 'hello' }
+      specify { build_field(normalizer: [:strip, :trim]).normalize(' hello ').should == 'he' }
+      specify { build_field(normalizer: [:trim, :strip]).normalize(' hello ').should == 'h' }
+      specify { build_field(normalizer: [:strip, { trim: { length: 4 } }]).normalize(' hello ').should == 'hell' }
+      specify { build_field(normalizer: {strip: { }, trim: { length: 4 } }).normalize(' hello ').should == 'hell' }
+      specify { build_field(normalizer: [:strip, { trim: { length: 4 } }, ->(v){ v.last(2) }])
+        .normalize(' hello ').should == 'll' }
+    end
   end
 
   describe '#read_value' do

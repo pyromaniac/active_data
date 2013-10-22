@@ -19,6 +19,19 @@ module ActiveData
   class UnknownAttributeError < NoMethodError
   end
 
+  class NormalizerMissing < NoMethodError
+    def initialize name
+      super <<-EOS
+Could not find normalizer `:#{name}`
+You can define it with:
+
+  ActiveData.normalizer(:#{name}) do |value, options|
+    # do some staff with value and options
+  end
+      EOS
+    end
+  end
+
   class IncorrectEntity < ActiveDataError
     def initialize expected, got
       super "Expected `#{expected}`, but got `#{got}`"
@@ -27,5 +40,6 @@ module ActiveData
 
   def self.config; ActiveData::Config.instance; end
 
-  singleton_class.delegate :include_root_in_json, :include_root_in_json=, :i18n_scope, :i18n_scope=, to: :config
+  singleton_class.delegate :include_root_in_json, :include_root_in_json=,
+    :i18n_scope, :i18n_scope=, :normalizer, to: :config
 end

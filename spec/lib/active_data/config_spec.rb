@@ -15,4 +15,11 @@ describe ActiveData::Config do
     specify { expect { subject.i18n_scope = :data_model }
       .to change { subject.i18n_scope }.from(:active_data).to(:data_model) }
   end
+
+  describe '#normalizer' do
+    its(:_normalizers) { should == {} }
+    specify { expect { subject.normalizer(:name) { } }
+      .to change { subject.normalizer(:name) rescue nil }.from(nil).to(an_instance_of(Proc)) }
+    specify { expect { subject.normalizer(:wrong) }.to raise_error ActiveData::NormalizerMissing }
+  end
 end

@@ -45,12 +45,17 @@ module ActiveData
         use_default ? default_value(context) : value
       end
 
-      def normalizer
-        @normalizer ||= options[:normalizer]
+      def normalizers
+        @normalizers ||= Array.wrap(options[:normalizer] || options[:normalizers])
       end
 
       def normalize value
-        normalizer ? normalizer.call(value) : value
+        normalizers.none? ? value : normalizers.inject(value) do |value, normalizer|
+          normalizer.is_a?(Proc) ? normalizer.call(value) :
+            normalizer.is_a?(Hash) ? normalizer.inject(value) do |value, (name, options)|
+              ActiveData.normalizer(name).call(value, options)
+            end : ActiveData.normalizer(normalizer).call(value, {})
+        end
       end
 
       def read_value value, context
