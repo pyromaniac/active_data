@@ -90,7 +90,7 @@ module ActiveData
         if enum
           context.class_eval <<-EOS
             def #{name}_values
-              _attributes['#{name}'].enum
+              _attributes['#{name}'].enum.to_a
             end
           EOS
         end

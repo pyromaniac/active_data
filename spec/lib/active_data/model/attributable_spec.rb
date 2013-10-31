@@ -25,7 +25,7 @@ describe ActiveData::Model::Attributable do
 
   context do
     subject { klass.new('world') }
-    specify { klass.enum_values.should == Set.new([1, 2, 3]) }
+    specify { klass.enum_values.should == [1, 2, 3] }
     its(:attributes) { should ==  { hello: nil, count: 10, calc: 5, enum: nil, string: 'world', foo: false, enum_with_default: 2 }.stringify_keys  }
     its(:present_attributes) { should ==  { count: 10, calc: 5, string: 'world', foo: false, enum_with_default: 2 }.stringify_keys  }
     its(:name) { should == 'world' }
