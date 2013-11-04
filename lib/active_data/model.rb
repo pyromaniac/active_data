@@ -49,6 +49,10 @@ module ActiveData
       def instantiate_collection data
         collection(Array.wrap(data).map { |attrs| instantiate attrs }, true)
       end
+
+      def to_ary
+        nil
+      end
     end
 
     def initialize attributes = {}

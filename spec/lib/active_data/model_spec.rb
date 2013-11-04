@@ -11,6 +11,7 @@ describe ActiveData::Model do
     end
   end
 
+  specify { [model].flatten.should == [model] }
   specify { expect { model.blablabla }.to raise_error NoMethodError }
   specify { model.i18n_scope.should == :active_data }
   specify { model.new.should_not be_persisted }
