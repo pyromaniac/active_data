@@ -59,7 +59,7 @@ module ActiveData
       end
 
       def read_value value, context
-        defaultize(enumerize(normalize(type_cast(value))), context)
+        normalize(defaultize(enumerize(type_cast(value)), context))
       end
 
       def read_value_before_type_cast value, context

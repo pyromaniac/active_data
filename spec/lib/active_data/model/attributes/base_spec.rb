@@ -126,7 +126,7 @@ describe ActiveData::Attributes::Base do
 
     specify { field.read_value(nil, self).should == 'world' }
     specify { field.read_value('hello', self).should == 'hello' }
-    specify { field.read_value(' hello ', self).should == 'hello' }
+    specify { field.read_value(' hello ', self).should == 'world' }
     specify { field.read_value(42, self).should == '42' }
     specify { field.read_value(43, self).should == 'world' }
     specify { field.read_value('', self).should == 'world' }

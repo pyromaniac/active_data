@@ -10,13 +10,13 @@ describe ActiveData::Attributes::Arrayed do
     let(:field) { build_field(type: String, normalizer: ->(v){ v.uniq.compact }, default: 'world', enum: ['hello', '42']) }
 
     specify { field.read_value(nil, self).should == [] }
-    specify { field.read_value([nil], self).should == [] }
+    specify { field.read_value([nil], self).should == ['world'] }
     specify { field.read_value('hello', self).should == ['hello'] }
     specify { field.read_value([42], self).should == ['42'] }
     specify { field.read_value([43], self).should == ['world'] }
     specify { field.read_value([''], self).should == ['world'] }
     specify { field.read_value(['hello', 42], self).should == ['hello', '42'] }
-    specify { field.read_value(['hello', false], self).should == ['hello'] }
+    specify { field.read_value(['hello', false], self).should == ['hello', 'world'] }
   end
 
   describe '#read_value_before_type_cast' do
