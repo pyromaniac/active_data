@@ -16,6 +16,7 @@ describe 'typecasting' do
       attribute :date, type: Date
       attribute :datetime, type: DateTime
       attribute :time, type: Time
+      attribute :time_zone, type: ActiveSupport::TimeZone
 
       def initialize name = nil
         @attributes = self.class.initialize_attributes
@@ -112,5 +113,22 @@ describe 'typecasting' do
     specify{subject.tap{|s| s.time = '2013-55-55 55:55'}.time.should == nil}
     specify{subject.tap{|s| s.time = Date.new(2013, 6, 13)}.time.should == Time.new(2013, 6, 13, 0, 0)}
     specify{subject.tap{|s| s.time = DateTime.new(2013, 6, 13, 23, 13)}.time.should == time}
+  end
+
+  context 'time_zone' do
+    specify{subject.tap{|s| s.time_zone = nil}.time_zone.should be_nil}
+    specify{subject.tap{|s| s.time_zone = Object.new}.time_zone.should be_nil}
+    specify{subject.tap{|s| s.time_zone = Time.now}.time_zone.should be_nil}
+    specify{subject.tap{|s| s.time_zone = 'blablabla'}.time_zone.should be_nil}
+    specify{subject.tap{|s| s.time_zone = TZInfo::Timezone.all.first}.time_zone.should be_a ActiveSupport::TimeZone}
+    specify{subject.tap{|s| s.time_zone = 'Moscow'}.time_zone.should be_a ActiveSupport::TimeZone}
+    specify{subject.tap{|s| s.time_zone = '+4'}.time_zone.should be_a ActiveSupport::TimeZone}
+    specify{subject.tap{|s| s.time_zone = '-3'}.time_zone.should be_a ActiveSupport::TimeZone}
+    specify{subject.tap{|s| s.time_zone = '3600'}.time_zone.should be_a ActiveSupport::TimeZone}
+    specify{subject.tap{|s| s.time_zone = '-7200'}.time_zone.should be_a ActiveSupport::TimeZone}
+    specify{subject.tap{|s| s.time_zone = 4}.time_zone.should be_a ActiveSupport::TimeZone}
+    specify{subject.tap{|s| s.time_zone = -3}.time_zone.should be_a ActiveSupport::TimeZone}
+    specify{subject.tap{|s| s.time_zone = 3600}.time_zone.should be_a ActiveSupport::TimeZone}
+    specify{subject.tap{|s| s.time_zone = -7200}.time_zone.should be_a ActiveSupport::TimeZone}
   end
 end
