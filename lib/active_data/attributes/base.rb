@@ -83,6 +83,10 @@ module ActiveData
           def #{name}_before_type_cast
             read_attribute_before_type_cast('#{name}')
           end
+
+          def #{name}_values
+            _attributes['#{name}'].enum.to_a
+          end
         EOS
       end
 
