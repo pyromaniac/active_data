@@ -6,6 +6,7 @@ ActiveSupport::Dependencies.autoload_paths += [File.dirname(__FILE__)]
 
 require 'active_model'
 require 'active_data/version'
+require 'active_data/config'
 require 'active_data/model'
 require 'active_data/model/extensions'
 
