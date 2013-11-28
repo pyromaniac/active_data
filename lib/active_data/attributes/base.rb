@@ -21,7 +21,9 @@ module ActiveData
       end
 
       def enum
-        @enum ||= Array.wrap(options[:enum] || options[:in]).to_set
+        enum = options[:enum] || options[:in]
+        enum = enum.to_a if enum.respond_to?(:to_a)
+        @enum ||= Array.wrap(enum).to_set
       end
 
       def enumerize value

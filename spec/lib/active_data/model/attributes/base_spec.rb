@@ -26,6 +26,8 @@ describe ActiveData::Attributes::Base do
     specify { build_field(enum: []).enum.should == [].to_set }
     specify { build_field(enum: 'hello').enum.should == ['hello'].to_set }
     specify { build_field(enum: ['hello', 'world']).enum.should == ['hello', 'world'].to_set }
+    specify { build_field(enum: [1..5]).enum.should == [1..5].to_set }
+    specify { build_field(enum: 1..5).enum.should == (1..5).to_a.to_set }
   end
 
   describe '#enumerize' do
