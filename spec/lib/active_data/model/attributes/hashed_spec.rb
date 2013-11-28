@@ -17,6 +17,14 @@ describe ActiveData::Attributes::Hashed do
     specify { field.read_value({a: 'hello', b: '42'}, self).should == {'a' => 'hello', 'b' => '42'} }
     specify { field.read_value({a: 'hello', b: '1'}, self).should == {'a' => 'hello', 'b' => 'world'} }
     specify { field.read_value({a: 'hello', x: '42'}, self).should == {'a' => 'hello'} }
+
+    context 'with :keys' do
+      let(:field) { build_field(type: String, keys: ['a', :b]) }
+
+      specify { field.read_value(nil, self).should == {} }
+      specify { field.read_value({}, self).should == {} }
+      specify { field.read_value({a: 1, 'b' => 2, c: 3, 'd' => 4}, self).should == {'a' => '1', 'b' => '2'} }
+    end
   end
 
   describe '#read_value_before_type_cast' do

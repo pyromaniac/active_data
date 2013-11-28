@@ -4,14 +4,21 @@ module ActiveData
       module ModeMethods
       end
 
-      def read_value value, context
-        normalize(Hash[(value.presence || {}).map do |key, value|
+      def keys
+        @keys = Array.wrap(options[:keys]).map(&:to_s)
+      end
+
+      def read_value hash, context
+        hash = hash.presence || {}
+        hash = hash.stringify_keys.slice(*keys) if keys.present?
+
+        normalize(Hash[hash.map do |key, value|
           [key, defaultize(enumerize(type_cast(value)), context)]
         end].with_indifferent_access).with_indifferent_access
       end
 
-      def read_value_before_type_cast value, context
-        (value.presence || {}).with_indifferent_access
+      def read_value_before_type_cast hash, context
+        (hash.presence || {}).with_indifferent_access
       end
     end
   end
