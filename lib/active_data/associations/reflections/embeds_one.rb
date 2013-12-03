@@ -7,23 +7,22 @@ module ActiveData
           false
         end
 
-        def define_reader target
-          target.class_eval <<-EOS
-            def #{name}
-              @#{name}
-            end
-          EOS
+        def builder_class
+          ActiveData::Associations::Builders::EmbedsOne
         end
 
-        def define_writer target
+        def define_methods target
           target.class_eval <<-EOS
+            def #{name}
+              association(:#{name}).target
+            end
+
             def #{name}= value
-              association = self.class.reflect_on_association('#{name}')
-              if value.nil? || value.is_a?(association.klass)
-                @#{name} = value
-              else
-                raise IncorrectEntity.new(association.klass, value.class)
-              end
+              association(:#{name}).assign(value)
+            end
+
+            def build_#{name} attributes = {}
+              association(:#{name}).build(attributes)
             end
           EOS
         end

@@ -13,7 +13,7 @@ module ActiveData
 
       include Attributable
       include Collectionizable
-      include ActiveData::Associations::ActiveData
+      include ActiveData::Associations
 
       self.include_root_in_json = ActiveData.include_root_in_json
 
@@ -41,7 +41,7 @@ module ActiveData
         end
 
         instance.instance_variable_set(:@attributes, attributes)
-        instance.instance_variable_set(:@new_record, false)
+        instance.instance_variable_set(:@persisted, true)
 
         instance
       end
@@ -57,7 +57,7 @@ module ActiveData
 
     def initialize attributes = {}
       @attributes = self.class.initialize_attributes
-      @new_record = true
+      @persisted = false
       assign_attributes attributes
     end
 
@@ -66,7 +66,7 @@ module ActiveData
     end
 
     def persisted?
-      !@new_record
+      @persisted
     end
 
     def == other

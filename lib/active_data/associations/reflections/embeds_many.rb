@@ -7,22 +7,18 @@ module ActiveData
           true
         end
 
-        def define_reader target
-          target.class_eval <<-EOS
-            def #{name}
-              @#{name} ||= begin
-                association = self.class.reflect_on_association('#{name}')
-                association.klass.collection
-              end
-            end
-          EOS
+        def builder_class
+          ActiveData::Associations::Builders::EmbedsMany
         end
 
-        def define_writer target
+        def define_methods target
           target.class_eval <<-EOS
+            def #{name}
+              association(:#{name}).target
+            end
+
             def #{name}= value
-              association = self.class.reflect_on_association('#{name}')
-              @#{name} = association.klass.collection(value)
+              association(:#{name}).assign(value)
             end
           EOS
         end
