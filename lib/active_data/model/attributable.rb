@@ -39,6 +39,10 @@ module ActiveData
         end
       end
 
+      def has_attribute? name
+        @attributes.key? name.to_s
+      end
+
       def write_attribute name, value
         name = name.to_s
         attributes_cache.delete name
@@ -55,10 +59,6 @@ module ActiveData
         end
       end
       alias_method :[], :read_attribute
-
-      def has_attribute? name
-        @attributes.key? name.to_s
-      end
 
       def read_attribute_before_type_cast name
         name = name.to_s

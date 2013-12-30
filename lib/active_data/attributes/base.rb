@@ -89,6 +89,10 @@ module ActiveData
           def #{name}_values
             _attributes['#{name}'].enum.to_a
           end
+
+          def #{name}_default
+            _attributes['#{name}'].default_value(self)
+          end
         EOS
       end
 
