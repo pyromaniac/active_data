@@ -34,12 +34,33 @@ module ActiveData
         @default ||= options[:default]
       end
 
+      def default?
+        @default_ ||= options.key?(:default)
+      end
+
+      def default_blank
+        @default_blank ||= options[:default_blank]
+      end
+
       def default_blank?
-        @default_blank ||= !!options[:default_blank]
+        @default_blank_ ||= options.key?(:default_blank)
+      end
+
+      def defaultizer
+        @defaultizer ||= default? ? default : default_blank
       end
 
       def default_value context
-        default.respond_to?(:call) ? default.call(context) : default unless default.nil?
+        case defaultizer
+        when Proc
+          if defaultizer.arity == 0
+            context.instance_exec(&defaultizer)
+          else
+            context.instance_exec(context, &defaultizer)
+          end
+        else
+          defaultizer
+        end
       end
 
       def defaultize value, context
@@ -48,20 +69,30 @@ module ActiveData
       end
 
       def normalizers
-        @normalizers ||= Array.wrap(options[:normalizer] || options[:normalizers])
+        @normalizers ||= Array.wrap(options[:normalize] || options[:normalizer] || options[:normalizers])
       end
 
-      def normalize value
-        normalizers.none? ? value : normalizers.inject(value) do |value, normalizer|
-          normalizer.is_a?(Proc) ? normalizer.call(value) :
-            normalizer.is_a?(Hash) ? normalizer.inject(value) do |value, (name, options)|
-              ActiveData.normalizer(name).call(value, options)
-            end : ActiveData.normalizer(normalizer).call(value, {})
+      def normalize value, context
+        if normalizers.none?
+          value
+        else
+          normalizers.inject(value) do |value, normalizer|
+            case normalizer
+            when Proc
+              context.instance_exec(value, &normalizer)
+            when Hash
+              normalizer.inject(value) do |value, (name, options)|
+                context.instance_exec(value, options, &ActiveData.normalizer(name))
+              end
+            else
+              context.instance_exec(value, {}, &ActiveData.normalizer(normalizer.to_sym))
+            end
+          end
         end
       end
 
       def read_value value, context
-        normalize(defaultize(enumerize(type_cast(value)), context))
+        normalize(defaultize(enumerize(type_cast(value)), context), context)
       end
 
       def read_value_before_type_cast value, context

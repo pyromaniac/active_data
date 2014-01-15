@@ -37,26 +37,42 @@ describe ActiveData::Attributes::Base do
   end
 
   describe '#default' do
-    specify { build_field.default.should == nil }
+    specify { build_field.default.should be_nil }
     specify { build_field(default: 42).default.should == 42 }
     specify { build_field { }.default.should be_a Proc }
   end
 
-  describe '#default_blank?' do
-    specify { build_field.default_blank?.should be_false }
-    specify { build_field(default_blank: true).default_blank?.should be_true }
+  describe '#default_blank' do
+    specify { build_field.default_blank.should be_nil }
+    specify { build_field(default_blank: 42).default_blank.should == 42 }
   end
 
   describe '#default_value' do
     let(:default) { 42 }
 
     specify { build_field.default_value(self).should == nil }
+    specify { build_field(default_blank: 'hello').default_value(self).should == 'hello' }
     specify { build_field(default: 'hello').default_value(self).should == 'hello' }
+    specify { build_field(default: 'hello1', default_blank: 'hello2').default_value(self).should == 'hello1' }
     specify { build_field { default }.default_value(self).should == 42 }
     specify { build_field { |context| context.default }.default_value(self).should == 42 }
   end
 
   describe '#defaultize' do
+    context do
+      let(:value) { 'value' }
+      let(:field) { build_field(default: ->{ value }) }
+
+      specify { field.defaultize(nil, self).should == 'value' }
+    end
+
+    context do
+      let(:value) { 'value' }
+      let(:field) { build_field(default: ->(instance) { instance.value }) }
+
+      specify { field.defaultize(nil, self).should == 'value' }
+    end
+
     context 'default_blank: false' do
       let(:field) { build_field(default: 'world') }
 
@@ -66,6 +82,22 @@ describe ActiveData::Attributes::Base do
 
       context do
         let(:field) { build_field(type: Boolean, default: true) }
+
+        specify { field.defaultize(nil, self).should == true }
+        specify { field.defaultize(true, self).should == true }
+        specify { field.defaultize(false, self).should == false }
+      end
+    end
+
+    context 'default_blank: value' do
+      let(:field) { build_field(default_blank: 'world') }
+
+      specify { field.defaultize('hello', self).should == 'hello' }
+      specify { field.defaultize('', self).should == 'world' }
+      specify { field.defaultize(nil, self).should == 'world' }
+
+      context do
+        let(:field) { build_field(type: Boolean, default_blank: true) }
 
         specify { field.defaultize(nil, self).should == true }
         specify { field.defaultize(true, self).should == true }
@@ -97,10 +129,15 @@ describe ActiveData::Attributes::Base do
   end
 
   describe '#normalize' do
-    specify { build_field.normalize(' hello ').should == ' hello ' }
-    specify { build_field(normalizer: ->(v){ v.strip }).normalize(' hello ').should == 'hello' }
-    specify { build_field(normalizer: [->(v){ v.strip }, ->(v){ v.first(4) }]).normalize(' hello ').should == 'hell' }
-    specify { build_field(normalizer: [->(v){ v.first(4) }, ->(v){ v.strip }]).normalize(' hello ').should == 'hel' }
+    specify { build_field.normalize(' hello ', self).should == ' hello ' }
+    specify { build_field(normalizer: ->(v){ v.strip }).normalize(' hello ', self).should == 'hello' }
+    specify { build_field(normalizer: [->(v){ v.strip }, ->(v){ v.first(4) }]).normalize(' hello ', self).should == 'hell' }
+    specify { build_field(normalizer: [->(v){ v.first(4) }, ->(v){ v.strip }]).normalize(' hello ', self).should == 'hel' }
+
+    context do
+      let(:value) { 'value' }
+      specify { build_field(normalizer: ->(v){ value }).normalize(' hello ', self).should == 'value' }
+    end
 
     context 'integration' do
       before do
@@ -109,17 +146,28 @@ describe ActiveData::Attributes::Base do
           value.strip
         end
         ActiveData.normalizer(:trim) do |value, options|
-          value.first(options[:length] || 2)
+          value.first(length || options[:length] || 2)
         end
       end
 
-      specify { build_field(normalizer: :strip).normalize(' hello ').should == 'hello' }
-      specify { build_field(normalizer: [:strip, :trim]).normalize(' hello ').should == 'he' }
-      specify { build_field(normalizer: [:trim, :strip]).normalize(' hello ').should == 'h' }
-      specify { build_field(normalizer: [:strip, { trim: { length: 4 } }]).normalize(' hello ').should == 'hell' }
-      specify { build_field(normalizer: {strip: { }, trim: { length: 4 } }).normalize(' hello ').should == 'hell' }
+      let(:length) { nil }
+
+      specify { build_field(normalizer: :strip).normalize(' hello ', self).should == 'hello' }
+      specify { build_field(normalizer: [:strip, :trim]).normalize(' hello ', self).should == 'he' }
+      specify { build_field(normalizer: [:trim, :strip]).normalize(' hello ', self).should == 'h' }
+      specify { build_field(normalizer: [:strip, { trim: { length: 4 } }]).normalize(' hello ', self).should == 'hell' }
+      specify { build_field(normalizer: {strip: { }, trim: { length: 4 } }).normalize(' hello ', self).should == 'hell' }
       specify { build_field(normalizer: [:strip, { trim: { length: 4 } }, ->(v){ v.last(2) }])
-        .normalize(' hello ').should == 'll' }
+        .normalize(' hello ', self).should == 'll' }
+
+      context do
+        let(:length) { 3 }
+
+        specify { build_field(normalizer: [:strip, { trim: { length: 4 } }]).normalize(' hello ', self).should == 'hel' }
+        specify { build_field(normalizer: {strip: { }, trim: { length: 4 } }).normalize(' hello ', self).should == 'hel' }
+        specify { build_field(normalizer: [:strip, { trim: { length: 4 } }, ->(v){ v.last(2) }])
+        .normalize(' hello ', self).should == 'el' }
+      end
     end
   end
 

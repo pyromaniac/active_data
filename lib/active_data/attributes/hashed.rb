@@ -14,7 +14,7 @@ module ActiveData
 
         normalize(Hash[hash.map do |key, value|
           [key, defaultize(enumerize(type_cast(value)), context)]
-        end].with_indifferent_access).with_indifferent_access
+        end].with_indifferent_access, context).with_indifferent_access
       end
 
       def read_value_before_type_cast hash, context
