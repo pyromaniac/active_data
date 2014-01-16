@@ -41,27 +41,34 @@ module ActiveData
         define_model_callbacks :initialize, only: :after
         define_model_callbacks :save, :create, :update, :destroy
 
-      private
-        def initialize *_
-          super
-          run_callbacks :initialize
-        end
+        alias_method_chain :initialize, :callbacks
+        alias_method_chain :save_object, :callbacks
+        alias_method_chain :create_object, :callbacks
+        alias_method_chain :update_object, :callbacks
+        alias_method_chain :destroy_object, :callbacks
+      end
 
-        def save_object
-          run_callbacks(:save) { super }
-        end
+    private
 
-        def create_object
-          run_callbacks(:create) { super }
-        end
+      def initialize_with_callbacks *_
+        initialize_without_callbacks(*_)
+        run_callbacks :initialize
+      end
 
-        def update_object
-          run_callbacks(:update) { super }
-        end
+      def save_object_with_callbacks
+        run_callbacks(:save) { save_object_without_callbacks }
+      end
 
-        def destroy_object
-          run_callbacks(:destroy) { super }
-        end
+      def create_object_with_callbacks
+        run_callbacks(:create) { create_object_without_callbacks }
+      end
+
+      def update_object_with_callbacks
+        run_callbacks(:update) { update_object_without_callbacks }
+      end
+
+      def destroy_object_with_callbacks
+        run_callbacks(:destroy) { destroy_object_without_callbacks }
       end
     end
   end
