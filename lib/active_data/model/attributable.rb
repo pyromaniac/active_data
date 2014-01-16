@@ -37,6 +37,10 @@ module ActiveData
         def initialize_attributes
           Hash[_attributes.keys.zip]
         end
+
+        def create attributes = {}
+          new attributes
+        end
       end
 
       def has_attribute? name
@@ -90,16 +94,6 @@ module ActiveData
         end
       end
       alias_method :attributes=, :assign_attributes
-
-      def reverse_update_attributes attributes
-        reverse_assign_attributes(attributes)
-      end
-
-      def reverse_assign_attributes attributes
-        (attributes.presence || {}).each do |(name, value)|
-          send("#{name}=", value) if respond_to?("#{name}=") && respond_to?(name) && send(name).blank?
-        end
-      end
 
     private
 

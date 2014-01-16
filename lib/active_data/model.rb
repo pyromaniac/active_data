@@ -42,6 +42,7 @@ module ActiveData
 
         instance.instance_variable_set(:@attributes, attributes)
         instance.instance_variable_set(:@persisted, true)
+        instance.instance_variable_set(:@destroyed, false)
 
         instance
       end
@@ -58,6 +59,7 @@ module ActiveData
     def initialize attributes = {}
       @attributes = self.class.initialize_attributes
       @persisted = false
+      @destroyed = false
       assign_attributes attributes
     end
 
@@ -67,6 +69,10 @@ module ActiveData
 
     def persisted?
       @persisted
+    end
+
+    def destroyed?
+      @destroyed
     end
 
     def == other

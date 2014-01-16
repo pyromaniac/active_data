@@ -18,7 +18,19 @@ module ActiveData
   class NotFound < ActiveDataError
   end
 
-  class UnknownAttributeError < NoMethodError
+  class ValidationError < ActiveDataError
+  end
+
+  class UnsavableObject < ActiveDataError
+  end
+
+  class UndestroyableObject < ActiveDataError
+  end
+
+  class ObjectNotSaved < ActiveDataError
+  end
+
+  class ObjectNotDestroyed < ActiveDataError
   end
 
   class NormalizerMissing < NoMethodError
