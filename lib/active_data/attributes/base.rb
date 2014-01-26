@@ -85,7 +85,7 @@ module ActiveData
                 context.instance_exec(value, options, &ActiveData.normalizer(name))
               end
             else
-              context.instance_exec(value, {}, &ActiveData.normalizer(normalizer.to_sym))
+              context.instance_exec(value, {}, &ActiveData.normalizer(normalizer.to_s))
             end
           end
         end
@@ -96,7 +96,7 @@ module ActiveData
       end
 
       def read_value_before_type_cast value, context
-        value
+        defaultize(value, context)
       end
 
       def generate_instance_methods context

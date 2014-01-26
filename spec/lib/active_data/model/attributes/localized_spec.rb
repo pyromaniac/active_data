@@ -22,6 +22,7 @@ describe ActiveData::Attributes::Localized do
 
     specify { field.read_value_before_type_cast(nil, self).should == {} }
     specify { field.read_value_before_type_cast({ en: 'hello' }, self).should == { 'en' => 'hello' } }
+    specify { field.read_value_before_type_cast({ en: nil }, self).should == { 'en' => 'world' } }
     specify { field.read_value_before_type_cast({ en: 42 }, self).should == { 'en' => 42 } }
     specify { field.read_value_before_type_cast({ en: 43 }, self).should == { 'en' => 43 } }
     specify { field.read_value_before_type_cast({ en: '' }, self).should == { 'en' => '' } }

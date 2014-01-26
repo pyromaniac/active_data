@@ -185,7 +185,7 @@ describe ActiveData::Attributes::Base do
   describe '#read_value_before_type_cast' do
     let(:field) { build_field(type: String, normalizer: ->(v){ v.strip }, default: 'world', enum: ['hello', '42']) }
 
-    specify { field.read_value_before_type_cast(nil, self).should == nil }
+    specify { field.read_value_before_type_cast(nil, self).should == 'world' }
     specify { field.read_value_before_type_cast('hello', self).should == 'hello' }
     specify { field.read_value_before_type_cast(42, self).should == 42 }
     specify { field.read_value_before_type_cast(43, self).should == 43 }
