@@ -101,6 +101,16 @@ describe ActiveData::Model::Lifecycle do
       end
     end
 
+    describe '#update, #update!' do
+      subject { User.new }
+
+      specify { expect { subject.update(name: 'Jonny') }.to change { subject.persisted? }.from(false).to(true) }
+      specify { expect { subject.update!(name: 'Jonny') }.to change { subject.persisted? }.from(false).to(true) }
+
+      specify { expect { subject.update({}) }.not_to change { subject.persisted? } }
+      specify { expect { subject.update!({}) }.to raise_error ActiveData::ValidationError }
+    end
+
     describe '#update_attributes, #update_attributes!' do
       subject { User.new }
 

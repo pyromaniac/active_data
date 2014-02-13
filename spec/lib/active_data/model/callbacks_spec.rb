@@ -35,9 +35,9 @@ describe ActiveData::Model::Lifecycle do
 
     specify { User.create.actions.should == [:before_save, :create, :after_save] }
     specify { User.new.tap(&:save).actions.should == [:before_save, :create, :after_save] }
-    specify { User.new.tap{ |u| u.update_attributes({}) }.actions.should == [:before_save, :create, :after_save] }
+    specify { User.new.tap{ |u| u.update({}) }.actions.should == [:before_save, :create, :after_save] }
     specify { User.create.tap(&:save).actions.should == [:before_save, :create, :after_save, :before_save, :update, :after_save] }
-    specify { User.create.tap{ |u| u.update_attributes({}) }.actions.should == [:before_save, :create, :after_save, :before_save, :update, :after_save] }
+    specify { User.create.tap{ |u| u.update({}) }.actions.should == [:before_save, :create, :after_save, :before_save, :update, :after_save] }
   end
 
   describe '.around_save' do
@@ -51,9 +51,9 @@ describe ActiveData::Model::Lifecycle do
 
     specify { User.create.actions.should == [:before_around_save, :create, :after_around_save] }
     specify { User.new.tap(&:save).actions.should == [:before_around_save, :create, :after_around_save] }
-    specify { User.new.tap{ |u| u.update_attributes({}) }.actions.should == [:before_around_save, :create, :after_around_save] }
+    specify { User.new.tap{ |u| u.update({}) }.actions.should == [:before_around_save, :create, :after_around_save] }
     specify { User.create.tap(&:save).actions.should == [:before_around_save, :create, :after_around_save, :before_around_save, :update, :after_around_save] }
-    specify { User.create.tap{ |u| u.update_attributes({}) }.actions.should == [:before_around_save, :create, :after_around_save, :before_around_save, :update, :after_around_save] }
+    specify { User.create.tap{ |u| u.update({}) }.actions.should == [:before_around_save, :create, :after_around_save, :before_around_save, :update, :after_around_save] }
   end
 
   describe '.before_create, .after_create' do
@@ -64,9 +64,9 @@ describe ActiveData::Model::Lifecycle do
 
     specify { User.create.actions.should == [:before_create, :create, :after_create] }
     specify { User.new.tap(&:save).actions.should == [:before_create, :create, :after_create] }
-    specify { User.new.tap{ |u| u.update_attributes({}) }.actions.should == [:before_create, :create, :after_create] }
+    specify { User.new.tap{ |u| u.update({}) }.actions.should == [:before_create, :create, :after_create] }
     specify { User.create.tap(&:save).actions.should == [:before_create, :create, :after_create, :update] }
-    specify { User.create.tap{ |u| u.update_attributes({}) }.actions.should == [:before_create, :create, :after_create, :update] }
+    specify { User.create.tap{ |u| u.update({}) }.actions.should == [:before_create, :create, :after_create, :update] }
   end
 
   describe '.around_create' do
@@ -80,9 +80,9 @@ describe ActiveData::Model::Lifecycle do
 
     specify { User.create.actions.should == [:before_around_create, :create, :after_around_create] }
     specify { User.new.tap(&:save).actions.should == [:before_around_create, :create, :after_around_create] }
-    specify { User.new.tap{ |u| u.update_attributes({}) }.actions.should == [:before_around_create, :create, :after_around_create] }
+    specify { User.new.tap{ |u| u.update({}) }.actions.should == [:before_around_create, :create, :after_around_create] }
     specify { User.create.tap(&:save).actions.should == [:before_around_create, :create, :after_around_create, :update] }
-    specify { User.create.tap{ |u| u.update_attributes({}) }.actions.should == [:before_around_create, :create, :after_around_create, :update] }
+    specify { User.create.tap{ |u| u.update({}) }.actions.should == [:before_around_create, :create, :after_around_create, :update] }
   end
 
   describe '.before_update, .after_update' do
@@ -93,9 +93,9 @@ describe ActiveData::Model::Lifecycle do
 
     specify { User.create.actions.should == [:create] }
     specify { User.new.tap(&:save).actions.should == [:create] }
-    specify { User.new.tap{ |u| u.update_attributes({}) }.actions.should == [:create] }
+    specify { User.new.tap{ |u| u.update({}) }.actions.should == [:create] }
     specify { User.create.tap(&:save).actions.should == [:create, :before_update, :update, :after_update] }
-    specify { User.create.tap{ |u| u.update_attributes({}) }.actions.should == [:create, :before_update, :update, :after_update] }
+    specify { User.create.tap{ |u| u.update({}) }.actions.should == [:create, :before_update, :update, :after_update] }
   end
 
   describe '.around_update' do
@@ -109,9 +109,9 @@ describe ActiveData::Model::Lifecycle do
 
     specify { User.create.actions.should == [:create] }
     specify { User.new.tap(&:save).actions.should == [:create] }
-    specify { User.new.tap{ |u| u.update_attributes({}) }.actions.should == [:create] }
+    specify { User.new.tap{ |u| u.update({}) }.actions.should == [:create] }
     specify { User.create.tap(&:save).actions.should == [:create, :before_around_update, :update, :after_around_update] }
-    specify { User.create.tap{ |u| u.update_attributes({}) }.actions.should == [:create, :before_around_update, :update, :after_around_update] }
+    specify { User.create.tap{ |u| u.update({}) }.actions.should == [:create, :before_around_update, :update, :after_around_update] }
   end
 
   describe '.before_save, .after_save, .around_save, .before_create, .after_create, .around_create, .before_update, .after_update, .around_update' do

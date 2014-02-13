@@ -84,9 +84,10 @@ module ActiveData
         @attributes.keys
       end
 
-      def update_attributes attributes
+      def update attributes
         assign_attributes(attributes)
       end
+      alias_method :update_attributes, :update
 
       def assign_attributes attributes
         (attributes.presence || {}).each do |(name, value)|

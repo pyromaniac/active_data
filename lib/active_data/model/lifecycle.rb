@@ -125,18 +125,20 @@ module ActiveData
       # Returns true or false in case of successful or unsuccessful
       # saving respectively.
       #
-      def update_attributes attributes
+      def update attributes
         assign_attributes(attributes) && save
       end
+      alias_method :update_attributes, :update
 
       # Assigns passed attributes and calls +save!+
       # Returns true in case of success and raises ActiveData::ValidationError
       # or ActiveData::ObjectNotSaved in case of validation or
       # saving fail respectively.
       #
-      def update_attributes! attributes
+      def update! attributes
         assign_attributes(attributes) && save!
       end
+      alias_method :update_attributes!, :update!
 
       # # Saves object by calling save performer defined with +define_save+,
       # +define_create+ or +define_update+ methods.
