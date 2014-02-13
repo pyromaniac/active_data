@@ -4,13 +4,22 @@ module ActiveData
       module Builders
         class EmbedsMany < Base
           class Proxy < Array
-            delegate :build, to: :@association
 
             def initialize(data, association)
               @association = association
               super(data)
             end
+
+            def build attributes = {}
+              push(@association.reflection.klass.new(attributes)).last
+            end
+
+            def create attributes = {}
+              push(@association.reflection.klass.create(attributes)).last
+            end
           end
+
+          delegate :build, :create, to: :target
 
           def target= value
             @target = Proxy.new value, self
@@ -20,12 +29,8 @@ module ActiveData
             @target ||= Proxy.new [], self
           end
 
-          def build attributes = {}
-            target.push(reflection.klass.new(attributes)).last
-          end
-
           def assign values
-            values = Array.wrap(values)
+            values ||= []
             values.each do |value|
               raise IncorrectEntity.new(reflection.klass, value.class) if value && !value.is_a?(reflection.klass)
             end

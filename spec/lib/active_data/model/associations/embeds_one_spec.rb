@@ -40,6 +40,12 @@ describe ActiveData::Model::Associations::Reflections::EmbedsOne do
     specify { expect { book.build_author(name: 'Author') }.to change { book.author }.from(nil).to(author) }
   end
 
+  describe '#create_author=' do
+    let(:author) { Author.new name: 'Author' }
+    specify { book.create_author(name: 'Author').should == author }
+    specify { expect { book.create_author(name: 'Author') }.to change { book.author }.from(nil).to(author) }
+  end
+
   describe '#==' do
     let(:author) { Author.new name: 'Author' }
     let(:other) { Author.new name: 'Other' }

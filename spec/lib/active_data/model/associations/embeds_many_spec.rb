@@ -21,9 +21,17 @@ describe ActiveData::Model::Associations::Reflections::EmbedsMany do
   end
 
   describe '#projects' do
-    let(:project) { Project.new title: 'Project' }
-    specify { user.projects.build(title: 'Project').should == project }
-    specify { expect { user.projects.build(title: 'Project') }.to change { user.projects }.from([]).to([project]) }
+    describe '#build' do
+      let(:project) { Project.new title: 'Project' }
+      specify { user.projects.build(title: 'Project').should == project }
+      specify { expect { user.projects.build(title: 'Project') }.to change { user.projects }.from([]).to([project]) }
+    end
+
+    describe '#create' do
+      let(:project) { Project.new title: 'Project' }
+      specify { user.projects.create(title: 'Project').should == project }
+      specify { expect { user.projects.create(title: 'Project') }.to change { user.projects }.from([]).to([project]) }
+    end
   end
 
   describe '#projects=' do

@@ -8,7 +8,11 @@ module ActiveData
           end
 
           def build attributes = {}
-            @target = reflection.klass.new attributes
+            @target = reflection.klass.new(attributes)
+          end
+
+          def create attributes = {}
+            @target = reflection.klass.create(attributes)
           end
 
           def assign value
