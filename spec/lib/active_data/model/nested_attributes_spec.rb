@@ -15,7 +15,7 @@ describe ActiveData::Model::Associations::NestedAttributes do
         include ActiveData::Model
 
         attribute :name
-        embeds_one :assoc, class_name: NestedAssoc
+        embeds_one :assoc, class_name: 'NestedAssoc'
 
         accepts_nested_attributes_for :assoc
       end
@@ -35,7 +35,7 @@ describe ActiveData::Model::Associations::NestedAttributes do
         include ActiveData::Model
 
         attribute :name
-        embeds_many :assocs, class_name: NestedAssoc
+        embeds_many :assocs, class_name: 'NestedAssoc'
 
         accepts_nested_attributes_for :assocs
       end

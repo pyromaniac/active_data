@@ -11,7 +11,7 @@ module ActiveData
 
           def klass
             @klass ||= begin
-              klass = options[:class] || (options[:class_name].to_s.presence || name.to_s.classify).safe_constantize
+              klass = (options[:class_name].presence || name.to_s.classify).safe_constantize
               raise "Can not determine class for `#{name}` association" unless klass
               klass
             end

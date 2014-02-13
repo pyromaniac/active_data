@@ -15,10 +15,10 @@ describe ActiveData::Validations do
       validates_presence_of :name
       validates_associated :validated_one, :unvalidated_one, :validated_many, :unvalidated_many
 
-      embeds_one :validated_one, class_name: ValidatedAssoc
-      embeds_one :unvalidated_one, class_name: UnvalidatedAssoc
-      embeds_many :validated_many, class_name: ValidatedAssoc
-      embeds_many :unvalidated_many, class_name: UnvalidatedAssoc
+      embeds_one :validated_one, class_name: 'ValidatedAssoc'
+      embeds_one :unvalidated_one, class_name: 'UnvalidatedAssoc'
+      embeds_many :validated_many, class_name: 'ValidatedAssoc'
+      embeds_many :unvalidated_many, class_name: 'UnvalidatedAssoc'
     end
   end
 
