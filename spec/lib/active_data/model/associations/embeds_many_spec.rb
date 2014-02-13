@@ -1,7 +1,7 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-describe ActiveData::Associations::Reflections::EmbedsMany do
+describe ActiveData::Model::Associations::Reflections::EmbedsMany do
   before do
     stub_model(:project) do
       attribute :title
@@ -16,7 +16,7 @@ describe ActiveData::Associations::Reflections::EmbedsMany do
   specify { user.projects.should == [] }
 
   describe '#association' do
-    specify { user.association(:projects).should be_a ActiveData::Associations::Builders::EmbedsMany }
+    specify { user.association(:projects).should be_a ActiveData::Model::Associations::Builders::EmbedsMany }
     specify { user.association(:projects).should == user.association(:projects) }
   end
 

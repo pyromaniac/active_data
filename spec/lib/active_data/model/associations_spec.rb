@@ -1,7 +1,7 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-describe ActiveData::Associations do
+describe ActiveData::Model::Associations do
   context 'inheritance' do
     before do
       stub_model(:nobody)

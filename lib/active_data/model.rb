@@ -13,7 +13,7 @@ module ActiveData
 
       include Attributable
       include Collectionizable
-      include ActiveData::Associations
+      include Associations
 
       self.include_root_in_json = ActiveData.include_root_in_json
 

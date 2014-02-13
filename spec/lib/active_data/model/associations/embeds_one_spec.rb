@@ -1,7 +1,7 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-describe ActiveData::Associations::Reflections::EmbedsOne do
+describe ActiveData::Model::Associations::Reflections::EmbedsOne do
   before do
     stub_model(:author) do
       attribute :name
@@ -17,7 +17,7 @@ describe ActiveData::Associations::Reflections::EmbedsOne do
   specify { book.author.should be_nil }
 
   describe '#association' do
-    specify { book.association(:author).should be_a ActiveData::Associations::Builders::EmbedsOne }
+    specify { book.association(:author).should be_a ActiveData::Model::Associations::Builders::EmbedsOne }
     specify { book.association(:author).should == book.association(:author) }
   end
 
