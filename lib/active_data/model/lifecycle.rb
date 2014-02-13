@@ -125,8 +125,8 @@ module ActiveData
       # Returns true or false in case of successful or unsuccessful
       # saving respectively.
       #
-      def update attributes
-        assign_attributes(attributes) && save
+      def update attributes, &block
+        assign_attributes(attributes) && save(&block)
       end
       alias_method :update_attributes, :update
 
@@ -135,8 +135,8 @@ module ActiveData
       # or ActiveData::ObjectNotSaved in case of validation or
       # saving fail respectively.
       #
-      def update! attributes
-        assign_attributes(attributes) && save!
+      def update! attributes, &block
+        assign_attributes(attributes) && save!(&block)
       end
       alias_method :update_attributes!, :update!
 
@@ -145,9 +145,10 @@ module ActiveData
       # Returns true or false in case of successful
       # or unsuccessful saving respectively. Changes +persisted?+ to true
       #
-      def save options = {}
-        raise ActiveData::UnsavableObject unless savable?
-        valid? && save_object
+      def save options = {}, &block
+        save_object(&block)
+      rescue ActiveData::ValidationError
+        false
       end
 
       # Saves object by calling save performer defined with +define_save+,
@@ -156,19 +157,16 @@ module ActiveData
       # or ActiveData::ObjectNotSaved in case of validation or
       # saving fail respectively. Changes +persisted?+ to true
       #
-      def save! options = {}
-        raise ActiveData::UnsavableObject unless savable?
-        raise ActiveData::ValidationError unless valid?
-        save_object or raise ActiveData::ObjectNotSaved
+      def save! options = {}, &block
+        save_object(&block) or raise ActiveData::ObjectNotSaved
       end
 
       # Destroys object by calling the destroy performer.
       # Returns instance in any case. Changes +persisted?+
       # to false and +destroyed?+ to true in case of success.
       #
-      def destroy
-        raise ActiveData::UndestroyableObject unless destroyable?
-        destroy_object
+      def destroy &block
+        destroy_object(&block)
         self
       end
 
@@ -177,9 +175,8 @@ module ActiveData
       # to false and +destroyed?+ to true.
       # Raises ActiveData::ObjectNotDestroyed in case of fail.
       #
-      def destroy!
-        raise ActiveData::UndestroyableObject unless destroyable?
-        destroy_object or raise ActiveData::ObjectNotDestroyed
+      def destroy! &block
+        destroy_object(&block) or raise ActiveData::ObjectNotDestroyed
         self
       end
 
@@ -189,7 +186,9 @@ module ActiveData
         !!((persisted? ? _update_performer : _create_performer) || _save_performer)
       end
 
-      def save_object
+      def save_object &block
+        raise ActiveData::UnsavableObject unless savable?
+        raise ActiveData::ValidationError unless valid?
         result = persisted? ? update_object : create_object
         @persisted = true if result
         result
@@ -209,7 +208,9 @@ module ActiveData
         !!_destroy_performer
       end
 
-      def destroy_object
+      def destroy_object &block
+        raise ActiveData::UndestroyableObject unless destroyable?
+
         result = instance_exec(self, &_destroy_performer)
         if result
           @persisted = false
