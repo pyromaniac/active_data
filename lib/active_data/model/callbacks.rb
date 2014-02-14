@@ -35,6 +35,8 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
+        extend ActiveModel::Callbacks
+
         include ActiveData::Model::Lifecycle
         include ActiveModel::Validations::Callbacks
 
