@@ -1,6 +1,9 @@
 require 'bundler'
 Bundler.require
 
+require 'coveralls'
+Coveralls.wear!
+
 require 'active_record'
 require 'database_cleaner'
 
