@@ -1,11 +1,11 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-describe ActiveData::Model::Attributable do
+describe ActiveData::Model::Attributes do
 
   let(:klass) do
     Class.new do
-      include ActiveData::Model::Attributable
+      include ActiveData::Model::Attributes
       attr_reader :name
 
       attribute :hello
@@ -85,7 +85,7 @@ describe ActiveData::Model::Attributable do
   context 'inheritance' do
     let!(:ancestor) do
       Class.new do
-        include ActiveData::Model::Attributable
+        include ActiveData::Model::Attributes
         attribute :foo
       end
     end

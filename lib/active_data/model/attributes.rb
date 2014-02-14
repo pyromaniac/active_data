@@ -1,6 +1,6 @@
 module ActiveData
   module Model
-    module Attributable
+    module Attributes
       extend ActiveSupport::Concern
 
       included do
@@ -22,7 +22,7 @@ module ActiveData
         end
 
         def build_attribute name, options = {}, &block
-          class_name = "ActiveData::Attributes::#{(options.delete(:mode).to_s.presence || 'base').classify}"
+          class_name = "ActiveData::Model::Attributes::#{(options.delete(:mode).to_s.presence || 'base').classify}"
           class_name.safe_constantize.new name, options, &block
         end
 

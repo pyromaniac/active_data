@@ -1,7 +1,7 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-describe ActiveData::Model::Collectionizable do
+describe ActiveData::Model::Collection do
   let(:klass) do
     Class.new do
       include ActiveData::Model

@@ -4,7 +4,7 @@ require 'spec_helper'
 describe 'typecasting' do
   let(:klass) do
     Class.new do
-      include ActiveData::Model::Attributable
+      include ActiveData::Model::Attributes
       attr_reader :name
 
       attribute :string, type: String

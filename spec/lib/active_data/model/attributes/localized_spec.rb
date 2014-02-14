@@ -1,7 +1,7 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-describe ActiveData::Attributes::Localized do
+describe ActiveData::Model::Attributes::Localized do
   def build_field(options = {}, &block)
     described_class.new(:field, options.reverse_merge(mode: :localized), &block)
   end

@@ -1,7 +1,7 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-describe ActiveData::Attributes::Base do
+describe ActiveData::Model::Attributes::Base do
   def build_field(options = {}, &block)
     described_class.new(:field, options, &block)
   end

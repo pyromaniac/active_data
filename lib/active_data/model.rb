@@ -11,8 +11,8 @@ module ActiveData
       include ActiveModel::Serialization
       include ActiveModel::Serializers::JSON
 
-      include Attributable
-      include Collectionizable
+      include Attributes
+      include Collection
       include Associations
 
       self.include_root_in_json = ActiveData.include_root_in_json
