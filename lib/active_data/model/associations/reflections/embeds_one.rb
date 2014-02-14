@@ -8,8 +8,8 @@ module ActiveData
             false
           end
 
-          def builder_class
-            ActiveData::Model::Associations::Builders::EmbedsOne
+          def association_class
+            ActiveData::Model::Associations::EmbedsOne
           end
 
           def define_methods target

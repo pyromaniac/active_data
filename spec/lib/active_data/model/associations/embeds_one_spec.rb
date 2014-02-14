@@ -17,7 +17,7 @@ describe ActiveData::Model::Associations::Reflections::EmbedsOne do
   specify { book.author.should be_nil }
 
   describe '#association' do
-    specify { book.association(:author).should be_a ActiveData::Model::Associations::Builders::EmbedsOne }
+    specify { book.association(:author).should be_a ActiveData::Model::Associations::EmbedsOne }
     specify { book.association(:author).should == book.association(:author) }
   end
 

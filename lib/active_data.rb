@@ -11,6 +11,10 @@ require 'active_data/config'
 require 'active_data/model'
 require 'active_data/model/extensions'
 
+ActiveSupport.on_load :active_record do
+  include ActiveData::ActiveRecord::Associations
+end
+
 module ActiveData
   class ActiveDataError < StandardError
   end

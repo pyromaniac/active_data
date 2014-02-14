@@ -21,8 +21,8 @@ module ActiveData
             klass.to_s
           end
 
-          def builder owner
-            builder_class.new owner, self
+          def build_association owner
+            association_class.new owner, self
           end
         end
       end

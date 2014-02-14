@@ -30,7 +30,7 @@ module ActiveData
 
       def association name
         @_associations ||= {}
-        @_associations[name.to_sym] ||= self.class.reflect_on_association(name).builder(self)
+        @_associations[name.to_sym] ||= self.class.reflect_on_association(name).build_association(self)
       end
 
       def == other
