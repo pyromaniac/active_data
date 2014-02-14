@@ -23,7 +23,7 @@ module ActiveData
     #     end
     #
     #     define_destroy do
-    #       REDIS.del(instance.id)
+    #       REDIS.del(id)
     #     end
     #   end
     #
@@ -46,6 +46,13 @@ module ActiveData
     #
     # In case of undefined performer ActiveData::UnsavableObject
     # or ActiveData::UndestroyableObject will be raised respectively.
+    #
+    # If performers was not defined in model, they cat be passed as
+    # blocks to `save`, `update` and `destroy` methods:
+    #
+    #   authos.save { REDIS.set(id, attributes.to_json) }
+    #   authos.update { REDIS.set(id, attributes.to_json) }
+    #   authos.destroy { REDIS.del(id) }
     #
     # Save and destroy processes acts almost the save way as
     # ActiveRecord's (with +persisted?+ and +destroyed?+ methods
@@ -125,6 +132,15 @@ module ActiveData
       # Returns true or false in case of successful or unsuccessful
       # saving respectively.
       #
+      #   author.update(name: 'Donald')
+      #
+      # If update performer is not defined with `define_update`
+      # or `define_save`, it raises ActiveData::UnsavableObject.
+      # Also save performer block might be passed instead of in-class
+      # performer definition:
+      #
+      #   author.update(name: 'Donald') { REDIS.set(id, attributes.to_json) }
+      #
       def update attributes, &block
         assign_attributes(attributes) && save(&block)
       end
@@ -135,6 +151,15 @@ module ActiveData
       # or ActiveData::ObjectNotSaved in case of validation or
       # saving fail respectively.
       #
+      #   author.update!(name: 'Donald')
+      #
+      # If update performer is not defined with `define_update`
+      # or `define_save`, it raises ActiveData::UnsavableObject.
+      # Also save performer block might be passed instead of in-class
+      # performer definition:
+      #
+      #   author.update!(name: 'Donald') { REDIS.set(id, attributes.to_json) }
+      #
       def update! attributes, &block
         assign_attributes(attributes) && save!(&block)
       end
@@ -144,6 +169,15 @@ module ActiveData
       # +define_create+ or +define_update+ methods.
       # Returns true or false in case of successful
       # or unsuccessful saving respectively. Changes +persisted?+ to true
+      #
+      #   author.save
+      #
+      # If save performer is not defined with `define_update` or
+      # `define_create` or `define_save`, it raises ActiveData::UnsavableObject.
+      # Also save performer block might be passed instead of in-class
+      # performer definition:
+      #
+      #   author.save { REDIS.set(id, attributes.to_json) }
       #
       def save options = {}, &block
         raise ActiveData::UnsavableObject unless block || savable?
@@ -156,6 +190,15 @@ module ActiveData
       # or ActiveData::ObjectNotSaved in case of validation or
       # saving fail respectively. Changes +persisted?+ to true
       #
+      #   author.save!
+      #
+      # If save performer is not defined with `define_update` or
+      # `define_create` or `define_save`, it raises ActiveData::UnsavableObject.
+      # Also save performer block might be passed instead of in-class
+      # performer definition:
+      #
+      #   author.save! { REDIS.set(id, attributes.to_json) }
+      #
       def save! options = {}, &block
         raise ActiveData::UnsavableObject unless block || savable?
         raise ActiveData::ValidationError unless valid?
@@ -165,6 +208,15 @@ module ActiveData
       # Destroys object by calling the destroy performer.
       # Returns instance in any case. Changes +persisted?+
       # to false and +destroyed?+ to true in case of success.
+      #
+      #   author.destroy
+      #
+      # If destroy performer is not defined with `define_destroy`,
+      # it raises ActiveData::UndestroyableObject.
+      # Also destroy performer block might be passed instead of in-class
+      # performer definition:
+      #
+      #   author.destroy { REDIS.del(id) }
       #
       def destroy &block
         raise ActiveData::UndestroyableObject unless block || destroyable?
@@ -176,6 +228,15 @@ module ActiveData
       # In case of success returns instance and changes +persisted?+
       # to false and +destroyed?+ to true.
       # Raises ActiveData::ObjectNotDestroyed in case of fail.
+      #
+      #   author.destroy!
+      #
+      # If destroy performer is not defined with `define_destroy`,
+      # it raises ActiveData::UndestroyableObject.
+      # Also destroy performer block might be passed instead of in-class
+      # performer definition:
+      #
+      #   author.destroy! { REDIS.del(id) }
       #
       def destroy! &block
         raise ActiveData::UndestroyableObject unless block || destroyable?

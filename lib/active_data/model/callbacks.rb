@@ -37,7 +37,6 @@ module ActiveData
       included do
         include ActiveData::Model::Lifecycle
         include ActiveModel::Validations::Callbacks
-        extend ActiveModel::Callbacks
 
         define_model_callbacks :initialize, only: :after
         define_model_callbacks :save, :create, :update, :destroy
