@@ -109,6 +109,16 @@ describe ActiveData::Model::Lifecycle do
 
       specify { expect { subject.update({}) }.not_to change { subject.persisted? } }
       specify { expect { subject.update!({}) }.to raise_error ActiveData::ValidationError }
+
+      specify { expect { subject.update(name: 'Jonny') }
+        .to change { Storage.storage.keys }.from([]).to([subject.id]) }
+      specify { expect { subject.update!(name: 'Jonny') }
+        .to change { Storage.storage.keys }.from([]).to([subject.id]) }
+
+      specify { expect { subject.update(name: 'Jonny') { Storage.storage[id] = 'created' } }
+        .to change { Storage.storage[subject.id] }.from(nil).to('created') }
+      specify { expect { subject.update!(name: 'Jonny') { Storage.storage[id] = 'created' } }
+        .to change { Storage.storage[subject.id] }.from(nil).to('created') }
     end
 
     describe '#update_attributes, #update_attributes!' do
@@ -119,6 +129,16 @@ describe ActiveData::Model::Lifecycle do
 
       specify { expect { subject.update_attributes({}) }.not_to change { subject.persisted? } }
       specify { expect { subject.update_attributes!({}) }.to raise_error ActiveData::ValidationError }
+
+      specify { expect { subject.update_attributes(name: 'Jonny') }
+        .to change { Storage.storage.keys }.from([]).to([subject.id]) }
+      specify { expect { subject.update_attributes!(name: 'Jonny') }
+        .to change { Storage.storage.keys }.from([]).to([subject.id]) }
+
+      specify { expect { subject.update_attributes(name: 'Jonny') { Storage.storage[id] = 'created' } }
+        .to change { Storage.storage[subject.id] }.from(nil).to('created') }
+      specify { expect { subject.update_attributes!(name: 'Jonny') { Storage.storage[id] = 'created' } }
+        .to change { Storage.storage[subject.id] }.from(nil).to('created') }
     end
 
     describe '#save, #save!' do
@@ -150,6 +170,11 @@ describe ActiveData::Model::Lifecycle do
         specify { expect { subject.save }.to change { Storage.storage.keys }.from([]).to([subject.id]) }
         specify { expect { subject.save! }.to change { Storage.storage.keys }.from([]).to([subject.id]) }
 
+        specify { expect { subject.save { Storage.storage[id] = 'created' } }
+          .to change { Storage.storage[subject.id] }.from(nil).to('created') }
+        specify { expect { subject.save! { Storage.storage[id] = 'created' } }
+          .to change { Storage.storage[subject.id] }.from(nil).to('created') }
+
         context 'save failed' do
           before { User.define_save { false } }
 
@@ -179,6 +204,13 @@ describe ActiveData::Model::Lifecycle do
           .from(hash_including(name: 'Jonny')).to(hash_including(name: 'Jimmy')) }
         specify { expect { subject.save! }.to change { Storage.storage[subject.id] }
           .from(hash_including(name: 'Jonny')).to(hash_including(name: 'Jimmy')) }
+
+        specify { expect { subject.save { Storage.storage[id] = 'updated' } }
+          .to change { Storage.storage[subject.id] }
+          .from(hash_including(name: 'Jonny')).to('updated') }
+        specify { expect { subject.save! { Storage.storage[id] = 'updated' } }
+          .to change { Storage.storage[subject.id] }
+          .from(hash_including(name: 'Jonny')).to('updated') }
 
         context 'save failed' do
           before { User.define_save { false } }
@@ -212,6 +244,11 @@ describe ActiveData::Model::Lifecycle do
 
       specify { expect { subject.destroy }.to change { Storage.storage.keys }.from([subject.id]).to([]) }
       specify { expect { subject.destroy! }.to change { Storage.storage.keys }.from([subject.id]).to([]) }
+
+      specify { expect { subject.destroy { Storage.storage[id] = 'deleted' } }
+        .to change { Storage.storage[subject.id] }.to('deleted') }
+      specify { expect { subject.destroy! { Storage.storage[id] = 'deleted' } }
+        .to change { Storage.storage[subject.id] }.to('deleted') }
 
       context 'save failed' do
         before { User.define_destroy { false } }

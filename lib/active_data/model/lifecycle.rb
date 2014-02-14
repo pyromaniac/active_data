@@ -146,9 +146,8 @@ module ActiveData
       # or unsuccessful saving respectively. Changes +persisted?+ to true
       #
       def save options = {}, &block
-        save_object(&block)
-      rescue ActiveData::ValidationError
-        false
+        raise ActiveData::UnsavableObject unless block || savable?
+        valid? && save_object(&block)
       end
 
       # Saves object by calling save performer defined with +define_save+,
@@ -158,6 +157,8 @@ module ActiveData
       # saving fail respectively. Changes +persisted?+ to true
       #
       def save! options = {}, &block
+        raise ActiveData::UnsavableObject unless block || savable?
+        raise ActiveData::ValidationError unless valid?
         save_object(&block) or raise ActiveData::ObjectNotSaved
       end
 
@@ -166,6 +167,7 @@ module ActiveData
       # to false and +destroyed?+ to true in case of success.
       #
       def destroy &block
+        raise ActiveData::UndestroyableObject unless block || destroyable?
         destroy_object(&block)
         self
       end
@@ -176,6 +178,7 @@ module ActiveData
       # Raises ActiveData::ObjectNotDestroyed in case of fail.
       #
       def destroy! &block
+        raise ActiveData::UndestroyableObject unless block || destroyable?
         destroy_object(&block) or raise ActiveData::ObjectNotDestroyed
         self
       end
@@ -187,20 +190,18 @@ module ActiveData
       end
 
       def save_object &block
-        raise ActiveData::UnsavableObject unless savable?
-        raise ActiveData::ValidationError unless valid?
-        result = persisted? ? update_object : create_object
+        result = persisted? ? update_object(&block) : create_object(&block)
         @persisted = true if result
         result
       end
 
-      def create_object
-        performer = _create_performer || _save_performer
+      def create_object &block
+        performer = block || _create_performer || _save_performer
         instance_exec(self, &performer)
       end
 
-      def update_object
-        performer = _update_performer || _save_performer
+      def update_object &block
+        performer = block || _update_performer || _save_performer
         instance_exec(self, &performer)
       end
 
@@ -209,9 +210,8 @@ module ActiveData
       end
 
       def destroy_object &block
-        raise ActiveData::UndestroyableObject unless destroyable?
-
-        result = instance_exec(self, &_destroy_performer)
+        performer = block || _destroy_performer
+        result = instance_exec(self, &performer)
         if result
           @persisted = false
           @destroyed = true

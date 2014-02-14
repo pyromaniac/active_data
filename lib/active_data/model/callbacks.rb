@@ -36,6 +36,7 @@ module ActiveData
 
       included do
         include ActiveData::Model::Lifecycle
+        include ActiveModel::Validations::Callbacks
         extend ActiveModel::Callbacks
 
         define_model_callbacks :initialize, only: :after
@@ -55,20 +56,20 @@ module ActiveData
         run_callbacks :initialize
       end
 
-      def save_object_with_callbacks
-        run_callbacks(:save) { save_object_without_callbacks }
+      def save_object_with_callbacks &block
+        run_callbacks(:save) { save_object_without_callbacks(&block) }
       end
 
-      def create_object_with_callbacks
-        run_callbacks(:create) { create_object_without_callbacks }
+      def create_object_with_callbacks &block
+        run_callbacks(:create) { create_object_without_callbacks(&block) }
       end
 
-      def update_object_with_callbacks
-        run_callbacks(:update) { update_object_without_callbacks }
+      def update_object_with_callbacks &block
+        run_callbacks(:update) { update_object_without_callbacks(&block) }
       end
 
-      def destroy_object_with_callbacks
-        run_callbacks(:destroy) { destroy_object_without_callbacks }
+      def destroy_object_with_callbacks &block
+        run_callbacks(:destroy) { destroy_object_without_callbacks(&block) }
       end
     end
   end
