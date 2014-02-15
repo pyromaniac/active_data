@@ -20,12 +20,17 @@ module ActiveData
 
         delegate :build, :create, to: :target
 
+        def load_target
+          data = owner.read_attribute reflection.name
+          data ? reflection.klass.instantiate_collection(data) : []
+        end
+
         def target= value
           @target = Proxy.new value, self
         end
 
         def target
-          @target ||= Proxy.new [], self
+          @target ||= Proxy.new load_target, self
         end
 
         def assign values

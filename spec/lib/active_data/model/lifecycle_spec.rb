@@ -11,31 +11,80 @@ describe ActiveData::Model::Lifecycle do
 
     subject { User.new }
 
-    specify { expect { subject.save }.to raise_error ActiveData::UnsavableObject }
-    specify { expect { subject.save! }.to raise_error ActiveData::UnsavableObject }
+    [:save, :create, :update, :destroy].each do |action|
+      specify { expect { subject.public_send "_#{action}_performer=", '' }.to raise_error NoMethodError }
+    end
 
-    specify { expect { subject.destroy }.to raise_error ActiveData::UndestroyableObject }
-    specify { expect { subject.destroy! }.to raise_error ActiveData::UndestroyableObject }
+    context 'save' do
+      specify { expect { subject.save }.to raise_error ActiveData::UnsavableObject }
+      specify { expect { subject.save! }.to raise_error ActiveData::UnsavableObject }
 
-    context do
-      before { User.define_create { true } }
+      specify { subject.save { true }.should == true }
+      specify { subject.save! { true }.should == true }
 
-      specify { subject.save.should == true }
-      specify { subject.save!.should == true }
+      context 'instance performer' do
+        before { subject.define_save { false } }
 
-      context do
-        subject { User.create }
+        specify { subject.save.should == false }
+        specify { expect { subject.save! }.to raise_error ActiveData::ObjectNotSaved }
+      end
+
+      context 'create performer' do
+        before { User.define_create { true } }
+
+        specify { subject.save.should == true }
+        specify { subject.save!.should == true }
+
+        context do
+          subject { User.create }
+
+          specify { expect { subject.save }.to raise_error ActiveData::UnsavableObject }
+          specify { expect { subject.save! }.to raise_error ActiveData::UnsavableObject }
+        end
+
+        context 'instance performer' do
+          before { subject.define_create { false } }
+
+          specify { subject.save.should == false }
+          specify { expect { subject.save! }.to raise_error ActiveData::ObjectNotSaved }
+        end
+      end
+
+      context 'update performer' do
+        before { User.define_update { true } }
 
         specify { expect { subject.save }.to raise_error ActiveData::UnsavableObject }
         specify { expect { subject.save! }.to raise_error ActiveData::UnsavableObject }
+
+        context do
+          subject { User.new.tap { |u| u.save { true } } }
+
+          specify { subject.save.should == true }
+          specify { subject.save!.should == true }
+
+          context 'instance performer' do
+            before { subject.define_update { false } }
+
+            specify { subject.save.should == false }
+            specify { expect { subject.save! }.to raise_error ActiveData::ObjectNotSaved }
+          end
+        end
       end
     end
 
-    context do
-      before { User.define_update { true } }
+    context 'destroy' do
+      specify { expect { subject.destroy }.to raise_error ActiveData::UndestroyableObject }
+      specify { expect { subject.destroy! }.to raise_error ActiveData::UndestroyableObject }
 
-      specify { expect { subject.save }.to raise_error ActiveData::UnsavableObject }
-      specify { expect { subject.save! }.to raise_error ActiveData::UnsavableObject }
+      specify { expect { subject.destroy { true } }.to be_true }
+      specify { expect { subject.destroy! { true } }.to be_true }
+
+      context 'instance performer' do
+        before { subject.define_save { false } }
+
+        specify { subject.save.should == false }
+        specify { expect { subject.save! }.to raise_error ActiveData::ObjectNotSaved }
+      end
     end
   end
 
@@ -114,11 +163,6 @@ describe ActiveData::Model::Lifecycle do
         .to change { Storage.storage.keys }.from([]).to([subject.id]) }
       specify { expect { subject.update!(name: 'Jonny') }
         .to change { Storage.storage.keys }.from([]).to([subject.id]) }
-
-      specify { expect { subject.update(name: 'Jonny') { Storage.storage[id] = 'created' } }
-        .to change { Storage.storage[subject.id] }.from(nil).to('created') }
-      specify { expect { subject.update!(name: 'Jonny') { Storage.storage[id] = 'created' } }
-        .to change { Storage.storage[subject.id] }.from(nil).to('created') }
     end
 
     describe '#update_attributes, #update_attributes!' do
@@ -134,11 +178,6 @@ describe ActiveData::Model::Lifecycle do
         .to change { Storage.storage.keys }.from([]).to([subject.id]) }
       specify { expect { subject.update_attributes!(name: 'Jonny') }
         .to change { Storage.storage.keys }.from([]).to([subject.id]) }
-
-      specify { expect { subject.update_attributes(name: 'Jonny') { Storage.storage[id] = 'created' } }
-        .to change { Storage.storage[subject.id] }.from(nil).to('created') }
-      specify { expect { subject.update_attributes!(name: 'Jonny') { Storage.storage[id] = 'created' } }
-        .to change { Storage.storage[subject.id] }.from(nil).to('created') }
     end
 
     describe '#save, #save!' do
@@ -170,11 +209,6 @@ describe ActiveData::Model::Lifecycle do
         specify { expect { subject.save }.to change { Storage.storage.keys }.from([]).to([subject.id]) }
         specify { expect { subject.save! }.to change { Storage.storage.keys }.from([]).to([subject.id]) }
 
-        specify { expect { subject.save { Storage.storage[id] = 'created' } }
-          .to change { Storage.storage[subject.id] }.from(nil).to('created') }
-        specify { expect { subject.save! { Storage.storage[id] = 'created' } }
-          .to change { Storage.storage[subject.id] }.from(nil).to('created') }
-
         context 'save failed' do
           before { User.define_save { false } }
 
@@ -204,13 +238,6 @@ describe ActiveData::Model::Lifecycle do
           .from(hash_including(name: 'Jonny')).to(hash_including(name: 'Jimmy')) }
         specify { expect { subject.save! }.to change { Storage.storage[subject.id] }
           .from(hash_including(name: 'Jonny')).to(hash_including(name: 'Jimmy')) }
-
-        specify { expect { subject.save { Storage.storage[id] = 'updated' } }
-          .to change { Storage.storage[subject.id] }
-          .from(hash_including(name: 'Jonny')).to('updated') }
-        specify { expect { subject.save! { Storage.storage[id] = 'updated' } }
-          .to change { Storage.storage[subject.id] }
-          .from(hash_including(name: 'Jonny')).to('updated') }
 
         context 'save failed' do
           before { User.define_save { false } }
@@ -244,11 +271,6 @@ describe ActiveData::Model::Lifecycle do
 
       specify { expect { subject.destroy }.to change { Storage.storage.keys }.from([subject.id]).to([]) }
       specify { expect { subject.destroy! }.to change { Storage.storage.keys }.from([subject.id]).to([]) }
-
-      specify { expect { subject.destroy { Storage.storage[id] = 'deleted' } }
-        .to change { Storage.storage[subject.id] }.to('deleted') }
-      specify { expect { subject.destroy! { Storage.storage[id] = 'deleted' } }
-        .to change { Storage.storage[subject.id] }.to('deleted') }
 
       context 'save failed' do
         before { User.define_destroy { false } }

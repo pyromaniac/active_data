@@ -28,17 +28,7 @@ module ActiveData
         instance = allocate
 
         attributes = initialize_attributes
-        attributes.merge!(data.slice(*attributes.keys))
-
-        data.slice(*reflections.keys.map(&:to_s)).each do |name, data|
-          reflection = reflect_on_association(name)
-          data = if reflection.collection?
-            reflection.klass.instantiate_collection data
-          else
-            reflection.klass.instantiate data
-          end
-          instance.send(:"#{name}=", data)
-        end
+        attributes.merge!(data.slice(*attributes.keys, *reflections.keys.map(&:to_s)))
 
         instance.instance_variable_set(:@attributes, attributes)
         instance.instance_variable_set(:@persisted, true)

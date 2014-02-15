@@ -63,7 +63,8 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
-        class_attribute *[:save, :create, :update, :destroy].map { |action| "_#{action}_performer" }, instance_writer: false
+        class_attribute *[:save, :create, :update, :destroy].map { |action| "_#{action}_performer" }
+        private *[:save, :create, :update, :destroy].map { |action| "_#{action}_performer=" }
       end
 
       module ClassMethods
@@ -108,7 +109,7 @@ module ActiveData
         #
         [:save, :create, :update, :destroy].each do |action|
           define_method "define_#{action}" do |&block|
-            self.send("_#{action}_performer=", block)
+            send("_#{action}_performer=", block)
           end
         end
 
@@ -125,6 +126,21 @@ module ActiveData
         #
         def create! attributes = {}
           new(attributes).tap(&:save!)
+        end
+      end
+
+      # <tt>define_<action></tt> on instance level works the same
+      # way as class <tt>define_<action></tt> methods, but defines
+      # performers for instance only
+      #
+      #   user.define_save do
+      #     REDIS.set(id, attributes.to_json)
+      #   end
+      #   user.save! # => will use instance-level performer
+      #
+      [:save, :create, :update, :destroy].each do |action|
+        define_method "define_#{action}" do |&block|
+          send("_#{action}_performer=", block)
         end
       end
 

@@ -70,14 +70,7 @@ module ActiveData
       end
 
       def attributes
-        Hash[attribute_names.map { |name| [name, send(name)] }]
-      end
-
-      def present_attributes
-        Hash[attribute_names.map do |name|
-          value = send(name)
-          [name, value] unless value.respond_to?(:empty?) ? value.empty? : value.nil?
-        end.compact]
+        Hash[attribute_names.map { |name| [name, public_send(name)] }]
       end
 
       def attribute_names
@@ -91,7 +84,7 @@ module ActiveData
 
       def assign_attributes attributes
         (attributes.presence || {}).each do |(name, value)|
-          send("#{name}=", value) if has_attribute?(name) || respond_to?("#{name}=")
+          public_send("#{name}=", value) if has_attribute?(name) || respond_to?("#{name}=")
         end
       end
       alias_method :attributes=, :assign_attributes

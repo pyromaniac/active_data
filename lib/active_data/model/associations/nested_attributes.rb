@@ -44,7 +44,7 @@ module ActiveData
 
           reflection = self.class.reflect_on_association association_name
 
-          send "#{association_name}=", attributes_collection.map { |attrs| reflection.klass.new attrs }
+          public_send "#{association_name}=", attributes_collection.map { |attrs| reflection.klass.new attrs }
         end
 
         def assign_nested_attributes_for_one_to_one_association(association_name, attributes, assignment_opts = {})
@@ -54,7 +54,7 @@ module ActiveData
 
           reflection = self.class.reflect_on_association association_name
 
-          send "#{association_name}=", reflection.klass.new(attributes)
+          public_send "#{association_name}=", reflection.klass.new(attributes)
         end
       end
     end

@@ -12,6 +12,7 @@ module ActiveData
         { embeds_many: Reflections::EmbedsMany, embeds_one: Reflections::EmbedsOne }.each do |(name, reflection_class)|
           define_singleton_method name do |*args|
             reflection = reflection_class.new *args
+            attribute reflection.name, mode: :association
             reflection.define_methods self
             self._reflections = _reflections.merge(reflection.name => reflection)
           end
@@ -35,7 +36,7 @@ module ActiveData
 
       def == other
         super(other) && self.class.reflections.keys.all? do |association|
-          send(association) == other.send(association)
+          public_send(association) == other.public_send(association)
         end
       end
     end
