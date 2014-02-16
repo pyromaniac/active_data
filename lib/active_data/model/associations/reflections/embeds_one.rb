@@ -15,11 +15,11 @@ module ActiveData
           def define_methods target
             target.class_eval <<-EOS
               def #{name}
-                association(:#{name}).target
+                association(:#{name}).reader
               end
 
               def #{name}= value
-                association(:#{name}).assign(value)
+                association(:#{name}).writer(value)
               end
 
               def build_#{name} attributes = {}
@@ -28,6 +28,10 @@ module ActiveData
 
               def create_#{name} attributes = {}
                 association(:#{name}).create(attributes)
+              end
+
+              def create_#{name}! attributes = {}
+                association(:#{name}).create!(attributes)
               end
             EOS
           end

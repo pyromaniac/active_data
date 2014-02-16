@@ -15,11 +15,11 @@ module ActiveData
           def define_methods target
             target.class_eval <<-EOS
               def #{name}
-                association(:#{name}).target
+                association(:#{name}).reader
               end
 
               def #{name}= value
-                association(:#{name}).assign(value)
+                association(:#{name}).writer(value)
               end
             EOS
           end
