@@ -75,6 +75,14 @@ module ActiveData
       @attributes.frozen?
     end
 
+    def mark_for_destruction
+      @marked_for_destruction = true
+    end
+
+    def marked_for_destruction?
+      @marked_for_destruction
+    end
+
     def == other
       other.instance_of?(self.class) && other.attributes == attributes
     end
