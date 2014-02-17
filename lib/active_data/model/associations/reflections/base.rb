@@ -3,6 +3,9 @@ module ActiveData
     module Associations
       module Reflections
         class Base
+          READ = ->(reflection, object) { object.read_attribute reflection.name }
+          WRITE = ->(reflection, object, value) { object.write_attribute reflection.name, value }
+
           attr_reader :name, :options
 
           def initialize name, options = {}
@@ -23,6 +26,14 @@ module ActiveData
 
           def build_association owner
             association_class.new owner, self
+          end
+
+          def read_source object
+            (options[:read] || READ).call(self, object)
+          end
+
+          def write_source object, value
+            (options[:write] || WRITE).call(self, object, value)
           end
         end
       end

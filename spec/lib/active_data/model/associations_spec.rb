@@ -32,6 +32,29 @@ describe ActiveData::Model::Associations do
 
     specify { book.author.should be_nil }
 
+    context ':read, :write' do
+      before do
+        stub_model(:book) do
+          attribute :title
+          embeds_one :author,
+            read: ->(reflection, object) {
+              value = object.read_attribute(reflection.name)
+              JSON.parse(value) if value.present?
+            },
+            write: ->(reflection, object, value) {
+              object.write_attribute(reflection.name, value.to_json)
+            }
+        end
+      end
+
+      let(:book) { Book.instantiate author: {name: 'Duke'}.to_json }
+      let(:author) { Author.new(name: 'Rick') }
+
+      specify { expect { book.author = author }
+        .to change { book.read_attribute(:author) }
+        .from({name: 'Duke'}.to_json).to({name: 'Rick'}.to_json) }
+    end
+
     describe '#author=' do
       let(:author) { Author.new name: 'Author' }
       specify { expect { book.author = author }.to change { book.author }.from(nil).to(author) }
@@ -84,6 +107,31 @@ describe ActiveData::Model::Associations do
       end
     end
     let(:user) { User.new }
+
+    context ':read, :write' do
+      before do
+        stub_model(:user) do
+          attribute :name
+          embeds_many :projects,
+            read: ->(reflection, object) {
+              value = object.read_attribute(reflection.name)
+              JSON.parse(value) if value.present?
+            },
+            write: ->(reflection, object, value) {
+              object.write_attribute(reflection.name, value.to_json)
+            }
+        end
+      end
+
+      let(:user) { User.instantiate name: 'Rick', projects: [{title: 'Genesis'}].to_json }
+      let(:new_project1) { Project.new(title: 'Project 1') }
+      let(:new_project2) { Project.new(title: 'Project 2') }
+
+      specify { expect { user.projects.concat([new_project1, new_project2]) }
+        .to change { user.read_attribute(:projects) }
+        .from([{title: 'Genesis'}].to_json)
+        .to([{title: 'Genesis'}, {title: 'Project 1'}, {title: 'Project 2'}].to_json) }
+    end
 
     describe '#projects' do
       specify { user.projects.should == [] }

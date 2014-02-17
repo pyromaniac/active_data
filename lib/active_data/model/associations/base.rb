@@ -24,11 +24,11 @@ module ActiveData
       private
 
         def read_source
-          owner.read_attribute reflection.name
+          reflection.read_source owner
         end
 
         def write_source value
-          owner.write_attribute reflection.name, value
+          reflection.write_source owner, value
         end
       end
     end
