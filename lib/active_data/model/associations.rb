@@ -23,6 +23,24 @@ module ActiveData
         def reflect_on_association name
           reflections[name.to_sym]
         end
+
+        def inspect
+          attributes = _attributes.map do |name, attribute|
+            data = if reflection = reflect_on_association(name)
+              case reflection.macro
+              when :embeds_one
+                reflection.klass
+              when :embeds_many
+                "[#{reflection.klass}, ...]"
+              end
+            else
+              attribute.type
+            end
+            "#{name}: #{data}"
+          end.join(', ')
+
+          "#{name}(#{attributes})"
+        end
       end
 
       def association name

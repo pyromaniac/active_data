@@ -3,6 +3,9 @@ module ActiveData
     module Associations
       module Reflections
         class EmbedsOne < Base
+          def macro
+            :embeds_one
+          end
 
           def collection?
             false
@@ -35,7 +38,6 @@ module ActiveData
               end
             EOS
           end
-
         end
       end
     end

@@ -41,6 +41,11 @@ module ActiveData
         def create attributes = {}
           new attributes
         end
+
+        def inspect
+          attributes = _attributes.map { |name, attribute| "#{name}: #{attribute.type}" }.join(', ')
+          "#{name}(#{attributes})"
+        end
       end
 
       def has_attribute? name
@@ -89,7 +94,23 @@ module ActiveData
       end
       alias_method :attributes=, :assign_attributes
 
+      def inspect
+        "#<#{self.class} #{attribute_names.map { |name| "#{name}: #{attribute_for_inspect(name)}" }.join(', ')}>"
+      end
+
     private
+
+      def attribute_for_inspect(name)
+        value = read_attribute(name)
+
+        if value.is_a?(String) && value.length > 50
+          "#{value[0..50]}...".inspect
+        elsif value.is_a?(Date) || value.is_a?(Time)
+          %("#{value.to_s(:db)}")
+        else
+          value.inspect
+        end
+      end
 
       def attributes_cache
         @attributes_cache ||= {}

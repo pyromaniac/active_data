@@ -30,7 +30,7 @@ module ActiveData
         instance = allocate
 
         attributes = initialize_attributes
-        attributes.merge!(data.slice(*attributes.keys, *reflections.keys.map(&:to_s)))
+        attributes.merge!(data.slice(*attributes.keys))
 
         instance.instance_variable_set(:@attributes, attributes)
         instance.instance_variable_set(:@persisted, true)
@@ -57,10 +57,6 @@ module ActiveData
 
     def == other
       other.instance_of?(self.class) && other.attributes == attributes
-    end
-
-    def inspect
-      "#<#{self.class} #{attributes.map { |name, value| "#{name}: #{value.inspect}" }.join(' ')}>"
     end
   end
 end

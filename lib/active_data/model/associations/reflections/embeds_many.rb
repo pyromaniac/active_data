@@ -3,6 +3,9 @@ module ActiveData
     module Associations
       module Reflections
         class EmbedsMany < Base
+          def macro
+            :embeds_many
+          end
 
           def collection?
             true
@@ -23,7 +26,6 @@ module ActiveData
               end
             EOS
           end
-
         end
       end
     end
