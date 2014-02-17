@@ -14,14 +14,14 @@ module ActiveData
 
           def klass
             @klass ||= begin
-              klass = (options[:class_name].presence || name.to_s.classify).safe_constantize
+              klass = class_name.safe_constantize
               raise "Can not determine class for `#{name}` association" unless klass
               klass
             end
           end
 
           def class_name
-            klass.to_s
+            @class_name ||= (options[:class_name].presence || name.to_s.classify).to_s
           end
 
           def build_association owner

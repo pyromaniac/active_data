@@ -44,9 +44,10 @@ module ActiveData
 
         def writer values
           transaction do
-            clear
+            reader.map(&:destroy!)
             concat_objects(values) or raise ActiveData::AssociationNotSaved
           end
+          reload
         end
 
         def concat *objects
