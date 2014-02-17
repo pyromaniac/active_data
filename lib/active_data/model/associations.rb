@@ -6,26 +6,22 @@ module ActiveData
       included do
         include NestedAttributes
 
-        class_attribute :_reflections, instance_reader: false, instance_writer: false
-        self._reflections = {}
+        class_attribute :reflections, instance_reader: false, instance_writer: false
+        self.reflections = {}
 
         { embeds_many: Reflections::EmbedsMany, embeds_one: Reflections::EmbedsOne }.each do |(name, reflection_class)|
           define_singleton_method name do |*args|
             reflection = reflection_class.new *args
             attribute reflection.name, mode: :association
             reflection.define_methods self
-            self._reflections = _reflections.merge(reflection.name => reflection)
+            self.reflections = reflections.merge(reflection.name => reflection)
           end
         end
       end
 
       module ClassMethods
         def reflect_on_association name
-          _reflections[name.to_sym]
-        end
-
-        def reflections
-          _reflections
+          reflections[name.to_sym]
         end
       end
 
