@@ -37,6 +37,9 @@ module ActiveData
   class ObjectNotDestroyed < ActiveDataError
   end
 
+  class AssociationNotSaved < ActiveDataError
+  end
+
   class NormalizerMissing < NoMethodError
     def initialize name
       super <<-EOS
@@ -50,9 +53,9 @@ You can define it with:
     end
   end
 
-  class IncorrectEntity < ActiveDataError
+  class AssociationTypeMismatch < ActiveDataError
     def initialize expected, got
-      super "Expected `#{expected}`, but got `#{got}`"
+      super "Expected `#{expected}` (##{expected.object_id}), but got `#{got}` (##{got.object_id})"
     end
   end
 

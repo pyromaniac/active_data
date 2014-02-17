@@ -18,7 +18,7 @@ module ActiveData
             source ||= self.class.superclass.new
 
             source.each do |entity|
-              raise IncorrectEntity.new(collectible, entity.class) unless entity.is_a?(collectible)
+              raise AssociationTypeMismatch.new(collectible, entity.class) unless entity.is_a?(collectible)
             end unless trust && source.is_a?(self.class)
 
             super source

@@ -13,6 +13,7 @@ module ActiveData
 
       include Attributes
       include Collection
+      include Lifecycle
       include Associations
 
       self.include_root_in_json = ActiveData.include_root_in_json
@@ -63,6 +64,15 @@ module ActiveData
 
     def destroyed?
       @destroyed
+    end
+
+    def freeze
+      @attributes = @attributes.clone.freeze
+      self
+    end
+
+    def frozen?
+      @attributes.frozen?
     end
 
     def == other

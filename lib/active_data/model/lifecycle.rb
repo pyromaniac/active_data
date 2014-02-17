@@ -237,7 +237,7 @@ module ActiveData
       def destroy &block
         raise ActiveData::UndestroyableObject unless block || destroyable?
         destroy_object(&block)
-        self
+        freeze
       end
 
       # Destroys object by calling the destroy performer.
@@ -257,7 +257,7 @@ module ActiveData
       def destroy! &block
         raise ActiveData::UndestroyableObject unless block || destroyable?
         destroy_object(&block) or raise ActiveData::ObjectNotDestroyed
-        self
+        freeze
       end
 
     private
@@ -269,7 +269,7 @@ module ActiveData
       def save_object &block
         result = persisted? ? update_object(&block) : create_object(&block)
         @persisted = true if result
-        result
+        !!result
       end
 
       def create_object &block

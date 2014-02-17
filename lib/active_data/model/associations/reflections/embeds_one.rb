@@ -14,8 +14,8 @@ module ActiveData
 
           def define_methods target
             target.class_eval <<-EOS
-              def #{name}
-                association(:#{name}).reader
+              def #{name} force_reload = false
+                association(:#{name}).reader(force_reload)
               end
 
               def #{name}= value

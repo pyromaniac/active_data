@@ -5,7 +5,7 @@ describe ActiveData::Config do
   subject { ActiveData::Config.send :new }
 
   describe '#include_root_in_json' do
-    its(:include_root_in_json) { should be_false }
+    its(:include_root_in_json) { should == false }
     specify { expect { subject.include_root_in_json = true }
       .to change { subject.include_root_in_json }.from(false).to(true) }
   end

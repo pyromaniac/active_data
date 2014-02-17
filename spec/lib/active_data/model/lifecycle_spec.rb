@@ -76,8 +76,8 @@ describe ActiveData::Model::Lifecycle do
       specify { expect { subject.destroy }.to raise_error ActiveData::UndestroyableObject }
       specify { expect { subject.destroy! }.to raise_error ActiveData::UndestroyableObject }
 
-      specify { expect { subject.destroy { true } }.to be_true }
-      specify { expect { subject.destroy! { true } }.to be_true }
+      specify { subject.destroy { true }.should be_true }
+      specify { subject.destroy! { true }.should be_true }
 
       context 'instance performer' do
         before { subject.define_save { false } }
@@ -187,7 +187,7 @@ describe ActiveData::Model::Lifecycle do
         it { should be_invalid }
         it { should_not be_persisted }
 
-        specify { subject.save.should be_false }
+        specify { subject.save.should == false }
         specify { expect { subject.save! }.to raise_error ActiveData::ValidationError }
 
         specify { expect { subject.save }.not_to change { subject.persisted? } }
@@ -200,8 +200,8 @@ describe ActiveData::Model::Lifecycle do
         it { should be_valid }
         it { should_not be_persisted }
 
-        specify { subject.save.should be_true }
-        specify { subject.save!.should be_true }
+        specify { subject.save.should == true }
+        specify { subject.save!.should == true }
 
         specify { expect { subject.save }.to change { subject.persisted? }.from(false).to(true) }
         specify { expect { subject.save! }.to change { subject.persisted? }.from(false).to(true) }
@@ -214,7 +214,7 @@ describe ActiveData::Model::Lifecycle do
 
           it { should_not be_persisted }
 
-          specify { subject.save.should be_false }
+          specify { subject.save.should == false }
           specify { expect { subject.save! }.to raise_error ActiveData::ObjectNotSaved }
 
           specify { expect { subject.save }.not_to change { subject.persisted? } }
@@ -228,8 +228,8 @@ describe ActiveData::Model::Lifecycle do
         it { should be_valid }
         it { should be_persisted }
 
-        specify { subject.save.should be_true }
-        specify { subject.save!.should be_true }
+        specify { subject.save.should == true }
+        specify { subject.save!.should == true }
 
         specify { expect { subject.save }.not_to change { subject.persisted? } }
         specify { expect { subject.save! }.not_to change { subject.persisted? } }
@@ -244,7 +244,7 @@ describe ActiveData::Model::Lifecycle do
 
           it { should be_persisted }
 
-          specify { subject.save.should be_false }
+          specify { subject.save.should == false }
           specify { expect { subject.save! }.to raise_error ActiveData::ObjectNotSaved }
 
           specify { expect { subject.save }.not_to change { subject.persisted? } }
