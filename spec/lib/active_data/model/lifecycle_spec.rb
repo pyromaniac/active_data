@@ -4,9 +4,7 @@ require 'spec_helper'
 describe ActiveData::Model::Lifecycle do
   context do
     before do
-      stub_model(:user) do
-        include ActiveData::Model::Lifecycle
-      end
+      stub_model(:user)
     end
 
     subject { User.new }
@@ -68,6 +66,36 @@ describe ActiveData::Model::Lifecycle do
             specify { subject.save.should == false }
             specify { expect { subject.save! }.to raise_error ActiveData::ObjectNotSaved }
           end
+        end
+      end
+
+      context 'performers execution' do
+        before do
+          stub_model(:user) do
+            include ActiveData::Model::Callbacks
+
+            attribute :actions, type: Array, default: []
+
+            def append action
+              self.actions = actions + [action]
+            end
+
+            define_create { append :create }
+            define_update { append :update }
+            define_destroy { append :destroy }
+          end
+        end
+
+        subject { User.new }
+
+        specify do
+          subject.destroy
+          subject.save
+          subject.save
+          subject.destroy
+          subject.destroy
+          subject.save
+          subject.actions.should == [:destroy, :create, :update, :destroy, :destroy, :create]
         end
       end
     end

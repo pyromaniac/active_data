@@ -56,6 +56,10 @@ module ActiveData
 
       private
 
+        def read_source
+          super || []
+        end
+
         def concat_objects objects
           objects.each { |object| push_object object }
           result = objects.all?(&:save)
@@ -78,17 +82,29 @@ module ActiveData
         def setup_performers! object
           association = self
 
-          object.define_save do
-            data = association.send(:read_source) || []
-            index = association.reader.select { |object| !object.destroyed? }.index { |object| object === self }
+          object.define_create do
+            data = association.send(:read_source)
+            index = association.reader.select do |object|
+              object.persisted? || object === self
+            end.index { |object| object === self }
+
+            data.insert(index, attributes)
+            association.send(:write_source, data)
+          end
+
+          object.define_update do
+            data = association.send(:read_source)
+            index = association.reader.select(&:persisted?).index { |object| object === self }
+
             data[index] = attributes
             association.send(:write_source, data)
           end
 
           object.define_destroy do
-            data = association.send(:read_source) || []
-            index = association.reader.select { |object| !object.destroyed? }.index { |object| object === self }
-            data.delete_at(index)
+            data = association.send(:read_source)
+            index = association.reader.select(&:persisted?).index { |object| object === self }
+
+            data.delete_at(index) if index
             association.send(:write_source, data)
           end
         end

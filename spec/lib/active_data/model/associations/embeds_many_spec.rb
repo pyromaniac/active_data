@@ -26,6 +26,48 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { association.should == user.association(:projects) }
   end
 
+  context 'performers' do
+    let(:user) { User.new(projects: [Project.new(title: 'Project 1')]) }
+
+    specify do
+      p2 = user.projects.build(title: 'Project 2')
+      p3 = user.projects.build(title: 'Project 3')
+      p4 = user.projects.create(title: 'Project 4')
+      user.read_attribute(:projects).should == [{'title' => 'Project 1'}, {'title' => 'Project 4'}]
+      p2.save!
+      user.read_attribute(:projects).should == [
+        {'title' => 'Project 1'}, {'title' => 'Project 2'}, {'title' => 'Project 4'}]
+      p2.destroy!.destroy!
+      user.read_attribute(:projects).should == [{'title' => 'Project 1'}, {'title' => 'Project 4'}]
+      p5 = user.projects.create(title: 'Project 5')
+      user.read_attribute(:projects).should == [
+        {'title' => 'Project 1'}, {'title' => 'Project 4'}, {"title" => "Project 5"}]
+      p3.destroy!
+      user.projects.first.destroy!
+      user.read_attribute(:projects).should == [{'title' => 'Project 4'}, {"title" => "Project 5"}]
+      p4.destroy!.save!
+      user.read_attribute(:projects).should == [{'title' => 'Project 4'}, {"title" => "Project 5"}]
+      user.projects.count.should == 5
+      user.projects.map(&:save!)
+      user.read_attribute(:projects).should == [
+        {'title' => 'Project 1'}, {'title' => 'Project 2'}, {'title' => 'Project 3'},
+        {'title' => 'Project 4'}, {"title" => "Project 5"}]
+      user.projects.map(&:destroy!)
+      user.read_attribute(:projects).should == []
+      user.projects.first(2).map(&:save!)
+      user.read_attribute(:projects).should == [{'title' => 'Project 1'}, {'title' => 'Project 2'}]
+      user.projects.reload.count.should == 2
+      p3 = user.projects.create!(title: 'Project 3')
+      user.read_attribute(:projects).should == [
+        {'title' => 'Project 1'}, {'title' => 'Project 2'}, {'title' => 'Project 3'}]
+      p3.destroy!
+      user.read_attribute(:projects).should == [{'title' => 'Project 1'}, {'title' => 'Project 2'}]
+      p4 = user.projects.create(title: 'Project 4')
+      user.read_attribute(:projects).should == [
+        {'title' => 'Project 1'}, {'title' => 'Project 2'}, {'title' => 'Project 4'}]
+    end
+  end
+
   describe '#build' do
     specify { association.build.should be_a Project }
     specify { association.build.should_not be_persisted }
