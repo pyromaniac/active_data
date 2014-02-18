@@ -12,6 +12,7 @@ describe ActiveData::Model::Associations::EmbedsOne do
     stub_model(:book) do
       attribute :title
       embeds_one :author
+      define_save { true }
     end
   end
 
@@ -140,46 +141,64 @@ describe ActiveData::Model::Associations::EmbedsOne do
     let(:new_author) { Author.new(name: 'Morty') }
     let(:invalid_author) { Author.new }
 
-    specify { expect { association.writer(stub_model(:dummy).new) }
-      .to raise_error ActiveData::AssociationTypeMismatch }
+    context 'new owner' do
+      let(:book) { Book.create }
 
-    specify { association.writer(nil).should be_nil }
-    specify { association.writer(new_author).should == new_author }
-    specify { expect { association.writer(nil) }
-      .not_to change { book.read_attribute(:author) } }
-    specify { expect { association.writer(new_author) }
-      .to change { association.reader.try(:attributes) }.from(nil).to('name' => 'Morty') }
-    specify { expect { association.writer(new_author) }
-      .to change { book.read_attribute(:author) }.from(nil).to('name' => 'Morty') }
+      specify { expect { association.writer(nil) }
+        .not_to change { book.read_attribute(:author) } }
+      specify { expect { association.writer(new_author) }
+        .to change { association.reader.try(:attributes) }.from(nil).to('name' => 'Morty') }
+      specify { expect { association.writer(new_author) }
+        .to change { book.read_attribute(:author) }.from(nil).to('name' => 'Morty') }
 
-    specify { expect { association.writer(invalid_author) }
-      .to raise_error ActiveData::AssociationNotSaved }
-    specify { expect { association.writer(invalid_author) rescue nil }
-      .not_to change { association.reader } }
-    specify { expect { association.writer(invalid_author) rescue nil }
-      .not_to change { book.read_attribute(:author) } }
+      specify { expect { association.writer(invalid_author) }
+        .to raise_error ActiveData::AssociationNotSaved }
+      specify { expect { association.writer(invalid_author) rescue nil }
+        .not_to change { association.reader } }
+      specify { expect { association.writer(invalid_author) rescue nil }
+        .not_to change { book.read_attribute(:author) } }
+    end
 
-    specify { expect { existing_association.writer(stub_model(:dummy).new) rescue nil }
-      .not_to change { existing_book.read_attribute(:author) } }
-    specify { expect { existing_association.writer(stub_model(:dummy).new) rescue nil }
-      .not_to change { existing_association.reader } }
+    context 'persisted owner' do
+      specify { expect { association.writer(stub_model(:dummy).new) }
+        .to raise_error ActiveData::AssociationTypeMismatch }
 
-    specify { existing_association.writer(nil).should be_nil }
-    specify { existing_association.writer(new_author).should == new_author }
-    specify { expect { existing_association.writer(nil) }
-      .to change { existing_book.read_attribute(:author) }.from('name' => 'Johny').to(nil) }
-    specify { expect { existing_association.writer(new_author) }
-      .to change { existing_association.reader.try(:attributes) }
-      .from('name' => 'Johny').to('name' => 'Morty') }
-    specify { expect { existing_association.writer(new_author) }
-      .to change { existing_book.read_attribute(:author) }
-      .from('name' => 'Johny').to('name' => 'Morty') }
+      specify { association.writer(nil).should be_nil }
+      specify { association.writer(new_author).should == new_author }
+      specify { expect { association.writer(nil) }
+        .not_to change { book.read_attribute(:author) } }
+      specify { expect { association.writer(new_author) }
+        .to change { association.reader.try(:attributes) }.from(nil).to('name' => 'Morty') }
+      specify { expect { association.writer(new_author) }
+        .not_to change { book.read_attribute(:author) } }
 
-    specify { expect { existing_association.writer(invalid_author) }
-      .to raise_error ActiveData::AssociationNotSaved }
-    specify { expect { existing_association.writer(invalid_author) rescue nil }
-      .not_to change { existing_association.reader } }
-    specify { expect { existing_association.writer(invalid_author) rescue nil }
-      .not_to change { existing_book.read_attribute(:author) } }
+      specify { expect { association.writer(invalid_author) }
+        .to change { association.reader.try(:attributes) }.from(nil).to('name' => nil) }
+      specify { expect { association.writer(invalid_author) }
+        .not_to change { book.read_attribute(:author) } }
+
+      specify { expect { existing_association.writer(stub_model(:dummy).new) rescue nil }
+        .not_to change { existing_book.read_attribute(:author) } }
+      specify { expect { existing_association.writer(stub_model(:dummy).new) rescue nil }
+        .not_to change { existing_association.reader } }
+
+      specify { existing_association.writer(nil).should be_nil }
+      specify { existing_association.writer(new_author).should == new_author }
+      specify { expect { existing_association.writer(nil) }
+        .to change { existing_book.read_attribute(:author) }.from('name' => 'Johny').to(nil) }
+      specify { expect { existing_association.writer(new_author) }
+        .to change { existing_association.reader.try(:attributes) }
+        .from('name' => 'Johny').to('name' => 'Morty') }
+      specify { expect { existing_association.writer(new_author) }
+        .to change { existing_book.read_attribute(:author) }
+        .from('name' => 'Johny').to('name' => 'Morty') }
+
+      specify { expect { existing_association.writer(invalid_author) }
+        .to raise_error ActiveData::AssociationNotSaved }
+      specify { expect { existing_association.writer(invalid_author) rescue nil }
+        .not_to change { existing_association.reader } }
+      specify { expect { existing_association.writer(invalid_author) rescue nil }
+        .not_to change { existing_book.read_attribute(:author) } }
+    end
   end
 end

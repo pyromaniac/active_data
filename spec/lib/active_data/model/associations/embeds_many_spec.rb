@@ -12,6 +12,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
     stub_model(:user) do
       attribute :name
       embeds_many :projects
+      define_save { true }
     end
   end
 
@@ -33,25 +34,23 @@ describe ActiveData::Model::Associations::EmbedsMany do
       p2 = user.projects.build(title: 'Project 2')
       p3 = user.projects.build(title: 'Project 3')
       p4 = user.projects.create(title: 'Project 4')
-      user.read_attribute(:projects).should == [{'title' => 'Project 1'}, {'title' => 'Project 4'}]
+      user.read_attribute(:projects).should == [{'title' => 'Project 4'}]
       p2.save!
-      user.read_attribute(:projects).should == [
-        {'title' => 'Project 1'}, {'title' => 'Project 2'}, {'title' => 'Project 4'}]
+      user.read_attribute(:projects).should == [{'title' => 'Project 2'}, {'title' => 'Project 4'}]
       p2.destroy!.destroy!
-      user.read_attribute(:projects).should == [{'title' => 'Project 1'}, {'title' => 'Project 4'}]
+      user.read_attribute(:projects).should == [{'title' => 'Project 4'}]
       p5 = user.projects.create(title: 'Project 5')
-      user.read_attribute(:projects).should == [
-        {'title' => 'Project 1'}, {'title' => 'Project 4'}, {"title" => "Project 5"}]
+      user.read_attribute(:projects).should == [{'title' => 'Project 4'}, {'title' => 'Project 5'}]
       p3.destroy!
       user.projects.first.destroy!
-      user.read_attribute(:projects).should == [{'title' => 'Project 4'}, {"title" => "Project 5"}]
+      user.read_attribute(:projects).should == [{'title' => 'Project 4'}, {'title' => 'Project 5'}]
       p4.destroy!.save!
-      user.read_attribute(:projects).should == [{'title' => 'Project 4'}, {"title" => "Project 5"}]
+      user.read_attribute(:projects).should == [{'title' => 'Project 4'}, {'title' => 'Project 5'}]
       user.projects.count.should == 5
       user.projects.map(&:save!)
       user.read_attribute(:projects).should == [
         {'title' => 'Project 1'}, {'title' => 'Project 2'}, {'title' => 'Project 3'},
-        {'title' => 'Project 4'}, {"title" => "Project 5"}]
+        {'title' => 'Project 4'}, {'title' => 'Project 5'}]
       user.projects.map(&:destroy!)
       user.read_attribute(:projects).should == []
       user.projects.first(2).map(&:save!)
@@ -219,7 +218,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { expect { association.writer([new_project1]) }
       .to change { association.reader.map(&:attributes) }.from([]).to([{'title' => 'Project 1'}]) }
     specify { expect { association.writer([new_project1]) }
-      .to change { user.read_attribute(:projects) }.from(nil).to([{'title' => 'Project 1'}]) }
+      .not_to change { user.read_attribute(:projects) } }
 
     specify { expect { existing_association.writer([new_project1, invalid_project]) }
       .to raise_error ActiveData::AssociationNotSaved }
@@ -273,12 +272,12 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { expect { association.concat(new_project1) }
       .to change { association.reader.map(&:attributes) }.from([]).to([{'title' => 'Project 1'}]) }
     specify { expect { association.concat(new_project1) }
-      .to change { user.read_attribute(:projects) }.from(nil).to([{'title' => 'Project 1'}]) }
+      .not_to change { user.read_attribute(:projects) } }
 
     specify { existing_association.concat(new_project1, invalid_project).should == false }
     specify { expect { existing_association.concat(new_project1, invalid_project) }
       .to change { existing_user.read_attribute(:projects) }
-      .from([{title: "Genesis"}]).to([{title: 'Genesis'}, {'title' => 'Project 1'}]) }
+      .from([{title: 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}]) }
     specify { expect { existing_association.concat(new_project1, invalid_project) }
       .to change { existing_association.reader.map(&:attributes) }
       .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}, {'title' => nil}]) }
@@ -298,6 +297,6 @@ describe ActiveData::Model::Associations::EmbedsMany do
       .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}, {'title' => 'Project 2'}]) }
     specify { expect { existing_association.concat([new_project1, new_project2]) }
       .to change { existing_user.read_attribute(:projects) }
-      .from([{title: 'Genesis'}]).to([{title: 'Genesis'}, {'title' => 'Project 1'}, {'title' => 'Project 2'}]) }
+      .from([{title: 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}, {'title' => 'Project 2'}]) }
   end
 end

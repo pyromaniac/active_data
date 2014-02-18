@@ -25,6 +25,14 @@ module ActiveData
           build(attributes).tap(&:save!)
         end
 
+        def save
+          reader.map(&:save).all?
+        end
+
+        def save!
+          save or raise ActiveData::AssociationNotSaved
+        end
+
         def reload
           @target = Proxy.new load_target!, self
         end
@@ -45,9 +53,9 @@ module ActiveData
         def writer values
           transaction do
             reader.map(&:destroy!)
+            reload
             concat_objects(values) or raise ActiveData::AssociationNotSaved
           end
-          reload
         end
 
         def concat *objects
@@ -62,8 +70,11 @@ module ActiveData
 
         def concat_objects objects
           objects.each { |object| push_object object }
-          result = objects.all?(&:save)
-          result ? reader : false
+          if owner.persisted?
+            save && reader
+          else
+            reader
+          end
         end
 
         def push_object object

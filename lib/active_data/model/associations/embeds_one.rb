@@ -14,6 +14,14 @@ module ActiveData
           build(attributes).tap(&:save!)
         end
 
+        def save
+          reader ? reader.save : true
+        end
+
+        def save!
+          save or raise ActiveData::AssociationNotSaved
+        end
+
         def reload
           reader(true)
         end
@@ -32,7 +40,7 @@ module ActiveData
           if value
             transaction do
               assign_object value
-              value.save or raise ActiveData::AssociationNotSaved
+              save! if owner.persisted?
             end
             value
           else

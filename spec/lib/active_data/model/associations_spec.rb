@@ -102,8 +102,10 @@ describe ActiveData::Model::Associations do
         attribute :title
       end
       stub_model(:user) do
+        include ActiveData::Model::Callbacks
         attribute :name
         embeds_many :projects
+        define_save { true }
       end
     end
     let(:user) { User.new }
@@ -140,24 +142,23 @@ describe ActiveData::Model::Associations do
         let(:project) { Project.new title: 'Project' }
         specify { user.projects.build(title: 'Project').should == project }
         specify { expect { user.projects.build(title: 'Project') }.to change { user.projects }.from([]).to([project]) }
-        specify { expect { user.projects.build(title: 'Project') }.not_to change { user.projects.reload }.from([]) }
       end
 
       describe '#create' do
         let(:project) { Project.new title: 'Project' }
         specify { user.projects.create(title: 'Project').should == project }
-        specify { expect { user.projects.create(title: 'Project') }.to change { user.projects.reload }.from([]).to([project]) }
+        specify { expect { user.projects.create(title: 'Project') }.to change { user.projects }.from([]).to([project]) }
       end
 
       describe '#create!' do
         let(:project) { Project.new title: 'Project' }
         specify { user.projects.create!(title: 'Project').should == project }
-        specify { expect { user.projects.create!(title: 'Project') }.to change { user.projects.reload }.from([]).to([project]) }
+        specify { expect { user.projects.create!(title: 'Project') }.to change { user.projects }.from([]).to([project]) }
       end
 
       describe '#reload' do
         let(:project) { Project.new title: 'Project' }
-        before { user.projects = [project] }
+        before { user.update(projects: [project]) }
         before { user.projects.build }
 
         specify { user.projects.count.should == 2 }
@@ -166,28 +167,28 @@ describe ActiveData::Model::Associations do
 
       describe '#concat' do
         let(:project) { Project.new title: 'Project' }
-        specify { expect { user.projects.concat project }.to change { user.projects.reload }.from([]).to([project]) }
+        specify { expect { user.projects.concat project }.to change { user.projects }.from([]).to([project]) }
         specify { expect { user.projects.concat project, 'string' }.to raise_error ActiveData::AssociationTypeMismatch }
 
         context do
           let(:other) { Project.new title: 'Other' }
           before { user.projects = [other] }
-          specify { expect { user.projects.concat project }.to change { user.projects.reload }.from([other]).to([other, project]) }
+          specify { expect { user.projects.concat project }.to change { user.projects }.from([other]).to([other, project]) }
         end
       end
     end
 
     describe '#projects=' do
       let(:project) { Project.new title: 'Project' }
-      specify { expect { user.projects = [] }.not_to change { user.projects.reload }.from([]) }
-      specify { expect { user.projects = [project] }.to change { user.projects.reload }.from([]).to([project]) }
+      specify { expect { user.projects = [] }.not_to change { user.projects }.from([]) }
+      specify { expect { user.projects = [project] }.to change { user.projects }.from([]).to([project]) }
       specify { expect { user.projects = [project, 'string'] }.to raise_error ActiveData::AssociationTypeMismatch }
 
       context do
         let(:other) { Project.new title: 'Other' }
         before { user.projects = [other] }
-        specify { expect { user.projects = [project] }.to change { user.projects.reload }.from([other]).to([project]) }
-        specify { expect { user.projects = [] }.to change { user.projects.reload }.from([other]).to([]) }
+        specify { expect { user.projects = [project] }.to change { user.projects }.from([other]).to([project]) }
+        specify { expect { user.projects = [] }.to change { user.projects }.from([other]).to([]) }
       end
     end
 

@@ -15,6 +15,15 @@ module ActiveData
             attribute reflection.name, mode: :association
             reflection.define_methods self
             self.reflections = reflections.merge(reflection.name => reflection)
+            if defined? before_save
+              callback_name = "update_#{reflection.name}_association"
+              before_save callback_name
+              class_eval <<-METHOD
+                def #{callback_name}
+                  association(:#{reflection.name}).save!
+                end
+              METHOD
+            end
           end
         end
       end
