@@ -13,6 +13,15 @@ describe ActiveData::Model::Lifecycle do
       specify { expect { subject.public_send "_#{action}_performer=", '' }.to raise_error NoMethodError }
     end
 
+    context 'performer execution' do
+      let(:foo) { true }
+
+      specify { expect { subject.save { foo } }.to raise_error NameError }
+      specify { expect { subject.save { |instance| attributes } }.to raise_error NameError }
+      specify { subject.save { attributes }.should == true }
+      specify { subject.save { |instance| foo }.should == true }
+    end
+
     context 'save' do
       specify { expect { subject.save }.to raise_error ActiveData::UnsavableObject }
       specify { expect { subject.save! }.to raise_error ActiveData::UnsavableObject }

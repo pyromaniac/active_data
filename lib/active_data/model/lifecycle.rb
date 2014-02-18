@@ -277,12 +277,12 @@ module ActiveData
 
       def create_object &block
         performer = block || _create_performer || _save_performer
-        instance_exec(self, &performer)
+        performer_exec(&performer)
       end
 
       def update_object &block
         performer = block || _update_performer || _save_performer
-        instance_exec(self, &performer)
+        performer_exec(&performer)
       end
 
       def destroyable?
@@ -291,12 +291,20 @@ module ActiveData
 
       def destroy_object &block
         performer = block || _destroy_performer
-        result = instance_exec(self, &performer)
+        result = performer_exec(&performer)
         if result
           @persisted = false
           @destroyed = true
         end
         result
+      end
+
+      def performer_exec &block
+        if block.arity == 1
+          block.call(self)
+        else
+          instance_exec(&block)
+        end
       end
     end
   end
