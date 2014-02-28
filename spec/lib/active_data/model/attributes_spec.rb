@@ -6,8 +6,9 @@ describe ActiveData::Model::Attributes do
   let(:klass) do
     Class.new do
       include ActiveData::Model::Attributes
-      attr_reader :name
+      attr_accessor :name
 
+      attribute :id
       attribute :hello
       attribute :string, type: String, default_blank: true, default: ->(record){ record.name }
       attribute :count, type: Integer, default: 10
@@ -23,13 +24,22 @@ describe ActiveData::Model::Attributes do
     end
   end
 
+  describe '#assign_attributes' do
+    subject { klass.new('world') }
+    let(:attributes) { { id: 42, hello: 'world', name: 'Ivan', missed: 'value' } }
+
+    specify { expect { subject.assign_attributes(attributes) }.not_to change { subject.id } }
+    specify { expect { subject.assign_attributes(attributes) }.to change { subject.hello } }
+    specify { expect { subject.assign_attributes(attributes) }.to change { subject.name } }
+  end
+
   context do
     subject { klass.new('world') }
     specify { klass.enum_values.should == [1, 2, 3] }
     its(:enum_values) { should == [1, 2, 3] }
     its(:string_default) { should == 'world' }
     its(:count_default) { should == 10 }
-    its(:attributes) { should ==  { hello: nil, count: 10, calc: 5, enum: nil, string: 'world', foo: false, enum_with_default: 2 }.stringify_keys  }
+    its(:attributes) { should ==  { id: nil, hello: nil, count: 10, calc: 5, enum: nil, string: 'world', foo: false, enum_with_default: 2 }.stringify_keys  }
     its(:name) { should == 'world' }
     its(:hello) { should be_nil }
     its(:count) { should == 10 }

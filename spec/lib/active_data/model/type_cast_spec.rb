@@ -17,6 +17,7 @@ describe 'typecasting' do
       attribute :datetime, type: DateTime
       attribute :time, type: Time
       attribute :time_zone, type: ActiveSupport::TimeZone
+      attribute :uuid, type: ActiveData::UUID
 
       def initialize name = nil
         @attributes = self.class.initialize_attributes
@@ -130,5 +131,20 @@ describe 'typecasting' do
     specify{subject.tap{|s| s.time_zone = -3}.time_zone.should be_a ActiveSupport::TimeZone}
     specify{subject.tap{|s| s.time_zone = 3600}.time_zone.should be_a ActiveSupport::TimeZone}
     specify{subject.tap{|s| s.time_zone = -7200}.time_zone.should be_a ActiveSupport::TimeZone}
+  end
+
+  context 'uuid' do
+    let(:uuid) { ActiveData::UUID.random_create }
+    let(:uuid_tools) { UUIDTools::UUID.random_create }
+
+    specify{subject.tap{|s| s.uuid = nil}.uuid.should be_nil}
+    specify{subject.tap{|s| s.uuid = Object.new}.uuid.should be_nil}
+    specify{subject.tap{|s| s.uuid = uuid_tools}.uuid.should be_a ActiveData::UUID }
+    specify{subject.tap{|s| s.uuid = uuid_tools}.uuid.should == uuid_tools}
+    specify{subject.tap{|s| s.uuid = uuid}.uuid.should == uuid}
+    specify{subject.tap{|s| s.uuid = uuid.to_s}.uuid.should == uuid}
+    specify{subject.tap{|s| s.uuid = uuid.to_i}.uuid.should == uuid}
+    specify{subject.tap{|s| s.uuid = uuid.hexdigest}.uuid.should == uuid}
+    specify{subject.tap{|s| s.uuid = uuid.raw}.uuid.should == uuid}
   end
 end

@@ -89,7 +89,8 @@ module ActiveData
 
       def assign_attributes attributes
         (attributes.presence || {}).each do |(name, value)|
-          public_send("#{name}=", value) if has_attribute?(name) || respond_to?("#{name}=")
+          name = name.to_s
+          public_send("#{name}=", value) if (has_attribute?(name) || respond_to?("#{name}=")) && name != 'id'
         end
       end
       alias_method :attributes=, :assign_attributes
