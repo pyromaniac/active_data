@@ -2,17 +2,6 @@ module ActiveData
   module Model
     module Associations
       class EmbedsMany < Base
-        class Proxy < Array
-          delegate :build, :create, :create!, :reload, :concat, to: :@association
-          alias_method :<<, :concat
-          alias_method :push, :concat
-
-          def initialize(data, association)
-            @association = association
-            super(data)
-          end
-        end
-
         def build attributes = {}
           push_object(reflection.klass.new(attributes))
         end
@@ -57,7 +46,7 @@ module ActiveData
 
         def reader force_reload = false
           reload if force_reload
-          Proxy.new load_target, self
+          @proxy ||= CollectionProxy.new self
         end
 
         def replace objects

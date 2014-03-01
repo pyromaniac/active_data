@@ -31,7 +31,7 @@ module ActiveData
         def load_target
           return target if loaded?
           data = read_source
-          self.target = (reflection.klass.instantiate(data) if data)
+          self.target = data && reflection.klass.instantiate(data)
         end
 
         def clear
