@@ -3,7 +3,7 @@ module ActiveData
     module Associations
       class EmbedsOne < Base
         def build attributes = {}
-          assign_object reflection.klass.new(attributes)
+          self.target = reflection.klass.new(attributes)
         end
 
         def create attributes = {}
@@ -22,45 +22,48 @@ module ActiveData
           save or raise ActiveData::AssociationNotSaved
         end
 
-        def reload
-          reader(true)
+        def target= object
+          setup_performers! object if object
+          loaded!
+          @target = object
+        end
+
+        def load_target
+          return target if loaded?
+          data = read_source
+          self.target = (reflection.klass.instantiate(data) if data)
         end
 
         def clear
-          reader.try(:destroy)
+          load_target.try(:destroy)
           reload.nil?
         end
 
         def reader force_reload = false
-          remove_instance_variable(:@target) if force_reload && instance_variable_defined?(:@target)
-          instance_variable_defined?(:@target) ? @target : load_target!
+          reload if force_reload
+          load_target
         end
 
-        def writer value
-          if value
+        def replace object
+          if object
+            raise AssociationTypeMismatch.new(reflection.klass, object.class) unless object.is_a?(reflection.klass)
             transaction do
-              assign_object value
+              clear
+              self.target = object
               save! if owner.persisted?
             end
-            value
           else
-            write_source nil
-            @target = nil
+            clear
           end
+
+          target
+        end
+
+        def writer object
+          replace object
         end
 
       private
-
-        def assign_object object
-          raise AssociationTypeMismatch.new(reflection.klass, object.class) unless object.is_a?(reflection.klass)
-          setup_performers! object
-          @target = object
-        end
-
-        def load_target!
-          data = read_source
-          assign_object reflection.klass.instantiate(data) if data
-        end
 
         def setup_performers! object
           association = self

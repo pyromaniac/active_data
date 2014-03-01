@@ -138,6 +138,28 @@ describe ActiveData::Model::Associations::EmbedsMany do
       .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Swordfish'}]) }
   end
 
+  describe '#target' do
+    specify { existing_association.target.should == [] }
+    specify do
+      existing_association.load_target
+      existing_association.target.should == existing_user.projects
+    end
+    specify { expect { association.build }.to change { association.target.count }.to(1) }
+  end
+
+  describe '#load_target' do
+    specify { association.load_target.should == [] }
+    specify { existing_association.load_target.should == existing_user.projects }
+  end
+
+  describe '#loaded?' do
+    specify { association.loaded?.should == false }
+    specify { expect { association.load_target }.to change { association.loaded? }.to(true) }
+    specify { expect { association.build }.to change { association.loaded? }.to(true) }
+    specify { expect { association.replace([]) }.to change { association.loaded? }.to(true) }
+    specify { expect { existing_association.replace([]) }.to change { existing_association.loaded? }.to(true) }
+  end
+
   describe '#reload' do
     specify { association.reload.should == [] }
 

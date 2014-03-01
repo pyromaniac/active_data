@@ -26,7 +26,7 @@ module ActiveData
                 JSON.parse(value) if value.present?
               },
               write: ->(reflection, object, value) {
-                object.send(:write_attribute, reflection.name, value.to_json)
+                object.send(:write_attribute, reflection.name, value ? value.to_json : nil)
               }
             ))
             reflection.define_methods self

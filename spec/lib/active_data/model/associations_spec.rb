@@ -42,7 +42,7 @@ describe ActiveData::Model::Associations do
               JSON.parse(value) if value.present?
             },
             write: ->(reflection, object, value) {
-              object.write_attribute(reflection.name, value.to_json)
+              object.write_attribute(reflection.name, value ? value.to_json : nil)
             }
         end
       end

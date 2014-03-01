@@ -77,6 +77,32 @@ describe ActiveData::Model::Associations::EmbedsOne do
       .to change { existing_book.read_attribute(:author) }.from('name' => 'Johny').to('name' => 'Fred') }
   end
 
+  describe '#target' do
+    specify { existing_association.target.should be_nil }
+    specify do
+      existing_association.load_target
+      existing_association.target.should == existing_book.author
+    end
+    specify { expect { association.build }.to change { association.target }.to(an_instance_of(Author)) }
+  end
+
+  describe '#load_target' do
+    specify { association.load_target.should == nil }
+    specify { existing_association.load_target.should == existing_book.author }
+  end
+
+  describe '#loaded?' do
+    let(:new_author) { Author.new(name: 'Morty') }
+
+    specify { association.loaded?.should == false }
+    specify { expect { association.load_target }.to change { association.loaded? }.to(true) }
+    specify { expect { association.build }.to change { association.loaded? }.to(true) }
+    specify { expect { association.replace(new_author) }.to change { association.loaded? }.to(true) }
+    specify { expect { association.replace(nil) }.to change { association.loaded? }.to(true) }
+    specify { expect { existing_association.replace(new_author) }.to change { existing_association.loaded? }.to(true) }
+    specify { expect { existing_association.replace(nil) }.to change { existing_association.loaded? }.to(true) }
+  end
+
   describe '#reload' do
     specify { association.reload.should be_nil }
 

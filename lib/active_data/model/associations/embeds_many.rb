@@ -26,40 +26,53 @@ module ActiveData
         end
 
         def save
-          reader.map(&:save).all?
+          load_target.map(&:save).all?
         end
 
         def save!
           save or raise ActiveData::AssociationNotSaved
         end
 
-        def reload
-          @target = Proxy.new load_target!, self
+        def target= objects
+          objects.each { |object| setup_performers! object }
+          loaded!
+          @target = objects
+        end
+
+        def load_target
+          return target if loaded?
+          data = read_source
+          self.target = data ? reflection.klass.instantiate_collection(data) : []
+        end
+
+        def reset
+          super
+          @target = []
         end
 
         def clear
-          transaction { reader.all?(&:destroy!) } rescue ActiveData::ObjectNotDestroyed
+          transaction { load_target.all?(&:destroy!) } rescue ActiveData::ObjectNotDestroyed
           reload.empty?
         end
 
         def reader force_reload = false
-          if force_reload
-            reload
-          else
-            @target ||= Proxy.new load_target!, self
+          reload if force_reload
+          Proxy.new load_target, self
+        end
+
+        def replace objects
+          transaction do
+            clear
+            append(objects) or raise ActiveData::AssociationNotSaved
           end
         end
 
-        def writer values
-          transaction do
-            reader.map(&:destroy!)
-            reload
-            concat_objects(values) or raise ActiveData::AssociationNotSaved
-          end
+        def writer objects
+          replace objects
         end
 
         def concat *objects
-          concat_objects objects.flatten
+          append objects.flatten
         end
 
       private
@@ -68,26 +81,18 @@ module ActiveData
           super || []
         end
 
-        def concat_objects objects
-          objects.each { |object| push_object object }
-          if owner.persisted?
-            save && reader
-          else
-            reader
+        def append objects
+          objects.each do |object|
+            raise AssociationTypeMismatch.new(reflection.klass, object.class) unless object && object.is_a?(reflection.klass)
+            push_object object
           end
+          result = owner.persisted? ? save : true
+          result && load_target
         end
 
         def push_object object
-          raise AssociationTypeMismatch.new(reflection.klass, object.class) unless object && object.is_a?(reflection.klass)
           setup_performers! object
-          reader[reader.size] = object
-        end
-
-        def load_target!
-          data = read_source
-          objects = data ? reflection.klass.instantiate_collection(data) : []
-          objects.each { |object| setup_performers! object }
-          objects
+          load_target[load_target.size] = object
         end
 
         def setup_performers! object
@@ -95,7 +100,7 @@ module ActiveData
 
           object.define_create do
             data = association.send(:read_source)
-            index = association.reader.select do |object|
+            index = association.load_target.select do |object|
               object.persisted? || object === self
             end.index { |object| object === self }
 
@@ -105,7 +110,7 @@ module ActiveData
 
           object.define_update do
             data = association.send(:read_source)
-            index = association.reader.select(&:persisted?).index { |object| object === self }
+            index = association.load_target.select(&:persisted?).index { |object| object === self }
 
             data[index] = attributes
             association.send(:write_source, data)
@@ -113,7 +118,7 @@ module ActiveData
 
           object.define_destroy do
             data = association.send(:read_source)
-            index = association.reader.select(&:persisted?).index { |object| object === self }
+            index = association.load_target.select(&:persisted?).index { |object| object === self }
 
             data.delete_at(index) if index
             association.send(:write_source, data)

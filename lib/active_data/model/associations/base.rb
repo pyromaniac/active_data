@@ -2,10 +2,29 @@ module ActiveData
   module Model
     module Associations
       class Base
-        attr_accessor :reflection, :owner
+        attr_accessor :reflection, :owner, :target
 
         def initialize owner, reflection
           @owner, @reflection = owner, reflection
+          reset
+        end
+
+        def reset
+          @loaded = false
+          @target = nil
+        end
+
+        def loaded?
+          !!@loaded
+        end
+
+        def loaded!
+          @loaded = true
+        end
+
+        def reload
+          reset
+          load_target
         end
 
         def transaction &block
@@ -15,10 +34,6 @@ module ActiveData
           write_source data
           reload
           raise e
-        end
-
-        def reload
-          raise NotImplementedError
         end
 
       private
