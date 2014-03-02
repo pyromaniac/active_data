@@ -7,7 +7,7 @@ module ActiveData
         class_attribute :_attributes, instance_writer: false
         self._attributes = {}
 
-        delegate :attribute_default, to: 'self.class'
+        delegate :attribute_default, :has_attribute?, to: 'self.class'
       end
 
       module ClassMethods
@@ -46,10 +46,10 @@ module ActiveData
           attributes = _attributes.map { |name, attribute| "#{name}: #{attribute.type}" }.join(', ')
           "#{name}(#{attributes})"
         end
-      end
 
-      def has_attribute? name
-        @attributes.key? name.to_s
+        def has_attribute? name
+          _attributes.key? name.to_s
+        end
       end
 
       def write_attribute name, value
@@ -90,7 +90,9 @@ module ActiveData
       def assign_attributes attributes
         (attributes.presence || {}).each do |(name, value)|
           name = name.to_s
-          public_send("#{name}=", value) if (has_attribute?(name) || respond_to?("#{name}=")) && name != 'id'
+          if (has_attribute?(name) || respond_to?("#{name}=")) && name != ActiveData.primary_attribute.to_s
+            public_send("#{name}=", value)
+          end
         end
       end
       alias_method :attributes=, :assign_attributes

@@ -59,8 +59,9 @@ You can define it with:
     end
   end
 
-  def self.config; ActiveData::Config.instance; end
+  def self.config
+    ActiveData::Config.instance
+  end
 
-  singleton_class.delegate :include_root_in_json, :include_root_in_json=,
-    :i18n_scope, :i18n_scope=, :normalizer, to: :config
+  singleton_class.delegate *ActiveData::Config.delegated, to: :config
 end

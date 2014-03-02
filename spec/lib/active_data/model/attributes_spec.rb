@@ -24,6 +24,13 @@ describe ActiveData::Model::Attributes do
     end
   end
 
+  describe '.has_attribute?' do
+    specify { klass.has_attribute?(:hello).should == true }
+    specify { klass.has_attribute?('hello').should == true }
+    specify { klass.has_attribute?(:name).should == false }
+    specify { klass.has_attribute?(:foobar).should == false }
+  end
+
   describe '#assign_attributes' do
     subject { klass.new('world') }
     let(:attributes) { { id: 42, hello: 'world', name: 'Ivan', missed: 'value' } }

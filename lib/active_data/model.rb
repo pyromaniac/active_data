@@ -13,6 +13,7 @@ module ActiveData
 
       include Conventions
       include Attributes
+      include Primary
       include Collection
       include Lifecycle
       include Associations

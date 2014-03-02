@@ -16,6 +16,12 @@ describe ActiveData::Config do
       .to change { subject.i18n_scope }.from(:active_data).to(:data_model) }
   end
 
+  describe '#primary_attribute' do
+    its(:primary_attribute) { should == :id }
+    specify { expect { subject.primary_attribute = :identified }
+      .to change { subject.primary_attribute }.from(:id).to(:identified) }
+  end
+
   describe '#normalizer' do
     its(:_normalizers) { should == {} }
     specify { expect { subject.normalizer(:name) { } }
