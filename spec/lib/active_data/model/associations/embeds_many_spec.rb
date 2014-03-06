@@ -137,6 +137,36 @@ describe ActiveData::Model::Associations::EmbedsMany do
       .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Swordfish'}]) }
   end
 
+  describe '#save' do
+    specify { expect { association.build; association.save }.to change { association.load_target.map(&:persisted?) }.to([false]) }
+    specify { expect { association.build(title: 'Genesis'); association.save }.to change { association.load_target.map(&:persisted?) }.to([true]) }
+    specify { expect {
+      existing_association.load_target.first.mark_for_destruction
+      existing_association.build(title: 'Swordfish');
+      existing_association.save
+    }.to change { existing_association.load_target.map(&:destroyed?) }.to([true, false]) }
+    specify { expect {
+      existing_association.load_target.first.mark_for_destruction
+      existing_association.build(title: 'Swordfish');
+      existing_association.save
+    }.to change { existing_association.load_target.map(&:persisted?) }.to([false, true]) }
+  end
+
+  describe '#save!' do
+    specify { expect { association.build; association.save! }.to raise_error ActiveData::AssociationNotSaved }
+    specify { expect { association.build(title: 'Genesis'); association.save! }.to change { association.load_target.map(&:persisted?) }.to([true]) }
+    specify { expect {
+      existing_association.load_target.first.mark_for_destruction
+      existing_association.build(title: 'Swordfish');
+      existing_association.save!
+    }.to change { existing_association.load_target.map(&:destroyed?) }.to([true, false]) }
+    specify { expect {
+      existing_association.load_target.first.mark_for_destruction
+      existing_association.build(title: 'Swordfish');
+      existing_association.save!
+    }.to change { existing_association.load_target.map(&:persisted?) }.to([false, true]) }
+  end
+
   describe '#target' do
     specify { existing_association.target.should == [] }
     specify do

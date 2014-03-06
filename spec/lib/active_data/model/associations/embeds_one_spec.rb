@@ -76,6 +76,18 @@ describe ActiveData::Model::Associations::EmbedsOne do
       .to change { existing_book.read_attribute(:author) }.from('name' => 'Johny').to('name' => 'Fred') }
   end
 
+  describe '#save' do
+    specify { expect { association.build; association.save }.to change { association.load_target.try(:persisted?) }.to(false) }
+    specify { expect { association.build(name: 'Fred'); association.save }.to change { association.load_target.try(:persisted?) }.to(true) }
+    specify { expect { existing_association.load_target.mark_for_destruction; existing_association.save }.to change { existing_association.load_target.destroyed? }.to(true) }
+  end
+
+  describe '#save!' do
+    specify { expect { association.build; association.save! }.to raise_error ActiveData::AssociationNotSaved }
+    specify { expect { association.build(name: 'Fred'); association.save! }.to change { association.load_target.try(:persisted?) }.to(true) }
+    specify { expect { existing_association.load_target.mark_for_destruction; existing_association.save! }.to change { existing_association.load_target.destroyed? }.to(true) }
+  end
+
   describe '#target' do
     specify { existing_association.target.should be_nil }
     specify do
