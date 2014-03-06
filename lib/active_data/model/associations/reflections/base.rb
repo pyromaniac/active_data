@@ -20,6 +20,10 @@ module ActiveData
             end
           end
 
+          def validate?
+            false
+          end
+
           def class_name
             @class_name ||= (options[:class_name].presence || name.to_s.classify).to_s
           end

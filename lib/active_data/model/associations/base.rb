@@ -14,10 +14,6 @@ module ActiveData
           @target = nil
         end
 
-        def validate?
-          false
-        end
-
         def loaded?
           !!@loaded
         end
