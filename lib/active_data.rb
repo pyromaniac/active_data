@@ -11,7 +11,9 @@ require 'active_data/errors'
 require 'active_data/config'
 require 'active_data/model'
 require 'active_data/model/extensions'
-require 'active_data/railtie' if defined?(Rails::Railtie)
+
+require 'active_data/active_record/associations'
+require 'active_data/active_record/nested_attributes'
 
 ActiveSupport.on_load :active_record do
   include ActiveData::ActiveRecord::Associations
