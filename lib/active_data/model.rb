@@ -1,3 +1,12 @@
+require 'active_data/model/extensions'
+require 'active_data/model/conventions'
+require 'active_data/model/attributes'
+require 'active_data/model/primary'
+require 'active_data/model/collection'
+require 'active_data/model/lifecycle'
+require 'active_data/model/callbacks'
+require 'active_data/model/associations'
+
 module ActiveData
   module Model
     extend ActiveSupport::Concern

@@ -1,3 +1,10 @@
+require 'active_data/model/associations/reflections/embeds_many'
+require 'active_data/model/associations/reflections/embeds_one'
+require 'active_data/model/associations/reflections/embeds_many'
+require 'active_data/model/associations/embeds_one'
+require 'active_data/model/associations/embeds_many'
+require 'active_data/model/associations/nested_attributes'
+
 module ActiveData
   module Model
     module Associations

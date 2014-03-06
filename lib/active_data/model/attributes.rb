@@ -1,3 +1,10 @@
+require 'active_data/model/attributes/base'
+require 'active_data/model/attributes/arrayed'
+require 'active_data/model/attributes/hashed'
+require 'active_data/model/attributes/localized'
+require 'active_data/model/attributes/association'
+
+
 module ActiveData
   module Model
     module Attributes
