@@ -7,58 +7,17 @@ ActiveSupport::Dependencies.autoload_paths += [File.dirname(__FILE__)]
 
 require 'active_model'
 require 'active_data/version'
+require 'active_data/errors'
 require 'active_data/config'
 require 'active_data/model'
 require 'active_data/model/extensions'
 
 ActiveSupport.on_load :active_record do
   include ActiveData::ActiveRecord::Associations
+  include ActiveData::ActiveRecord::NestedAttributes
 end
 
 module ActiveData
-  class ActiveDataError < StandardError
-  end
-
-  class NotFound < ActiveDataError
-  end
-
-  class ValidationError < ActiveDataError
-  end
-
-  class UnsavableObject < ActiveDataError
-  end
-
-  class UndestroyableObject < ActiveDataError
-  end
-
-  class ObjectNotSaved < ActiveDataError
-  end
-
-  class ObjectNotDestroyed < ActiveDataError
-  end
-
-  class AssociationNotSaved < ActiveDataError
-  end
-
-  class NormalizerMissing < NoMethodError
-    def initialize name
-      super <<-EOS
-Could not find normalizer `:#{name}`
-You can define it with:
-
-  ActiveData.normalizer(:#{name}) do |value, options|
-    # do some staff with value and options
-  end
-      EOS
-    end
-  end
-
-  class AssociationTypeMismatch < ActiveDataError
-    def initialize expected, got
-      super "Expected `#{expected}` (##{expected.object_id}), but got `#{got}` (##{got.object_id})"
-    end
-  end
-
   def self.config
     ActiveData::Config.instance
   end

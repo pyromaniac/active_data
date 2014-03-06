@@ -36,7 +36,10 @@ module ActiveData
             before_save callback_name
             class_eval <<-METHOD
               def #{callback_name}
-                association(:#{reflection.name}).save!
+                association = association(:#{reflection.name})
+                result = association.save!
+                association.reload
+                result
               end
             METHOD
           end

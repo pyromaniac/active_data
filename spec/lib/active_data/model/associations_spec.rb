@@ -102,7 +102,6 @@ describe ActiveData::Model::Associations do
         attribute :title
       end
       stub_model(:user) do
-        include ActiveData::Model::Callbacks
         attribute :name
         embeds_many :projects
         define_save { true }

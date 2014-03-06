@@ -15,7 +15,7 @@ module ActiveData
         end
 
         def save
-          reader ? reader.save : true
+          load_target ? (load_target.marked_for_destruction? ? load_target.destroy : load_target.save) : true
         end
 
         def save!

@@ -4,8 +4,6 @@ require 'spec_helper'
 describe ActiveData::Model::Lifecycle do
   before do
     stub_model(:user) do
-      include ActiveData::Model::Callbacks
-
       attribute :actions, type: Array, default: []
 
       def append action
@@ -223,8 +221,6 @@ describe ActiveData::Model::Lifecycle do
   context 'unsavable, undestroyable' do
     before do
       stub_model(:user) do
-        include ActiveData::Model::Callbacks
-
         attribute :actions, type: Array, default: []
         attribute :validated, type: Boolean, default: false
 

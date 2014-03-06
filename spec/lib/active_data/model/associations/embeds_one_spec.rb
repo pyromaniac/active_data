@@ -4,7 +4,6 @@ require 'spec_helper'
 describe ActiveData::Model::Associations::EmbedsOne do
   before do
     stub_model(:author) do
-      include ActiveData::Model::Callbacks
       attribute :name
       validates :name, presence: true
     end

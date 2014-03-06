@@ -56,8 +56,7 @@ module ActiveData
     #
     # Save and destroy processes acts almost the save way as
     # ActiveRecord's (with +persisted?+ and +destroyed?+ methods
-    # affecting). But without callbacks by default. To add callbacks
-    # you need simply include ActiveData::Model::Callbacks.
+    # affecting).
     #
     module Lifecycle
       extend ActiveSupport::Concern

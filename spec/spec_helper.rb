@@ -14,9 +14,9 @@ ActiveRecord::Base.logger = Logger.new('/dev/null')
 
 ActiveRecord::Schema.define do
   create_table :users do |t|
-    t.column :name, :string
-    t.column :abilities, :text
-    t.column :tracking, :text
+    t.column :email, :string
+    t.column :projects, :text
+    t.column :profile, :text
   end
 end
 

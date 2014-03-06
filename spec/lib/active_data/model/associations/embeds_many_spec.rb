@@ -5,7 +5,6 @@ describe ActiveData::Model::Associations::EmbedsMany do
   before do
     stub_model(:dummy)
     stub_model(:project) do
-      include ActiveData::Model::Callbacks
       attribute :title
       validates :title, presence: true
     end

@@ -1,29 +1,16 @@
+# encoding: UTF-8
 require 'spec_helper'
+require 'lib/active_data/model/nested_attributes'
 
-describe ActiveData::ActiveRecord::Associations do
+describe ActiveData::ActiveRecord::NestedAttributes do
   before do
-    stub_model(:ability) do
-      primary_attribute
-      attribute :title, type: String
-      attribute :read, type: Boolean, default: false
-      attribute :create, type: Boolean, default: false
-      attribute :update, type: Boolean, default: false
-      attribute :delete, type: Boolean, default: false
-
-      validates :title, presence: true
-    end
-
-    stub_model(:tracking) do
-      primary_attribute
-      attribute :referer, type: String
-      attribute :ip_address, type: String
-    end
-
     stub_class(:user, ActiveRecord::Base) do
-      embeds_many :abilities
-      embeds_one :tracking
+      embeds_one :profile
+      embeds_many :projects
 
-      validates :abilities, associated: true
+      accepts_nested_attributes_for :profile, :projects
     end
   end
+
+  include_examples 'nested attributes'
 end

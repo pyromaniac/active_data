@@ -15,7 +15,7 @@ module ActiveData
         end
 
         def save
-          load_target.map(&:save).all?
+          load_target.map { |object| object.marked_for_destruction? ? object.destroy : object.save }.all?
         end
 
         def save!

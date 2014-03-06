@@ -9,6 +9,10 @@ module ActiveData
         @persisted
       end
 
+      def new_record?
+        !@persisted
+      end
+
       def destroyed?
         @destroyed
       end

@@ -16,6 +16,7 @@ module ActiveData
       include Primary
       include Collection
       include Lifecycle
+      include Callbacks
       include Associations
 
       self.include_root_in_json = ActiveData.include_root_in_json

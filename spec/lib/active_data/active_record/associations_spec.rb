@@ -2,59 +2,55 @@ require 'spec_helper'
 
 describe ActiveData::ActiveRecord::Associations do
   before do
-    stub_model(:ability) do
+    stub_model(:project) do
       attribute :title, type: String
-      attribute :read, type: Boolean, default: false
-      attribute :create, type: Boolean, default: false
-      attribute :update, type: Boolean, default: false
-      attribute :delete, type: Boolean, default: false
 
       validates :title, presence: true
     end
 
-    stub_model(:tracking) do
-      attribute :referer, type: String
-      attribute :ip_address, type: String
+    stub_model(:profile) do
+      attribute :first_name, type: String
+      attribute :last_name, type: String
     end
 
     stub_class(:user, ActiveRecord::Base) do
-      embeds_many :abilities
-      embeds_one :tracking
+      embeds_many :projects
+      embeds_one :profile
 
-      validates :abilities, associated: true
+      validates :projects, associated: true
     end
   end
 
 
-  its(:abilities) { should = [] }
-  its(:tracking) { should = nil }
+  its(:projects) { should = [] }
+  its(:profile) { should = nil }
 
   context 'new owner' do
     subject(:user) { User.new }
 
-    describe '#abilities' do
-      specify { expect { user.abilities << Ability.new }
-        .not_to change { user.read_attribute(:abilities) } }
-      specify { expect { user.abilities << Ability.new(title: 'First') }
-        .not_to change { user.read_attribute(:abilities) } }
-      specify { expect { user.abilities << Ability.new(title: 'First') }
-        .not_to change { user.abilities.reload.count } }
+    describe '#projects' do
+      specify { expect { user.projects << Project.new }
+        .not_to change { user.read_attribute(:projects) } }
+      specify { expect { user.projects << Project.new(title: 'First') }
+        .not_to change { user.read_attribute(:projects) } }
+      specify { expect { user.projects << Project.new(title: 'First') }
+        .not_to change { user.projects.reload.count } }
       specify do
-        user.abilities << Ability.new(title: 'First')
+        user.projects << Project.new(title: 'First')
         user.save
-        user.reload.abilities.first.title.should == 'First'
+        user.reload.projects.first.title.should == 'First'
       end
     end
 
-    describe '#tracking' do
-      specify { expect { user.tracking = Tracking.new(referer: 'google.com') }
-        .not_to change { user.read_attribute(:tracking) } }
-      specify { expect { user.tracking = Tracking.new(referer: 'google.com') }
-        .to change { user.tracking }.from(nil).to(an_instance_of(Tracking)) }
+    describe '#profile' do
+      specify { expect { user.profile = Profile.new(first_name: 'google.com') }
+        .not_to change { user.read_attribute(:profile) } }
+      specify { expect { user.profile = Profile.new(first_name: 'google.com') }
+        .to change { user.profile }.from(nil).to(an_instance_of(Profile)) }
       specify do
-        user.tracking = Tracking.new(referer: 'google.com')
+        user.profile = Profile.new(first_name: 'google.com')
         user.save
-        user.reload.tracking.referer.should == 'google.com'
+        user.reload.profile.first_name.should == 'google.com'
       end
     end
   end
@@ -62,31 +58,31 @@ describe ActiveData::ActiveRecord::Associations do
   context 'persisted owner' do
     subject(:user) { User.create }
 
-    describe '#abilities' do
-      specify { expect { user.abilities << Ability.new }
-        .not_to change { user.read_attribute(:abilities) } }
-      specify { expect { user.abilities << Ability.new(title: 'First') }
-        .to change { user.read_attribute(:abilities) }.from(nil)
-        .to([{title: 'First', read: false, create: false, update: false, delete: false}].to_json) }
-      specify { expect { user.abilities << Ability.new(title: 'First') }
-        .to change { user.abilities.reload.count }.from(0).to(1) }
+    describe '#projects' do
+      specify { expect { user.projects << Project.new }
+        .not_to change { user.read_attribute(:projects) } }
+      specify { expect { user.projects << Project.new(title: 'First') }
+        .to change { user.read_attribute(:projects) }.from(nil)
+        .to([{title: 'First'}].to_json) }
+      specify { expect { user.projects << Project.new(title: 'First') }
+        .to change { user.projects.reload.count }.from(0).to(1) }
       specify do
-        user.abilities << Ability.new(title: 'First')
+        user.projects << Project.new(title: 'First')
         user.save
-        user.reload.abilities.first.title.should == 'First'
+        user.reload.projects.first.title.should == 'First'
       end
     end
 
-    describe '#tracking' do
-      specify { expect { user.tracking = Tracking.new(referer: 'google.com') }
-        .to change { user.read_attribute(:tracking) }.from(nil)
-        .to({referer: 'google.com', ip_address: nil}.to_json) }
-      specify { expect { user.tracking = Tracking.new(referer: 'google.com') }
-        .to change { user.tracking }.from(nil).to(an_instance_of(Tracking)) }
+    describe '#profile' do
+      specify { expect { user.profile = Profile.new(first_name: 'google.com') }
+        .to change { user.read_attribute(:profile) }.from(nil)
+        .to({first_name: 'google.com', last_name: nil}.to_json) }
+      specify { expect { user.profile = Profile.new(first_name: 'google.com') }
+        .to change { user.profile }.from(nil).to(an_instance_of(Profile)) }
       specify do
-        user.tracking = Tracking.new(referer: 'google.com')
+        user.profile = Profile.new(first_name: 'google.com')
         user.save
-        user.reload.tracking.referer.should == 'google.com'
+        user.reload.profile.first_name.should == 'google.com'
       end
     end
   end

@@ -8,7 +8,6 @@ module ActiveData
     #
     #   class Book
     #     include ActiveData::Model
-    #     include ActiveData::Model::Callbacks
     #
     #     attribute :id, type: Integer
     #     attribute :title, type: String
