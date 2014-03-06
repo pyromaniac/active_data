@@ -12,10 +12,10 @@ require 'active_data/config'
 require 'active_data/model'
 require 'active_data/model/extensions'
 
-require 'active_data/active_record/associations'
-require 'active_data/active_record/nested_attributes'
-
 ActiveSupport.on_load :active_record do
+  require 'active_data/active_record/associations'
+  require 'active_data/active_record/nested_attributes'
+
   include ActiveData::ActiveRecord::Associations
   include ActiveData::ActiveRecord::NestedAttributes
 end
