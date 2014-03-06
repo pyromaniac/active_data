@@ -9,7 +9,7 @@ module ActiveData
             to_s
           end
 
-          def to_json *_
+          def to_param
             to_s
           end
         end
