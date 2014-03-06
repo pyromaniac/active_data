@@ -137,6 +137,9 @@ describe 'typecasting' do
     let(:uuid) { ActiveData::UUID.random_create }
     let(:uuid_tools) { UUIDTools::UUID.random_create }
 
+    specify { uuid.as_json.should == uuid.to_s }
+    specify { uuid.to_json.should == uuid.to_s }
+
     specify{subject.tap{|s| s.uuid = nil}.uuid.should be_nil}
     specify{subject.tap{|s| s.uuid = Object.new}.uuid.should be_nil}
     specify{subject.tap{|s| s.uuid = uuid_tools}.uuid.should be_a ActiveData::UUID }

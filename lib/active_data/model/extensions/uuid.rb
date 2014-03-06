@@ -4,11 +4,17 @@ module ActiveData
       module UUID
         extend ActiveSupport::Concern
 
-        module ClassMethods
-          def as_json
+        included do
+          def as_json *_
             to_s
           end
 
+          def to_json *_
+            to_s
+          end
+        end
+
+        module ClassMethods
           def active_data_type_cast value
             case value
             when UUIDTools::UUID
