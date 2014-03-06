@@ -7,14 +7,6 @@ require 'active_data/version'
 require 'active_data/errors'
 require 'active_data/config'
 
-ActiveSupport.on_load :active_record do
-  require 'active_data/active_record/associations'
-  require 'active_data/active_record/nested_attributes'
-
-  include ActiveData::ActiveRecord::Associations
-  include ActiveData::ActiveRecord::NestedAttributes
-end
-
 module ActiveData
   def self.config
     ActiveData::Config.instance
@@ -25,3 +17,11 @@ end
 
 require 'active_data/model'
 require 'active_data/validations'
+
+ActiveSupport.on_load :active_record do
+  require 'active_data/active_record/associations'
+  require 'active_data/active_record/nested_attributes'
+
+  include ActiveData::ActiveRecord::Associations
+  include ActiveData::ActiveRecord::NestedAttributes
+end
