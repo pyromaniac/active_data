@@ -110,12 +110,12 @@ module ActiveData
               write_attribute('#{name}', value)
             end
 
-            def #{name}?
-              read_attribute('#{name}').present?
-            end
-
             def #{name}_before_type_cast
               read_attribute_before_type_cast('#{name}')
+            end
+
+            def #{name}?
+              attribute_present?('#{name}')
             end
 
             def #{name}_values

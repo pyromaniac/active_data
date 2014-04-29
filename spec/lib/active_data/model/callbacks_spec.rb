@@ -43,7 +43,7 @@ describe ActiveData::Model::Lifecycle do
 
   describe '.around_save' do
     before do
-      User.around_save do |&block|
+      User.around_save do |user, block|
         append :before_around_save
         block.call
         append :after_around_save
@@ -77,7 +77,7 @@ describe ActiveData::Model::Lifecycle do
 
   describe '.around_create' do
     before do
-      User.around_create do |&block|
+      User.around_create do |user, block|
         append :before_around_create
         block.call
         append :after_around_create
@@ -110,7 +110,7 @@ describe ActiveData::Model::Lifecycle do
 
   describe '.around_update' do
     before do
-      User.around_update do |&block|
+      User.around_update do |user, block|
         append :before_around_update
         block.call
         append :after_around_update
@@ -137,7 +137,7 @@ describe ActiveData::Model::Lifecycle do
 
       User.before_save { append :before_save }
       User.after_save { append :after_save }
-      User.around_save do |&block|
+      User.around_save do |user, block|
         append :before_around_save
         block.call
         append :after_around_save
@@ -145,7 +145,7 @@ describe ActiveData::Model::Lifecycle do
 
       User.before_create { append :before_create }
       User.after_create { append :after_create }
-      User.around_create do |&block|
+      User.around_create do |user, block|
         append :before_around_create
         block.call
         append :after_around_create
@@ -153,7 +153,7 @@ describe ActiveData::Model::Lifecycle do
 
       User.before_update { append :before_update }
       User.after_update { append :after_update }
-      User.around_update do |&block|
+      User.around_update do |user, block|
         append :before_around_update
         block.call
         append :after_around_update
@@ -161,7 +161,7 @@ describe ActiveData::Model::Lifecycle do
 
       User.before_destroy { append :before_destroy }
       User.after_destroy { append :after_destroy }
-      User.around_destroy do |&block|
+      User.around_destroy do |user, block|
         append :before_around_destroy
         block.call
         append :after_around_destroy
@@ -204,7 +204,7 @@ describe ActiveData::Model::Lifecycle do
 
   describe '.around_destroy' do
     before do
-      User.around_destroy do |&block|
+      User.around_destroy do |user, block|
         append :before_around_destroy
         block.call
         append :after_around_destroy

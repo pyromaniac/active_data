@@ -81,6 +81,11 @@ module ActiveData
         _attributes[name].read_value_before_type_cast(@attributes[name], self)
       end
 
+      def attribute_present? name
+        value = read_attribute name
+        !value.nil? && !(value.respond_to?(:empty?) && value.empty?)
+      end
+
       def attributes
         Hash[attribute_names.map { |name| [name, public_send(name)] }]
       end
