@@ -5,7 +5,7 @@
 
 # ActiveData
 
-ActiveData is a ActiveModel-based fronend for your data. You might need to use it in the following cases:
+ActiveData is a ActiveModel-based frontend for your data. You might need to use it in the following cases:
 
 * When you need a form objects pattern.
 
