@@ -7,6 +7,7 @@ module ActiveData
           WRITE = ->(reflection, object, value) { object.write_attribute reflection.name, value }
 
           attr_reader :name, :options
+          attr_accessor :parent_reflection # [:name, Reflection]
 
           def initialize name, options = {}
             @name, @options = name.to_sym, options
