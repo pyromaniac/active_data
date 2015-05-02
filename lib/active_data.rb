@@ -1,6 +1,7 @@
 require 'active_support'
-require 'active_support/concern'
+require 'active_support/deprecation'
 require 'active_support/core_ext'
+require 'active_support/concern'
 require 'singleton'
 
 require 'active_model'

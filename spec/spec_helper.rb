@@ -1,9 +1,7 @@
 require 'bundler'
 Bundler.require
 
-require 'coveralls'
-Coveralls.wear!
-
+require 'rspec/its'
 require 'active_record'
 require 'database_cleaner'
 
@@ -22,6 +20,7 @@ end
 
 RSpec.configure do |config|
   config.mock_with :rspec
+  config.order = :random
 
   config.include ModelHelpers
 

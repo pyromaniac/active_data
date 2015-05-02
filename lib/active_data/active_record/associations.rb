@@ -30,7 +30,11 @@ module ActiveData
               }
             ))
             reflection.define_methods self
-            self.reflections = reflections.merge(reflection.name => reflection)
+            if ::ActiveRecord::Reflection.respond_to? :add_reflection
+              ::ActiveRecord::Reflection.add_reflection self, reflection.name, reflection
+            else
+              self.reflections = reflections.merge(reflection.name => reflection)
+            end
 
             callback_name = "update_#{reflection.name}_association"
             before_save callback_name

@@ -7,6 +7,7 @@ module ActiveData
           WRITE = ->(reflection, object, value) { object.write_attribute reflection.name, value }
 
           attr_reader :name, :options
+          attr_accessor :parent_reflection
 
           def initialize name, options = {}
             @name, @options = name.to_sym, options
@@ -21,6 +22,10 @@ module ActiveData
           end
 
           def validate?
+            false
+          end
+
+          def belongs_to?
             false
           end
 

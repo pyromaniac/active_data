@@ -111,8 +111,8 @@ describe ActiveData::Model::Lifecycle do
       specify { expect { subject.destroy }.to raise_error ActiveData::UndestroyableObject }
       specify { expect { subject.destroy! }.to raise_error ActiveData::UndestroyableObject }
 
-      specify { subject.destroy { true }.should be_true }
-      specify { subject.destroy! { true }.should be_true }
+      specify { subject.destroy { true }.should be_a User }
+      specify { subject.destroy! { true }.should be_a User }
 
       context 'instance performer' do
         before { subject.define_save { false } }
