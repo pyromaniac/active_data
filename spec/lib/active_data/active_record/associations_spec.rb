@@ -38,7 +38,7 @@ describe ActiveData::ActiveRecord::Associations do
       specify do
         user.projects << Project.new(title: 'First')
         user.save
-        user.reload.projects.first.title.should == 'First'
+        expect(user.reload.projects.first.title).to eq('First')
       end
     end
 
@@ -50,7 +50,7 @@ describe ActiveData::ActiveRecord::Associations do
       specify do
         user.profile = Profile.new(first_name: 'google.com')
         user.save
-        user.reload.profile.first_name.should == 'google.com'
+        expect(user.reload.profile.first_name).to eq('google.com')
       end
     end
   end
@@ -69,7 +69,7 @@ describe ActiveData::ActiveRecord::Associations do
       specify do
         user.projects << Project.new(title: 'First')
         user.save
-        user.reload.projects.first.title.should == 'First'
+        expect(user.reload.projects.first.title).to eq('First')
       end
     end
 
@@ -82,7 +82,7 @@ describe ActiveData::ActiveRecord::Associations do
       specify do
         user.profile = Profile.new(first_name: 'google.com')
         user.save
-        user.reload.profile.first_name.should == 'google.com'
+        expect(user.reload.profile.first_name).to eq('google.com')
       end
     end
   end

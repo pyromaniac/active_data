@@ -11,10 +11,10 @@ describe ActiveData::Model::Associations do
       stub_model(:admin, User) { embeds_many :admin_projects, class_name: 'Project' }
     end
 
-    specify { Nobody.reflections.keys.should == [] }
-    specify { User.reflections.keys.should == [:projects] }
-    specify { Manager.reflections.keys.should == [:managed_project] }
-    specify { Admin.reflections.keys.should == [:projects, :admin_projects] }
+    specify { expect(Nobody.reflections.keys).to eq([]) }
+    specify { expect(User.reflections.keys).to eq([:projects]) }
+    specify { expect(Manager.reflections.keys).to eq([:managed_project]) }
+    specify { expect(Admin.reflections.keys).to eq([:projects, :admin_projects]) }
   end
 
   context '.embeds_one' do
@@ -30,7 +30,7 @@ describe ActiveData::Model::Associations do
     end
     let(:book) { Book.new }
 
-    specify { book.author.should be_nil }
+    specify { expect(book.author).to be_nil }
 
     context ':read, :write' do
       before do
@@ -70,19 +70,19 @@ describe ActiveData::Model::Associations do
 
     describe '#build_author' do
       let(:author) { Author.new name: 'Author' }
-      specify { book.build_author(name: 'Author').should == author }
+      specify { expect(book.build_author(name: 'Author')).to eq(author) }
       specify { expect { book.build_author(name: 'Author') }.to change { book.author }.from(nil).to(author) }
     end
 
     describe '#create_author' do
       let(:author) { Author.new name: 'Author' }
-      specify { book.create_author(name: 'Author').should == author }
+      specify { expect(book.create_author(name: 'Author')).to eq(author) }
       specify { expect { book.create_author(name: 'Author') }.to change { book.author }.from(nil).to(author) }
     end
 
     describe '#create_author!' do
       let(:author) { Author.new name: 'Author' }
-      specify { book.create_author!(name: 'Author').should == author }
+      specify { expect(book.create_author!(name: 'Author')).to eq(author) }
       specify { expect { book.create_author!(name: 'Author') }.to change { book.author }.from(nil).to(author) }
     end
 
@@ -90,9 +90,9 @@ describe ActiveData::Model::Associations do
       let(:author) { Author.new name: 'Author' }
       let(:other) { Author.new name: 'Other' }
 
-      specify { Book.new(author: author).should == Book.new(author: author) }
-      specify { Book.new(author: author).should_not == Book.new(author: other) }
-      specify { Book.new(author: author).should_not == Book.new }
+      specify { expect(Book.new(author: author)).to eq(Book.new(author: author)) }
+      specify { expect(Book.new(author: author)).not_to eq(Book.new(author: other)) }
+      specify { expect(Book.new(author: author)).not_to eq(Book.new) }
     end
   end
 
@@ -135,23 +135,23 @@ describe ActiveData::Model::Associations do
     end
 
     describe '#projects' do
-      specify { user.projects.should == [] }
+      specify { expect(user.projects).to eq([]) }
 
       describe '#build' do
         let(:project) { Project.new title: 'Project' }
-        specify { user.projects.build(title: 'Project').should == project }
+        specify { expect(user.projects.build(title: 'Project')).to eq(project) }
         specify { expect { user.projects.build(title: 'Project') }.to change { user.projects }.from([]).to([project]) }
       end
 
       describe '#create' do
         let(:project) { Project.new title: 'Project' }
-        specify { user.projects.create(title: 'Project').should == project }
+        specify { expect(user.projects.create(title: 'Project')).to eq(project) }
         specify { expect { user.projects.create(title: 'Project') }.to change { user.projects }.from([]).to([project]) }
       end
 
       describe '#create!' do
         let(:project) { Project.new title: 'Project' }
-        specify { user.projects.create!(title: 'Project').should == project }
+        specify { expect(user.projects.create!(title: 'Project')).to eq(project) }
         specify { expect { user.projects.create!(title: 'Project') }.to change { user.projects }.from([]).to([project]) }
       end
 
@@ -160,8 +160,8 @@ describe ActiveData::Model::Associations do
         before { user.update(projects: [project]) }
         before { user.projects.build }
 
-        specify { user.projects.count.should == 2 }
-        specify { user.projects.reload.should == [project] }
+        specify { expect(user.projects.count).to eq(2) }
+        specify { expect(user.projects.reload).to eq([project]) }
       end
 
       describe '#concat' do
@@ -195,9 +195,9 @@ describe ActiveData::Model::Associations do
       let(:project) { Project.new title: 'Project' }
       let(:other) { Project.new title: 'Other' }
 
-      specify { User.new(projects: [project]).should == User.new(projects: [project]) }
-      specify { User.new(projects: [project]).should_not == User.new(projects: [other]) }
-      specify { User.new(projects: [project]).should_not == User.new }
+      specify { expect(User.new(projects: [project])).to eq(User.new(projects: [project])) }
+      specify { expect(User.new(projects: [project])).not_to eq(User.new(projects: [other])) }
+      specify { expect(User.new(projects: [project])).not_to eq(User.new) }
     end
   end
 end

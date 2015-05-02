@@ -11,12 +11,12 @@ describe ActiveData::Model do
     end
   end
 
-  specify { [model].flatten.should == [model] }
+  specify { expect([model].flatten).to eq([model]) }
   specify { expect { model.blablabla }.to raise_error NoMethodError }
-  specify { model.i18n_scope.should == :active_data }
-  specify { model.new.should_not be_persisted }
-  specify { model.instantiate({}).should be_an_instance_of model }
-  specify { model.instantiate({}).should be_persisted }
+  specify { expect(model.i18n_scope).to eq(:active_data) }
+  specify { expect(model.new).not_to be_persisted }
+  specify { expect(model.instantiate({})).to be_an_instance_of model }
+  specify { expect(model.instantiate({})).to be_persisted }
 
   context 'Fault tolerance' do
     specify{ expect { model.new(foo: 'bar') }.not_to raise_error }
@@ -26,18 +26,18 @@ describe ActiveData::Model do
     context do
       subject(:instance) { model.instantiate(name: 'Hello', foo: 'Bar') }
 
-      specify { subject.instance_variable_get(:@attributes).should == { name: 'Hello', count: nil }.stringify_keys }
+      specify { expect(subject.instance_variable_get(:@attributes)).to eq({ name: 'Hello', count: nil }.stringify_keys) }
     end
   end
 
   describe '#==' do
     subject { model.new name: 'hello', count: 42 }
-    it { should_not == nil }
-    it { should_not == 'hello' }
-    it { should_not == Object.new }
-    it { should_not == model.new }
-    it { should_not == model.new(name: 'hello1', count: 42) }
-    it { should_not == model.new(name: 'hello', count: 42.1) }
-    it { should == model.new(name: 'hello', count: 42) }
+    it { is_expected.not_to eq(nil) }
+    it { is_expected.not_to eq('hello') }
+    it { is_expected.not_to eq(Object.new) }
+    it { is_expected.not_to eq(model.new) }
+    it { is_expected.not_to eq(model.new(name: 'hello1', count: 42)) }
+    it { is_expected.not_to eq(model.new(name: 'hello', count: 42.1)) }
+    it { is_expected.to eq(model.new(name: 'hello', count: 42)) }
   end
 end

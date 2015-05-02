@@ -24,18 +24,18 @@ describe ActiveData::Model::Collection do
 
   let(:collection) { klass.instantiate_collection([{ name: 'Hello' }, { name: 'World' }, { name: 'Mars' }]) }
 
-  specify { klass.collection_class.should_not be_nil }
-  specify { klass.collection_class.collectible.should == klass }
-  specify { klass.collection_class.new.should be_empty }
-  specify { CollectionizableTest.collection_class.should < Array }
+  specify { expect(klass.collection_class).not_to be_nil }
+  specify { expect(klass.collection_class.collectible).to eq(klass) }
+  specify { expect(klass.collection_class.new).to be_empty }
+  specify { expect(CollectionizableTest.collection_class).to be < Array }
 
-  specify { collection.should be_instance_of klass.collection_class }
-  specify { collection.except_first.should be_instance_of klass.collection_class }
-  specify { collection.no_mars.should be_instance_of klass.collection_class }
-  specify { collection.except_first.should == klass.instantiate_collection([{ name: 'World' }, { name: 'Mars' }]) }
-  specify { collection.no_mars.should == klass.instantiate_collection([{ name: 'Hello' }, { name: 'World' }]) }
-  specify { collection.except_first.no_mars.should == klass.instantiate_collection([{ name: 'World' }]) }
-  specify { collection.no_mars.except_first.should == klass.instantiate_collection([{ name: 'World' }]) }
+  specify { expect(collection).to be_instance_of klass.collection_class }
+  specify { expect(collection.except_first).to be_instance_of klass.collection_class }
+  specify { expect(collection.no_mars).to be_instance_of klass.collection_class }
+  specify { expect(collection.except_first).to eq(klass.instantiate_collection([{ name: 'World' }, { name: 'Mars' }])) }
+  specify { expect(collection.no_mars).to eq(klass.instantiate_collection([{ name: 'Hello' }, { name: 'World' }])) }
+  specify { expect(collection.except_first.no_mars).to eq(klass.instantiate_collection([{ name: 'World' }])) }
+  specify { expect(collection.no_mars.except_first).to eq(klass.instantiate_collection([{ name: 'World' }])) }
 
   context do
     let!(:ancestor) do
@@ -52,9 +52,9 @@ describe ActiveData::Model::Collection do
       Class.new ancestor
     end
 
-    specify { descendant1.collection_class.should < Array }
-    specify { descendant2.collection_class.should < Array }
-    specify { ancestor.collection_class.should_not == descendant1.collection_class }
-    specify { descendant1.collection_class.should_not == descendant2.collection_class }
+    specify { expect(descendant1.collection_class).to be < Array }
+    specify { expect(descendant2.collection_class).to be < Array }
+    specify { expect(ancestor.collection_class).not_to eq(descendant1.collection_class) }
+    specify { expect(descendant1.collection_class).not_to eq(descendant2.collection_class) }
   end
 end

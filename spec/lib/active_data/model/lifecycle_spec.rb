@@ -18,29 +18,29 @@ describe ActiveData::Model::Lifecycle do
 
       specify { expect { subject.save { foo } }.to raise_error NameError }
       specify { expect { subject.save { |instance| attributes } }.to raise_error NameError }
-      specify { subject.save { attributes }.should == true }
-      specify { subject.save { |instance| foo }.should == true }
+      specify { expect(subject.save { attributes }).to eq(true) }
+      specify { expect(subject.save { |instance| foo }).to eq(true) }
     end
 
     context 'save' do
       specify { expect { subject.save }.to raise_error ActiveData::UnsavableObject }
       specify { expect { subject.save! }.to raise_error ActiveData::UnsavableObject }
 
-      specify { subject.save { true }.should == true }
-      specify { subject.save! { true }.should == true }
+      specify { expect(subject.save { true }).to eq(true) }
+      specify { expect(subject.save! { true }).to eq(true) }
 
       context 'instance performer' do
         before { subject.define_save { false } }
 
-        specify { subject.save.should == false }
+        specify { expect(subject.save).to eq(false) }
         specify { expect { subject.save! }.to raise_error ActiveData::ObjectNotSaved }
       end
 
       context 'create performer' do
         before { User.define_create { true } }
 
-        specify { subject.save.should == true }
-        specify { subject.save!.should == true }
+        specify { expect(subject.save).to eq(true) }
+        specify { expect(subject.save!).to eq(true) }
 
         context do
           subject { User.create }
@@ -52,7 +52,7 @@ describe ActiveData::Model::Lifecycle do
         context 'instance performer' do
           before { subject.define_create { false } }
 
-          specify { subject.save.should == false }
+          specify { expect(subject.save).to eq(false) }
           specify { expect { subject.save! }.to raise_error ActiveData::ObjectNotSaved }
         end
       end
@@ -66,13 +66,13 @@ describe ActiveData::Model::Lifecycle do
         context do
           subject { User.new.tap { |u| u.save { true } } }
 
-          specify { subject.save.should == true }
-          specify { subject.save!.should == true }
+          specify { expect(subject.save).to eq(true) }
+          specify { expect(subject.save!).to eq(true) }
 
           context 'instance performer' do
             before { subject.define_update { false } }
 
-            specify { subject.save.should == false }
+            specify { expect(subject.save).to eq(false) }
             specify { expect { subject.save! }.to raise_error ActiveData::ObjectNotSaved }
           end
         end
@@ -102,7 +102,7 @@ describe ActiveData::Model::Lifecycle do
           subject.destroy
           subject.destroy
           subject.save
-          subject.actions.should == [:destroy, :create, :update, :destroy, :destroy, :create]
+          expect(subject.actions).to eq([:destroy, :create, :update, :destroy, :destroy, :create])
         end
       end
     end
@@ -111,13 +111,13 @@ describe ActiveData::Model::Lifecycle do
       specify { expect { subject.destroy }.to raise_error ActiveData::UndestroyableObject }
       specify { expect { subject.destroy! }.to raise_error ActiveData::UndestroyableObject }
 
-      specify { subject.destroy { true }.should be_a User }
-      specify { subject.destroy! { true }.should be_a User }
+      specify { expect(subject.destroy { true }).to be_a User }
+      specify { expect(subject.destroy! { true }).to be_a User }
 
       context 'instance performer' do
         before { subject.define_save { false } }
 
-        specify { subject.save.should == false }
+        specify { expect(subject.save).to eq(false) }
         specify { expect { subject.save! }.to raise_error ActiveData::ObjectNotSaved }
       end
     end
@@ -158,25 +158,25 @@ describe ActiveData::Model::Lifecycle do
     describe '.create' do
       subject { User.create(name: 'Jonny') }
 
-      it { should be_a User }
-      it { should be_valid }
-      it { should be_persisted }
+      it { is_expected.to be_a User }
+      it { is_expected.to be_valid }
+      it { is_expected.to be_persisted }
 
       context 'invalid' do
         subject { User.create }
 
-        it { should be_a User }
-        it { should be_invalid }
-        it { should_not be_persisted }
+        it { is_expected.to be_a User }
+        it { is_expected.to be_invalid }
+        it { is_expected.not_to be_persisted }
       end
     end
 
     describe '.create!' do
       subject { User.create!(name: 'Jonny') }
 
-      it { should be_a User }
-      it { should be_valid }
-      it { should be_persisted }
+      it { is_expected.to be_a User }
+      it { is_expected.to be_valid }
+      it { is_expected.to be_persisted }
 
       context 'invalid' do
         subject { User.create! }
@@ -219,10 +219,10 @@ describe ActiveData::Model::Lifecycle do
       context 'invalid' do
         subject { User.new }
 
-        it { should be_invalid }
-        it { should_not be_persisted }
+        it { is_expected.to be_invalid }
+        it { is_expected.not_to be_persisted }
 
-        specify { subject.save.should == false }
+        specify { expect(subject.save).to eq(false) }
         specify { expect { subject.save! }.to raise_error ActiveData::ValidationError }
 
         specify { expect { subject.save }.not_to change { subject.persisted? } }
@@ -232,11 +232,11 @@ describe ActiveData::Model::Lifecycle do
       context 'create' do
         subject { User.new(name: 'Jonny') }
 
-        it { should be_valid }
-        it { should_not be_persisted }
+        it { is_expected.to be_valid }
+        it { is_expected.not_to be_persisted }
 
-        specify { subject.save.should == true }
-        specify { subject.save!.should == true }
+        specify { expect(subject.save).to eq(true) }
+        specify { expect(subject.save!).to eq(true) }
 
         specify { expect { subject.save }.to change { subject.persisted? }.from(false).to(true) }
         specify { expect { subject.save! }.to change { subject.persisted? }.from(false).to(true) }
@@ -247,9 +247,9 @@ describe ActiveData::Model::Lifecycle do
         context 'save failed' do
           before { User.define_save { false } }
 
-          it { should_not be_persisted }
+          it { is_expected.not_to be_persisted }
 
-          specify { subject.save.should == false }
+          specify { expect(subject.save).to eq(false) }
           specify { expect { subject.save! }.to raise_error ActiveData::ObjectNotSaved }
 
           specify { expect { subject.save }.not_to change { subject.persisted? } }
@@ -260,11 +260,11 @@ describe ActiveData::Model::Lifecycle do
       context 'update' do
         subject! { User.new(name: 'Jonny').tap(&:save).tap { |u| u.name = 'Jimmy' } }
 
-        it { should be_valid }
-        it { should be_persisted }
+        it { is_expected.to be_valid }
+        it { is_expected.to be_persisted }
 
-        specify { subject.save.should == true }
-        specify { subject.save!.should == true }
+        specify { expect(subject.save).to eq(true) }
+        specify { expect(subject.save!).to eq(true) }
 
         specify { expect { subject.save }.not_to change { subject.persisted? } }
         specify { expect { subject.save! }.not_to change { subject.persisted? } }
@@ -277,9 +277,9 @@ describe ActiveData::Model::Lifecycle do
         context 'save failed' do
           before { User.define_save { false } }
 
-          it { should be_persisted }
+          it { is_expected.to be_persisted }
 
-          specify { subject.save.should == false }
+          specify { expect(subject.save).to eq(false) }
           specify { expect { subject.save! }.to raise_error ActiveData::ObjectNotSaved }
 
           specify { expect { subject.save }.not_to change { subject.persisted? } }
@@ -291,12 +291,12 @@ describe ActiveData::Model::Lifecycle do
     describe '#destroy, #destroy!' do
       subject { User.create(name: 'Jonny') }
 
-      it { should be_valid }
-      it { should be_persisted }
-      it { should_not be_destroyed }
+      it { is_expected.to be_valid }
+      it { is_expected.to be_persisted }
+      it { is_expected.not_to be_destroyed }
 
-      specify { subject.destroy.should == subject }
-      specify { subject.destroy!.should == subject }
+      specify { expect(subject.destroy).to eq(subject) }
+      specify { expect(subject.destroy!).to eq(subject) }
 
       specify { expect { subject.destroy }.to change { subject.persisted? }.from(true).to(false) }
       specify { expect { subject.destroy! }.to change { subject.persisted? }.from(true).to(false) }
@@ -310,9 +310,9 @@ describe ActiveData::Model::Lifecycle do
       context 'save failed' do
         before { User.define_destroy { false } }
 
-        it { should be_persisted }
+        it { is_expected.to be_persisted }
 
-        specify { subject.destroy.should == subject }
+        specify { expect(subject.destroy).to eq(subject) }
         specify { expect { subject.destroy! }.to raise_error ActiveData::ObjectNotDestroyed }
 
         specify { expect { subject.destroy }.not_to change { subject.persisted? } }

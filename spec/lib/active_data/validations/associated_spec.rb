@@ -38,51 +38,51 @@ describe ActiveData::Validations do
 
   context do
     subject(:instance) { main.instantiate name: 'hello', validated_one: { name: 'name' } }
-    it { should be_valid }
+    it { is_expected.to be_valid }
   end
 
   context do
     subject(:instance) { main.instantiate name: 'hello', validated_one: { } }
-    it { should_not be_valid }
+    it { is_expected.not_to be_valid }
   end
 
   context do
     subject(:instance) { main.instantiate name: 'hello', unvalidated_one: { name: 'name' } }
-    it { should be_valid }
+    it { is_expected.to be_valid }
   end
 
   context do
     subject(:instance) { main.instantiate name: 'hello', unvalidated_one: { } }
-    it { should be_valid }
+    it { is_expected.to be_valid }
   end
 
   context do
     subject(:instance) { main.instantiate name: 'hello', validated_many: [{ name: 'name' }] }
-    it { should be_valid }
+    it { is_expected.to be_valid }
   end
 
   context do
     subject(:instance) { main.instantiate name: 'hello', validated_many: [{ }] }
-    it { should_not be_valid }
+    it { is_expected.not_to be_valid }
   end
 
   context do
     subject(:instance) { main.instantiate name: 'hello', unvalidated_many: [{ name: 'name' }] }
-    it { should be_valid }
+    it { is_expected.to be_valid }
   end
 
   context do
     subject(:instance) { main.instantiate name: 'hello', unvalidated_many: [{ }] }
-    it { should be_valid }
+    it { is_expected.to be_valid }
   end
 
   context do
     subject(:instance) { main.instantiate name: 'hello', validated_many: [{ name: 'name' }], validated_one: { } }
-    it { should_not be_valid }
+    it { is_expected.not_to be_valid }
   end
 
   context do
     subject(:instance) { main.instantiate name: 'hello', validated_many: [{ }], validated_one: { name: 'name' } }
-    it { should_not be_valid }
+    it { is_expected.not_to be_valid }
   end
 end

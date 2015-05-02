@@ -22,13 +22,13 @@ describe ActiveData::Model::Associations::EmbedsOne do
   let(:existing_association) { existing_book.association(:author) }
 
   describe 'book#association' do
-    specify { association.should be_a described_class }
-    specify { association.should == book.association(:author) }
+    specify { expect(association).to be_a described_class }
+    specify { expect(association).to eq(book.association(:author)) }
   end
 
   describe '#build' do
-    specify { association.build.should be_a Author }
-    specify { association.build.should_not be_persisted }
+    specify { expect(association.build).to be_a Author }
+    specify { expect(association.build).not_to be_persisted }
 
     specify { expect { association.build(name: 'Fred') }
       .not_to change { book.read_attribute(:author) } }
@@ -38,11 +38,11 @@ describe ActiveData::Model::Associations::EmbedsOne do
   end
 
   describe '#create' do
-    specify { association.create.should be_a Author }
-    specify { association.create.should_not be_persisted }
+    specify { expect(association.create).to be_a Author }
+    specify { expect(association.create).not_to be_persisted }
 
-    specify { association.create(name: 'Fred').should be_a Author }
-    specify { association.create(name: 'Fred').should be_persisted }
+    specify { expect(association.create(name: 'Fred')).to be_a Author }
+    specify { expect(association.create(name: 'Fred')).to be_persisted }
 
     specify { expect { association.create }
       .not_to change { book.read_attribute(:author) } }
@@ -58,8 +58,8 @@ describe ActiveData::Model::Associations::EmbedsOne do
   describe '#create!' do
     specify { expect { association.create! }.to raise_error ActiveData::ValidationError }
 
-    specify { association.create!(name: 'Fred').should be_a Author }
-    specify { association.create!(name: 'Fred').should be_persisted }
+    specify { expect(association.create!(name: 'Fred')).to be_a Author }
+    specify { expect(association.create!(name: 'Fred')).to be_persisted }
 
     specify { expect { association.create! rescue nil }
       .not_to change { book.read_attribute(:author) } }
@@ -89,23 +89,23 @@ describe ActiveData::Model::Associations::EmbedsOne do
   end
 
   describe '#target' do
-    specify { existing_association.target.should be_nil }
+    specify { expect(existing_association.target).to be_nil }
     specify do
       existing_association.load_target
-      existing_association.target.should == existing_book.author
+      expect(existing_association.target).to eq(existing_book.author)
     end
     specify { expect { association.build }.to change { association.target }.to(an_instance_of(Author)) }
   end
 
   describe '#load_target' do
-    specify { association.load_target.should == nil }
-    specify { existing_association.load_target.should == existing_book.author }
+    specify { expect(association.load_target).to eq(nil) }
+    specify { expect(existing_association.load_target).to eq(existing_book.author) }
   end
 
   describe '#loaded?' do
     let(:new_author) { Author.new(name: 'Morty') }
 
-    specify { association.loaded?.should == false }
+    specify { expect(association.loaded?).to eq(false) }
     specify { expect { association.load_target }.to change { association.loaded? }.to(true) }
     specify { expect { association.build }.to change { association.loaded? }.to(true) }
     specify { expect { association.replace(new_author) }.to change { association.loaded? }.to(true) }
@@ -115,10 +115,10 @@ describe ActiveData::Model::Associations::EmbedsOne do
   end
 
   describe '#reload' do
-    specify { association.reload.should be_nil }
+    specify { expect(association.reload).to be_nil }
 
-    specify { existing_association.reload.should be_a Author }
-    specify { existing_association.reload.should be_persisted }
+    specify { expect(existing_association.reload).to be_a Author }
+    specify { expect(existing_association.reload).to be_persisted }
 
     context do
       before { association.build(name: 'Fred') }
@@ -135,10 +135,10 @@ describe ActiveData::Model::Associations::EmbedsOne do
   end
 
   describe '#clear' do
-    specify { association.clear.should == true }
+    specify { expect(association.clear).to eq(true) }
     specify { expect { association.clear }.not_to change { association.reader } }
 
-    specify { existing_association.clear.should == true }
+    specify { expect(existing_association.clear).to eq(true) }
     specify { expect { existing_association.clear }
       .to change { existing_association.reader.try(:attributes) }.from('name' => 'Johny').to(nil) }
     specify { expect { existing_association.clear }
@@ -146,7 +146,7 @@ describe ActiveData::Model::Associations::EmbedsOne do
 
     context do
       before { Author.before_destroy { false } }
-      specify { existing_association.clear.should == false }
+      specify { expect(existing_association.clear).to eq(false) }
       specify { expect { existing_association.clear }
         .not_to change { existing_association.reader } }
       specify { expect { existing_association.clear }
@@ -155,22 +155,22 @@ describe ActiveData::Model::Associations::EmbedsOne do
   end
 
   describe '#reader' do
-    specify { association.reader.should be_nil }
+    specify { expect(association.reader).to be_nil }
 
-    specify { existing_association.reader.should be_a Author }
-    specify { existing_association.reader.should be_persisted }
+    specify { expect(existing_association.reader).to be_a Author }
+    specify { expect(existing_association.reader).to be_persisted }
 
     context do
       before { association.build }
-      specify { association.reader.should be_a Author }
-      specify { association.reader.should_not be_persisted }
-      specify { association.reader(true).should be_nil }
+      specify { expect(association.reader).to be_a Author }
+      specify { expect(association.reader).not_to be_persisted }
+      specify { expect(association.reader(true)).to be_nil }
     end
 
     context do
       before { existing_association.build(name: 'Fred') }
-      specify { existing_association.reader.name.should == 'Fred' }
-      specify { existing_association.reader(true).name.should == 'Johny' }
+      specify { expect(existing_association.reader.name).to eq('Fred') }
+      specify { expect(existing_association.reader(true).name).to eq('Johny') }
     end
   end
 
@@ -200,8 +200,8 @@ describe ActiveData::Model::Associations::EmbedsOne do
       specify { expect { association.writer(stub_model(:dummy).new) }
         .to raise_error ActiveData::AssociationTypeMismatch }
 
-      specify { association.writer(nil).should be_nil }
-      specify { association.writer(new_author).should == new_author }
+      specify { expect(association.writer(nil)).to be_nil }
+      specify { expect(association.writer(new_author)).to eq(new_author) }
       specify { expect { association.writer(nil) }
         .not_to change { book.read_attribute(:author) } }
       specify { expect { association.writer(new_author) }
@@ -219,8 +219,8 @@ describe ActiveData::Model::Associations::EmbedsOne do
       specify { expect { existing_association.writer(stub_model(:dummy).new) rescue nil }
         .not_to change { existing_association.reader } }
 
-      specify { existing_association.writer(nil).should be_nil }
-      specify { existing_association.writer(new_author).should == new_author }
+      specify { expect(existing_association.writer(nil)).to be_nil }
+      specify { expect(existing_association.writer(new_author)).to eq(new_author) }
       specify { expect { existing_association.writer(nil) }
         .to change { existing_book.read_attribute(:author) }.from('name' => 'Johny').to(nil) }
       specify { expect { existing_association.writer(new_author) }

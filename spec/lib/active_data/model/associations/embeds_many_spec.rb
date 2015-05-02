@@ -22,8 +22,8 @@ describe ActiveData::Model::Associations::EmbedsMany do
   let(:existing_association) { existing_user.association(:projects) }
 
   describe 'user#association' do
-    specify { association.should be_a described_class }
-    specify { association.should == user.association(:projects) }
+    specify { expect(association).to be_a described_class }
+    specify { expect(association).to eq(user.association(:projects)) }
   end
 
   context 'performers' do
@@ -33,42 +33,42 @@ describe ActiveData::Model::Associations::EmbedsMany do
       p2 = user.projects.build(title: 'Project 2')
       p3 = user.projects.build(title: 'Project 3')
       p4 = user.projects.create(title: 'Project 4')
-      user.read_attribute(:projects).should == [{'title' => 'Project 4'}]
+      expect(user.read_attribute(:projects)).to eq([{'title' => 'Project 4'}])
       p2.save!
-      user.read_attribute(:projects).should == [{'title' => 'Project 2'}, {'title' => 'Project 4'}]
+      expect(user.read_attribute(:projects)).to eq([{'title' => 'Project 2'}, {'title' => 'Project 4'}])
       p2.destroy!.destroy!
-      user.read_attribute(:projects).should == [{'title' => 'Project 4'}]
+      expect(user.read_attribute(:projects)).to eq([{'title' => 'Project 4'}])
       p5 = user.projects.create(title: 'Project 5')
-      user.read_attribute(:projects).should == [{'title' => 'Project 4'}, {'title' => 'Project 5'}]
+      expect(user.read_attribute(:projects)).to eq([{'title' => 'Project 4'}, {'title' => 'Project 5'}])
       p3.destroy!
       user.projects.first.destroy!
-      user.read_attribute(:projects).should == [{'title' => 'Project 4'}, {'title' => 'Project 5'}]
+      expect(user.read_attribute(:projects)).to eq([{'title' => 'Project 4'}, {'title' => 'Project 5'}])
       p4.destroy!.save!
-      user.read_attribute(:projects).should == [{'title' => 'Project 4'}, {'title' => 'Project 5'}]
-      user.projects.count.should == 5
+      expect(user.read_attribute(:projects)).to eq([{'title' => 'Project 4'}, {'title' => 'Project 5'}])
+      expect(user.projects.count).to eq(5)
       user.projects.map(&:save!)
-      user.read_attribute(:projects).should == [
+      expect(user.read_attribute(:projects)).to eq([
         {'title' => 'Project 1'}, {'title' => 'Project 2'}, {'title' => 'Project 3'},
-        {'title' => 'Project 4'}, {'title' => 'Project 5'}]
+        {'title' => 'Project 4'}, {'title' => 'Project 5'}])
       user.projects.map(&:destroy!)
-      user.read_attribute(:projects).should == []
+      expect(user.read_attribute(:projects)).to eq([])
       user.projects.first(2).map(&:save!)
-      user.read_attribute(:projects).should == [{'title' => 'Project 1'}, {'title' => 'Project 2'}]
-      user.projects.reload.count.should == 2
+      expect(user.read_attribute(:projects)).to eq([{'title' => 'Project 1'}, {'title' => 'Project 2'}])
+      expect(user.projects.reload.count).to eq(2)
       p3 = user.projects.create!(title: 'Project 3')
-      user.read_attribute(:projects).should == [
-        {'title' => 'Project 1'}, {'title' => 'Project 2'}, {'title' => 'Project 3'}]
+      expect(user.read_attribute(:projects)).to eq([
+        {'title' => 'Project 1'}, {'title' => 'Project 2'}, {'title' => 'Project 3'}])
       p3.destroy!
-      user.read_attribute(:projects).should == [{'title' => 'Project 1'}, {'title' => 'Project 2'}]
+      expect(user.read_attribute(:projects)).to eq([{'title' => 'Project 1'}, {'title' => 'Project 2'}])
       p4 = user.projects.create(title: 'Project 4')
-      user.read_attribute(:projects).should == [
-        {'title' => 'Project 1'}, {'title' => 'Project 2'}, {'title' => 'Project 4'}]
+      expect(user.read_attribute(:projects)).to eq([
+        {'title' => 'Project 1'}, {'title' => 'Project 2'}, {'title' => 'Project 4'}])
     end
   end
 
   describe '#build' do
-    specify { association.build.should be_a Project }
-    specify { association.build.should_not be_persisted }
+    specify { expect(association.build).to be_a Project }
+    specify { expect(association.build).not_to be_persisted }
 
     specify { expect { association.build(title: 'Swordfish') }
       .not_to change { user.read_attribute(:projects) } }
@@ -84,11 +84,11 @@ describe ActiveData::Model::Associations::EmbedsMany do
   end
 
   describe '#create' do
-    specify { association.create.should be_a Project }
-    specify { association.create.should_not be_persisted }
+    specify { expect(association.create).to be_a Project }
+    specify { expect(association.create).not_to be_persisted }
 
-    specify { association.create(title: 'Swordfish').should be_a Project }
-    specify { association.create(title: 'Swordfish').should be_persisted }
+    specify { expect(association.create(title: 'Swordfish')).to be_a Project }
+    specify { expect(association.create(title: 'Swordfish')).to be_persisted }
 
     specify { expect { association.create }
       .not_to change { user.read_attribute(:projects) } }
@@ -111,8 +111,8 @@ describe ActiveData::Model::Associations::EmbedsMany do
   describe '#create!' do
     specify { expect { association.create! }.to raise_error ActiveData::ValidationError }
 
-    specify { association.create!(title: 'Swordfish').should be_a Project }
-    specify { association.create!(title: 'Swordfish').should be_persisted }
+    specify { expect(association.create!(title: 'Swordfish')).to be_a Project }
+    specify { expect(association.create!(title: 'Swordfish')).to be_persisted }
 
     specify { expect { association.create! rescue nil }
       .not_to change { user.read_attribute(:projects) } }
@@ -168,21 +168,21 @@ describe ActiveData::Model::Associations::EmbedsMany do
   end
 
   describe '#target' do
-    specify { existing_association.target.should == [] }
+    specify { expect(existing_association.target).to eq([]) }
     specify do
       existing_association.load_target
-      existing_association.target.should == existing_user.projects
+      expect(existing_association.target).to eq(existing_user.projects)
     end
     specify { expect { association.build }.to change { association.target.count }.to(1) }
   end
 
   describe '#load_target' do
-    specify { association.load_target.should == [] }
-    specify { existing_association.load_target.should == existing_user.projects }
+    specify { expect(association.load_target).to eq([]) }
+    specify { expect(existing_association.load_target).to eq(existing_user.projects) }
   end
 
   describe '#loaded?' do
-    specify { association.loaded?.should == false }
+    specify { expect(association.loaded?).to eq(false) }
     specify { expect { association.load_target }.to change { association.loaded? }.to(true) }
     specify { expect { association.build }.to change { association.loaded? }.to(true) }
     specify { expect { association.replace([]) }.to change { association.loaded? }.to(true) }
@@ -190,9 +190,9 @@ describe ActiveData::Model::Associations::EmbedsMany do
   end
 
   describe '#reload' do
-    specify { association.reload.should == [] }
+    specify { expect(association.reload).to eq([]) }
 
-    specify { existing_association.reload.should == existing_user.projects }
+    specify { expect(existing_association.reload).to eq(existing_user.projects) }
 
     context do
       before { association.build(title: 'Swordfish') }
@@ -209,10 +209,10 @@ describe ActiveData::Model::Associations::EmbedsMany do
   end
 
   describe '#clear' do
-    specify { association.clear.should == true }
+    specify { expect(association.clear).to eq(true) }
     specify { expect { association.clear }.not_to change { association.reader } }
 
-    specify { existing_association.clear.should == true }
+    specify { expect(existing_association.clear).to eq(true) }
     specify { expect { existing_association.clear }
       .to change { existing_association.reader.map(&:attributes) }.from([{'title' => 'Genesis'}]).to([]) }
     specify { expect { existing_association.clear }
@@ -222,7 +222,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
       let(:existing_user) { User.instantiate name: 'Rick', projects: [{title: 'Genesis'}, {title: 'Swordfish'}] }
       before { Project.before_destroy { title == 'Genesis' } }
 
-      specify { existing_association.clear.should == false }
+      specify { expect(existing_association.clear).to eq(false) }
       specify { expect { existing_association.clear }
         .not_to change { existing_association.reader } }
       specify { expect { existing_association.clear }
@@ -231,25 +231,25 @@ describe ActiveData::Model::Associations::EmbedsMany do
   end
 
   describe '#reader' do
-    specify { association.reader.should == [] }
+    specify { expect(association.reader).to eq([]) }
 
-    specify { existing_association.reader.first.should be_a Project }
-    specify { existing_association.reader.first.should be_persisted }
+    specify { expect(existing_association.reader.first).to be_a Project }
+    specify { expect(existing_association.reader.first).to be_persisted }
 
     context do
       before { association.build }
-      specify { association.reader.last.should be_a Project }
-      specify { association.reader.last.should_not be_persisted }
-      specify { association.reader.size.should == 1 }
-      specify { association.reader(true).should == [] }
+      specify { expect(association.reader.last).to be_a Project }
+      specify { expect(association.reader.last).not_to be_persisted }
+      specify { expect(association.reader.size).to eq(1) }
+      specify { expect(association.reader(true)).to eq([]) }
     end
 
     context do
       before { existing_association.build(title: 'Swordfish') }
-      specify { existing_association.reader.size.should == 2 }
-      specify { existing_association.reader.last.title.should == 'Swordfish' }
-      specify { existing_association.reader(true).size.should == 1 }
-      specify { existing_association.reader(true).last.title.should == 'Genesis' }
+      specify { expect(existing_association.reader.size).to eq(2) }
+      specify { expect(existing_association.reader.last.title).to eq('Swordfish') }
+      specify { expect(existing_association.reader(true).size).to eq(1) }
+      specify { expect(existing_association.reader(true).last.title).to eq('Genesis') }
     end
   end
 
@@ -263,9 +263,9 @@ describe ActiveData::Model::Associations::EmbedsMany do
 
     specify { expect { association.writer(nil) }.to raise_error }
     specify { expect { association.writer(new_project1) }.to raise_error }
-    specify { association.writer([]).should == [] }
+    specify { expect(association.writer([])).to eq([]) }
 
-    specify { association.writer([new_project1]).should == [new_project1] }
+    specify { expect(association.writer([new_project1])).to eq([new_project1]) }
     specify { expect { association.writer([new_project1]) }
       .to change { association.reader.map(&:attributes) }.from([]).to([{'title' => 'Project 1'}]) }
     specify { expect { association.writer([new_project1]) }
@@ -291,13 +291,13 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { expect { existing_association.writer(nil) rescue nil }
       .not_to change { existing_association.reader } }
 
-    specify { existing_association.writer([]).should == [] }
+    specify { expect(existing_association.writer([])).to eq([]) }
     specify { expect { existing_association.writer([]) }
       .to change { existing_user.read_attribute(:projects) }.to([]) }
     specify { expect { existing_association.writer([]) }
       .to change { existing_association.reader }.to([]) }
 
-    specify { existing_association.writer([new_project1, new_project2]).should == [new_project1, new_project2] }
+    specify { expect(existing_association.writer([new_project1, new_project2])).to eq([new_project1, new_project2]) }
     specify { expect { existing_association.writer([new_project1, new_project2]) }
       .to change { existing_association.reader.map(&:attributes) }
       .from([{'title' => 'Genesis'}]).to([{'title' => 'Project 1'}, {'title' => 'Project 2'}]) }
@@ -315,17 +315,17 @@ describe ActiveData::Model::Associations::EmbedsMany do
       .to raise_error ActiveData::AssociationTypeMismatch }
 
     specify { expect { association.concat(nil) }.to raise_error }
-    specify { association.concat([]).should == [] }
-    specify { existing_association.concat([]).should == existing_user.projects }
-    specify { existing_association.concat.should == existing_user.projects }
+    specify { expect(association.concat([])).to eq([]) }
+    specify { expect(existing_association.concat([])).to eq(existing_user.projects) }
+    specify { expect(existing_association.concat).to eq(existing_user.projects) }
 
-    specify { association.concat(new_project1).should == [new_project1] }
+    specify { expect(association.concat(new_project1)).to eq([new_project1]) }
     specify { expect { association.concat(new_project1) }
       .to change { association.reader.map(&:attributes) }.from([]).to([{'title' => 'Project 1'}]) }
     specify { expect { association.concat(new_project1) }
       .not_to change { user.read_attribute(:projects) } }
 
-    specify { existing_association.concat(new_project1, invalid_project).should == false }
+    specify { expect(existing_association.concat(new_project1, invalid_project)).to eq(false) }
     specify { expect { existing_association.concat(new_project1, invalid_project) }
       .to change { existing_user.read_attribute(:projects) }
       .from([{title: 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}]) }
@@ -341,8 +341,8 @@ describe ActiveData::Model::Associations::EmbedsMany do
       .to change { existing_association.reader.map(&:attributes) }
       .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}]) }
 
-    specify { existing_association.concat(new_project1, new_project2)
-      .should == [existing_user.projects.first, new_project1, new_project2] }
+    specify { expect(existing_association.concat(new_project1, new_project2))
+      .to eq([existing_user.projects.first, new_project1, new_project2]) }
     specify { expect { existing_association.concat([new_project1, new_project2]) }
       .to change { existing_association.reader.map(&:attributes) }
       .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}, {'title' => 'Project 2'}]) }

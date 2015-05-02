@@ -25,10 +25,10 @@ describe ActiveData::Model::Attributes do
   end
 
   describe '.has_attribute?' do
-    specify { klass.has_attribute?(:hello).should == true }
-    specify { klass.has_attribute?('hello').should == true }
-    specify { klass.has_attribute?(:name).should == false }
-    specify { klass.has_attribute?(:foobar).should == false }
+    specify { expect(klass.has_attribute?(:hello)).to eq(true) }
+    specify { expect(klass.has_attribute?('hello')).to eq(true) }
+    specify { expect(klass.has_attribute?(:name)).to eq(false) }
+    specify { expect(klass.has_attribute?(:foobar)).to eq(false) }
   end
 
   describe '#assign_attributes' do
@@ -42,7 +42,7 @@ describe ActiveData::Model::Attributes do
 
   context do
     subject { klass.new('world') }
-    specify { klass.enum_values.should == [1, 2, 3] }
+    specify { expect(klass.enum_values).to eq([1, 2, 3]) }
     its(:enum_values) { should == [1, 2, 3] }
     its(:string_default) { should == 'world' }
     its(:count_default) { should == 10 }
@@ -59,12 +59,12 @@ describe ActiveData::Model::Attributes do
   context 'enums' do
     subject { klass.new('world') }
 
-    specify { subject.enum = 3; subject.enum.should == 3 }
-    specify { subject.enum = '3'; subject.enum.should == 3 }
-    specify { subject.enum = 10; subject.enum.should == nil }
-    specify { subject.enum = 'hello'; subject.enum.should == nil }
-    specify { subject.enum_with_default = 3; subject.enum_with_default.should == 3 }
-    specify { subject.enum_with_default = 10; subject.enum_with_default.should == 2 }
+    specify { subject.enum = 3; expect(subject.enum).to eq(3) }
+    specify { subject.enum = '3'; expect(subject.enum).to eq(3) }
+    specify { subject.enum = 10; expect(subject.enum).to eq(nil) }
+    specify { subject.enum = 'hello'; expect(subject.enum).to eq(nil) }
+    specify { subject.enum_with_default = 3; expect(subject.enum_with_default).to eq(3) }
+    specify { subject.enum_with_default = 10; expect(subject.enum_with_default).to eq(2) }
   end
 
   context 'attribute caching' do
@@ -72,7 +72,7 @@ describe ActiveData::Model::Attributes do
 
     context do
       before do
-        subject.send(:attributes_cache).should_not_receive(:[])
+        expect(subject.send(:attributes_cache)).not_to receive(:[])
       end
 
       specify { subject.hello }
@@ -81,7 +81,7 @@ describe ActiveData::Model::Attributes do
     context do
       before do
         subject.hello
-        subject.send(:attributes_cache).should_receive(:[]).with('hello').once
+        expect(subject.send(:attributes_cache)).to receive(:[]).with('hello').once
       end
 
       specify { subject.hello }
@@ -94,7 +94,7 @@ describe ActiveData::Model::Attributes do
         subject.hello = 'newnewnew'
       end
 
-      specify { subject.hello.should == 'newnewnew' }
+      specify { expect(subject.hello).to eq('newnewnew') }
     end
   end
 
@@ -119,14 +119,14 @@ describe ActiveData::Model::Attributes do
       end
     end
 
-    specify { ancestor._attributes.keys.should == ['foo'] }
-    specify { ancestor.instance_methods.should include :foo, :foo= }
-    specify { ancestor.instance_methods.should_not include :bar, :bar=, :baz, :baz= }
-    specify { descendant1._attributes.keys.should == ['foo', 'bar'] }
-    specify { descendant1.instance_methods.should include :foo, :foo=, :bar, :bar= }
-    specify { descendant1.instance_methods.should_not include :baz, :baz= }
-    specify { descendant2._attributes.keys.should == ['foo', 'baz', 'moo'] }
-    specify { descendant2.instance_methods.should include :foo, :foo=, :baz, :baz=, :moo, :moo= }
-    specify { descendant2.instance_methods.should_not include :bar, :bar= }
+    specify { expect(ancestor._attributes.keys).to eq(['foo']) }
+    specify { expect(ancestor.instance_methods).to include :foo, :foo= }
+    specify { expect(ancestor.instance_methods).not_to include :bar, :bar=, :baz, :baz= }
+    specify { expect(descendant1._attributes.keys).to eq(['foo', 'bar']) }
+    specify { expect(descendant1.instance_methods).to include :foo, :foo=, :bar, :bar= }
+    specify { expect(descendant1.instance_methods).not_to include :baz, :baz= }
+    specify { expect(descendant2._attributes.keys).to eq(['foo', 'baz', 'moo']) }
+    specify { expect(descendant2.instance_methods).to include :foo, :foo=, :baz, :baz=, :moo, :moo= }
+    specify { expect(descendant2.instance_methods).not_to include :bar, :bar= }
   end
 end

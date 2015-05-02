@@ -21,8 +21,8 @@ describe ActiveData::Model::Lifecycle do
       User.after_initialize { append :after_initialize }
     end
 
-    specify { User.new.actions.should == [:after_initialize] }
-    specify { User.create.actions.should == [:after_initialize, :create] }
+    specify { expect(User.new.actions).to eq([:after_initialize]) }
+    specify { expect(User.create.actions).to eq([:after_initialize, :create]) }
   end
 
   describe '.before_save, .after_save' do
@@ -31,14 +31,14 @@ describe ActiveData::Model::Lifecycle do
       User.after_save { append :after_save }
     end
 
-    specify { User.create.actions.should == [:before_save, :create, :after_save] }
-    specify { User.new.tap(&:save).actions.should == [:before_save, :create, :after_save] }
-    specify { User.new.tap{ |u| u.update({}) }.actions.should == [:before_save, :create, :after_save] }
-    specify { User.create.tap(&:save).actions.should == [:before_save, :create, :after_save, :before_save, :update, :after_save] }
-    specify { User.create.tap{ |u| u.update({}) }.actions.should == [:before_save, :create, :after_save, :before_save, :update, :after_save] }
+    specify { expect(User.create.actions).to eq([:before_save, :create, :after_save]) }
+    specify { expect(User.new.tap(&:save).actions).to eq([:before_save, :create, :after_save]) }
+    specify { expect(User.new.tap{ |u| u.update({}) }.actions).to eq([:before_save, :create, :after_save]) }
+    specify { expect(User.create.tap(&:save).actions).to eq([:before_save, :create, :after_save, :before_save, :update, :after_save]) }
+    specify { expect(User.create.tap{ |u| u.update({}) }.actions).to eq([:before_save, :create, :after_save, :before_save, :update, :after_save]) }
 
-    specify { User.new.tap { |u| u.save { false } }.actions.should == [:before_save] }
-    specify { User.create.tap { |u| u.save { false } }.actions.should == [:before_save, :create, :after_save, :before_save] }
+    specify { expect(User.new.tap { |u| u.save { false } }.actions).to eq([:before_save]) }
+    specify { expect(User.create.tap { |u| u.save { false } }.actions).to eq([:before_save, :create, :after_save, :before_save]) }
   end
 
   describe '.around_save' do
@@ -50,14 +50,14 @@ describe ActiveData::Model::Lifecycle do
       end
     end
 
-    specify { User.create.actions.should == [:before_around_save, :create, :after_around_save] }
-    specify { User.new.tap(&:save).actions.should == [:before_around_save, :create, :after_around_save] }
-    specify { User.new.tap{ |u| u.update({}) }.actions.should == [:before_around_save, :create, :after_around_save] }
-    specify { User.create.tap(&:save).actions.should == [:before_around_save, :create, :after_around_save, :before_around_save, :update, :after_around_save] }
-    specify { User.create.tap{ |u| u.update({}) }.actions.should == [:before_around_save, :create, :after_around_save, :before_around_save, :update, :after_around_save] }
+    specify { expect(User.create.actions).to eq([:before_around_save, :create, :after_around_save]) }
+    specify { expect(User.new.tap(&:save).actions).to eq([:before_around_save, :create, :after_around_save]) }
+    specify { expect(User.new.tap{ |u| u.update({}) }.actions).to eq([:before_around_save, :create, :after_around_save]) }
+    specify { expect(User.create.tap(&:save).actions).to eq([:before_around_save, :create, :after_around_save, :before_around_save, :update, :after_around_save]) }
+    specify { expect(User.create.tap{ |u| u.update({}) }.actions).to eq([:before_around_save, :create, :after_around_save, :before_around_save, :update, :after_around_save]) }
 
-    specify { User.new.tap { |u| u.save { false } }.actions.should == [:before_around_save, :after_around_save] }
-    specify { User.create.tap { |u| u.save { false } }.actions.should == [:before_around_save, :create, :after_around_save, :before_around_save, :after_around_save] }
+    specify { expect(User.new.tap { |u| u.save { false } }.actions).to eq([:before_around_save, :after_around_save]) }
+    specify { expect(User.create.tap { |u| u.save { false } }.actions).to eq([:before_around_save, :create, :after_around_save, :before_around_save, :after_around_save]) }
   end
 
   describe '.before_create, .after_create' do
@@ -66,13 +66,13 @@ describe ActiveData::Model::Lifecycle do
       User.after_create { append :after_create }
     end
 
-    specify { User.create.actions.should == [:before_create, :create, :after_create] }
-    specify { User.new.tap(&:save).actions.should == [:before_create, :create, :after_create] }
-    specify { User.new.tap{ |u| u.update({}) }.actions.should == [:before_create, :create, :after_create] }
-    specify { User.create.tap(&:save).actions.should == [:before_create, :create, :after_create, :update] }
-    specify { User.create.tap{ |u| u.update({}) }.actions.should == [:before_create, :create, :after_create, :update] }
+    specify { expect(User.create.actions).to eq([:before_create, :create, :after_create]) }
+    specify { expect(User.new.tap(&:save).actions).to eq([:before_create, :create, :after_create]) }
+    specify { expect(User.new.tap{ |u| u.update({}) }.actions).to eq([:before_create, :create, :after_create]) }
+    specify { expect(User.create.tap(&:save).actions).to eq([:before_create, :create, :after_create, :update]) }
+    specify { expect(User.create.tap{ |u| u.update({}) }.actions).to eq([:before_create, :create, :after_create, :update]) }
 
-    specify { User.new.tap { |u| u.save { false } }.actions.should == [:before_create] }
+    specify { expect(User.new.tap { |u| u.save { false } }.actions).to eq([:before_create]) }
   end
 
   describe '.around_create' do
@@ -84,13 +84,13 @@ describe ActiveData::Model::Lifecycle do
       end
     end
 
-    specify { User.create.actions.should == [:before_around_create, :create, :after_around_create] }
-    specify { User.new.tap(&:save).actions.should == [:before_around_create, :create, :after_around_create] }
-    specify { User.new.tap{ |u| u.update({}) }.actions.should == [:before_around_create, :create, :after_around_create] }
-    specify { User.create.tap(&:save).actions.should == [:before_around_create, :create, :after_around_create, :update] }
-    specify { User.create.tap{ |u| u.update({}) }.actions.should == [:before_around_create, :create, :after_around_create, :update] }
+    specify { expect(User.create.actions).to eq([:before_around_create, :create, :after_around_create]) }
+    specify { expect(User.new.tap(&:save).actions).to eq([:before_around_create, :create, :after_around_create]) }
+    specify { expect(User.new.tap{ |u| u.update({}) }.actions).to eq([:before_around_create, :create, :after_around_create]) }
+    specify { expect(User.create.tap(&:save).actions).to eq([:before_around_create, :create, :after_around_create, :update]) }
+    specify { expect(User.create.tap{ |u| u.update({}) }.actions).to eq([:before_around_create, :create, :after_around_create, :update]) }
 
-    specify { User.new.tap { |u| u.save { false } }.actions.should == [:before_around_create, :after_around_create] }
+    specify { expect(User.new.tap { |u| u.save { false } }.actions).to eq([:before_around_create, :after_around_create]) }
   end
 
   describe '.before_update, .after_update' do
@@ -99,13 +99,13 @@ describe ActiveData::Model::Lifecycle do
       User.after_update { append :after_update }
     end
 
-    specify { User.create.actions.should == [:create] }
-    specify { User.new.tap(&:save).actions.should == [:create] }
-    specify { User.new.tap{ |u| u.update({}) }.actions.should == [:create] }
-    specify { User.create.tap(&:save).actions.should == [:create, :before_update, :update, :after_update] }
-    specify { User.create.tap{ |u| u.update({}) }.actions.should == [:create, :before_update, :update, :after_update] }
+    specify { expect(User.create.actions).to eq([:create]) }
+    specify { expect(User.new.tap(&:save).actions).to eq([:create]) }
+    specify { expect(User.new.tap{ |u| u.update({}) }.actions).to eq([:create]) }
+    specify { expect(User.create.tap(&:save).actions).to eq([:create, :before_update, :update, :after_update]) }
+    specify { expect(User.create.tap{ |u| u.update({}) }.actions).to eq([:create, :before_update, :update, :after_update]) }
 
-    specify { User.create.tap { |u| u.save { false } }.actions.should == [:create, :before_update] }
+    specify { expect(User.create.tap { |u| u.save { false } }.actions).to eq([:create, :before_update]) }
   end
 
   describe '.around_update' do
@@ -117,13 +117,13 @@ describe ActiveData::Model::Lifecycle do
       end
     end
 
-    specify { User.create.actions.should == [:create] }
-    specify { User.new.tap(&:save).actions.should == [:create] }
-    specify { User.new.tap{ |u| u.update({}) }.actions.should == [:create] }
-    specify { User.create.tap(&:save).actions.should == [:create, :before_around_update, :update, :after_around_update] }
-    specify { User.create.tap{ |u| u.update({}) }.actions.should == [:create, :before_around_update, :update, :after_around_update] }
+    specify { expect(User.create.actions).to eq([:create]) }
+    specify { expect(User.new.tap(&:save).actions).to eq([:create]) }
+    specify { expect(User.new.tap{ |u| u.update({}) }.actions).to eq([:create]) }
+    specify { expect(User.create.tap(&:save).actions).to eq([:create, :before_around_update, :update, :after_around_update]) }
+    specify { expect(User.create.tap{ |u| u.update({}) }.actions).to eq([:create, :before_around_update, :update, :after_around_update]) }
 
-    specify { User.create.tap { |u| u.save { false } }.actions.should == [:create, :before_around_update, :after_around_update] }
+    specify { expect(User.create.tap { |u| u.save { false } }.actions).to eq([:create, :before_around_update, :after_around_update]) }
   end
 
   describe '.before_validation, .after_validation,
@@ -168,7 +168,7 @@ describe ActiveData::Model::Lifecycle do
       end
     end
 
-    specify { User.create.tap(&:save).destroy.actions.should == [
+    specify { expect(User.create.tap(&:save).destroy.actions).to eq([
       :before_validation, :after_validation,
       :before_save, :before_around_save,
       :before_create, :before_around_create,
@@ -186,7 +186,7 @@ describe ActiveData::Model::Lifecycle do
       :before_destroy, :before_around_destroy,
       :destroy,
       :after_around_destroy, :after_destroy
-    ] }
+    ]) }
   end
 
   describe '.before_destroy, .after_destroy' do
@@ -195,11 +195,11 @@ describe ActiveData::Model::Lifecycle do
       User.after_destroy { append :after_destroy }
     end
 
-    specify { User.new.destroy.actions.should == [:before_destroy, :destroy, :after_destroy] }
-    specify { User.create.destroy.actions.should == [:create, :before_destroy, :destroy, :after_destroy] }
+    specify { expect(User.new.destroy.actions).to eq([:before_destroy, :destroy, :after_destroy]) }
+    specify { expect(User.create.destroy.actions).to eq([:create, :before_destroy, :destroy, :after_destroy]) }
 
-    specify { User.new.destroy { false }.actions.should == [:before_destroy] }
-    specify { User.create.destroy { false }.actions.should == [:create, :before_destroy] }
+    specify { expect(User.new.destroy { false }.actions).to eq([:before_destroy]) }
+    specify { expect(User.create.destroy { false }.actions).to eq([:create, :before_destroy]) }
   end
 
   describe '.around_destroy' do
@@ -211,11 +211,11 @@ describe ActiveData::Model::Lifecycle do
       end
     end
 
-    specify { User.new.destroy.actions.should == [:before_around_destroy, :destroy, :after_around_destroy] }
-    specify { User.create.destroy.actions.should == [:create, :before_around_destroy, :destroy, :after_around_destroy] }
+    specify { expect(User.new.destroy.actions).to eq([:before_around_destroy, :destroy, :after_around_destroy]) }
+    specify { expect(User.create.destroy.actions).to eq([:create, :before_around_destroy, :destroy, :after_around_destroy]) }
 
-    specify { User.new.destroy { false }.actions.should == [:before_around_destroy, :after_around_destroy] }
-    specify { User.create.destroy { false }.actions.should == [:create, :before_around_destroy, :after_around_destroy] }
+    specify { expect(User.new.destroy { false }.actions).to eq([:before_around_destroy, :after_around_destroy]) }
+    specify { expect(User.create.destroy { false }.actions).to eq([:create, :before_around_destroy, :after_around_destroy]) }
   end
 
   context 'unsavable, undestroyable' do
@@ -275,7 +275,7 @@ describe ActiveData::Model::Lifecycle do
       begin
         user.save
       rescue ActiveData::UnsavableObject
-        user.actions.should == []
+        expect(user.actions).to eq([])
       end
     end
 
@@ -283,20 +283,20 @@ describe ActiveData::Model::Lifecycle do
       begin
         user.save!
       rescue ActiveData::UnsavableObject
-        user.actions.should == []
+        expect(user.actions).to eq([])
       end
     end
 
     specify do
       user.save { true }
-      user.actions.should == [:before_validation, :after_validation]
+      expect(user.actions).to eq([:before_validation, :after_validation])
     end
 
     specify do
       begin
         user.save! { true }
       rescue ActiveData::ValidationError
-        user.actions.should == [:before_validation, :after_validation]
+        expect(user.actions).to eq([:before_validation, :after_validation])
       end
     end
 
@@ -304,7 +304,7 @@ describe ActiveData::Model::Lifecycle do
       begin
         user.update({})
       rescue ActiveData::UnsavableObject
-        user.actions.should == []
+        expect(user.actions).to eq([])
       end
     end
 
@@ -312,7 +312,7 @@ describe ActiveData::Model::Lifecycle do
       begin
         user.update!({})
       rescue ActiveData::UnsavableObject
-        user.actions.should == []
+        expect(user.actions).to eq([])
       end
     end
 
@@ -320,7 +320,7 @@ describe ActiveData::Model::Lifecycle do
       begin
         user.destroy
       rescue ActiveData::UndestroyableObject
-        user.actions.should == []
+        expect(user.actions).to eq([])
       end
     end
 
@@ -328,7 +328,7 @@ describe ActiveData::Model::Lifecycle do
       begin
         user.destroy!
       rescue ActiveData::UndestroyableObject
-        user.actions.should == []
+        expect(user.actions).to eq([])
       end
     end
   end
