@@ -44,4 +44,7 @@ You can define it with:
       super "Expected `#{expected}` (##{expected.object_id}), but got `#{got}` (##{got.object_id})"
     end
   end
+
+  class TooManyObjects < ActiveDataError
+  end
 end

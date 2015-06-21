@@ -1,37 +1,28 @@
 module ActiveData
   module Model
     module Conventions
+      extend ActiveSupport::Concern
+
       def errors
         @errors ||= ActiveModel::Errors.new(self)
       end
 
       def persisted?
-        @persisted
+        false
       end
 
       def new_record?
-        !@persisted
+        !persisted?
       end
 
-      def destroyed?
-        @destroyed
-      end
+      module ClassMethods
+        def i18n_scope
+          ActiveData.i18n_scope
+        end
 
-      def freeze
-        @attributes = @attributes.clone.freeze
-        self
-      end
-
-      def frozen?
-        @attributes.frozen?
-      end
-
-      def mark_for_destruction
-        @marked_for_destruction = true
-      end
-
-      def marked_for_destruction?
-        @marked_for_destruction
+        def to_ary
+          nil
+        end
       end
     end
   end

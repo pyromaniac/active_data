@@ -62,6 +62,8 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
+        include Persistence
+
         class_attribute *[:save, :create, :update, :destroy].map { |action| "_#{action}_performer" }
         private *[:save, :create, :update, :destroy].map { |action| "_#{action}_performer=" }
       end

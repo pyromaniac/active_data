@@ -3,12 +3,18 @@ require 'spec_helper'
 
 describe ActiveData::Model::Associations::EmbedsMany do
   before do
-    stub_model(:dummy)
+    stub_model(:dummy) do
+      include ActiveData::Model::Associations
+    end
     stub_model(:project) do
+      include ActiveData::Model::Associations
+
       attribute :title
       validates :title, presence: true
     end
     stub_model(:user) do
+      include ActiveData::Model::Associations
+
       attribute :name
       embeds_many :projects
       define_save { true }

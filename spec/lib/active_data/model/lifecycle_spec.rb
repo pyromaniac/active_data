@@ -4,7 +4,9 @@ require 'spec_helper'
 describe ActiveData::Model::Lifecycle do
   context do
     before do
-      stub_model(:user)
+      stub_model(:user) do
+        include ActiveData::Model::Lifecycle
+      end
     end
 
     subject { User.new }
@@ -81,6 +83,8 @@ describe ActiveData::Model::Lifecycle do
       context 'performers execution' do
         before do
           stub_model(:user) do
+            include ActiveData::Model::Lifecycle
+
             attribute :actions, type: Array, default: []
 
             def append action

@@ -12,9 +12,6 @@ module ActiveData
           self.nested_attributes_options = {}
         end
 
-        class TooManyObjects < ActiveData::ActiveDataError
-        end
-
         class NestedAttributesMethods
           REJECT_ALL_BLANK_PROC = proc { |attributes| attributes.all? { |key, value| key == DESTROY_ATTRIBUTE || value.blank? } }
 
@@ -54,10 +51,10 @@ module ActiveData
             elsif attributes[ActiveData.primary_attribute.to_s].present?
               raise_nested_attributes_record_not_found!(object, association_name, attributes[ActiveData.primary_attribute.to_s])
 
-            elsif !reject_new_record?(object, association_name, attributes)
+            elsif !reject_new_object?(object, association_name, attributes)
               assignable_attributes = attributes.except(*UNASSIGNABLE_KEYS)
 
-              if existing_record && existing_record.new_record?
+              if existing_record && !existing_record.persisted?
                 existing_record.assign_attributes(assignable_attributes)
               else
                 association.build(assignable_attributes)
@@ -89,7 +86,7 @@ module ActiveData
               attributes = attributes.with_indifferent_access
 
               if attributes[ActiveData.primary_attribute.to_s].blank?
-                unless reject_new_record?(object, association_name, attributes)
+                unless reject_new_object?(object, association_name, attributes)
                   association.build(attributes.except(*UNASSIGNABLE_KEYS))
                 end
               elsif existing_record = association.load_target.detect { |record| record.send(ActiveData.primary_attribute).to_s == attributes[ActiveData.primary_attribute.to_s].to_s }
@@ -114,7 +111,7 @@ module ActiveData
               end
 
               if limit && attributes_collection.size > limit
-                raise TooManyObjects, "Maximum #{limit} objects are allowed. Got #{attributes_collection.size} objects instead."
+                raise ActiveData::TooManyObjects, "Maximum #{limit} objects are allowed. Got #{attributes_collection.size} objects instead."
               end
             end
           end
@@ -128,7 +125,7 @@ module ActiveData
             Boolean.active_data_type_cast(hash[DESTROY_ATTRIBUTE])
           end
 
-          def self.reject_new_record?(object, association_name, attributes)
+          def self.reject_new_object?(object, association_name, attributes)
             has_destroy_flag?(attributes) || call_reject_if(object, association_name, attributes)
           end
 
@@ -151,6 +148,14 @@ module ActiveData
           def accepts_nested_attributes_for(*attr_names)
             NestedAttributesMethods.accepts_nested_attributes_for self, *attr_names
           end
+        end
+
+        def mark_for_destruction
+          @marked_for_destruction = true
+        end
+
+        def marked_for_destruction?
+          @marked_for_destruction
         end
 
         def _destroy

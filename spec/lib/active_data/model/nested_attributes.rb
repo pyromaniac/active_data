@@ -3,11 +3,15 @@ require 'spec_helper'
 shared_examples 'nested attributes' do
   before do
     stub_model :project do
+      include ActiveData::Model::Associations
+
       primary_attribute
       attribute :title, type: String
     end
 
     stub_model :profile do
+      include ActiveData::Model::Associations
+
       primary_attribute
       attribute :first_name, type: String
     end
@@ -80,7 +84,7 @@ shared_examples 'nested attributes' do
       specify { expect { user.projects_attributes = [{title: 'Project 1'}] }
         .to change { user.projects.map(&:title) }.to(['Project 1']) }
       specify { expect { user.projects_attributes = [{title: 'Project 1'}, {title: 'Project 2'}] }
-        .to raise_error ActiveData::Model::Associations::NestedAttributes::TooManyObjects }
+        .to raise_error ActiveData::TooManyObjects }
     end
 
     context ':reject_if' do

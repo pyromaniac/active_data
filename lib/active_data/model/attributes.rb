@@ -59,6 +59,15 @@ module ActiveData
         end
       end
 
+      def freeze
+        @attributes = @attributes.clone.freeze
+        self
+      end
+
+      def frozen?
+        @attributes.frozen?
+      end
+
       def write_attribute name, value
         name = name.to_s
         attributes_cache.delete name

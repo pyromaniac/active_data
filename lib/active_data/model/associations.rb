@@ -11,6 +11,8 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
+        include Callbacks
+        include Primary
         include NestedAttributes
 
         class_attribute :reflections, instance_reader: false, instance_writer: false

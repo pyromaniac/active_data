@@ -4,11 +4,24 @@ require 'spec_helper'
 describe ActiveData::Model::Associations do
   context 'inheritance' do
     before do
-      stub_model(:nobody)
-      stub_model(:project)
-      stub_model(:user, Nobody) { embeds_many :projects }
-      stub_model(:manager, Nobody) { embeds_one :managed_project, class_name: 'Project' }
-      stub_model(:admin, User) { embeds_many :admin_projects, class_name: 'Project' }
+      stub_model(:nobody) do
+        include ActiveData::Model::Associations
+      end
+      stub_model(:project) do
+        include ActiveData::Model::Associations
+      end
+      stub_model(:user, Nobody) do
+        include ActiveData::Model::Associations
+        embeds_many :projects
+      end
+      stub_model(:manager, Nobody) do
+        include ActiveData::Model::Associations
+        embeds_one :managed_project, class_name: 'Project'
+      end
+      stub_model(:admin, User) do
+        include ActiveData::Model::Associations
+        embeds_many :admin_projects, class_name: 'Project'
+      end
     end
 
     specify { expect(Nobody.reflections.keys).to eq([]) }
@@ -20,10 +33,12 @@ describe ActiveData::Model::Associations do
   context '.embeds_one' do
     before do
       stub_model(:author) do
+        include ActiveData::Model::Associations
         attribute :name
       end
 
       stub_model(:book) do
+        include ActiveData::Model::Associations
         attribute :title
         embeds_one :author
       end
@@ -35,6 +50,7 @@ describe ActiveData::Model::Associations do
     context ':read, :write' do
       before do
         stub_model(:book) do
+          include ActiveData::Model::Associations
           attribute :title
           embeds_one :author,
             read: ->(reflection, object) {
@@ -99,9 +115,12 @@ describe ActiveData::Model::Associations do
   describe '.embeds_many' do
     before do
       stub_model(:project) do
+        include ActiveData::Model::Associations
         attribute :title
       end
       stub_model(:user) do
+        include ActiveData::Model::Associations
+
         attribute :name
         embeds_many :projects
         define_save { true }
@@ -112,6 +131,8 @@ describe ActiveData::Model::Associations do
     context ':read, :write' do
       before do
         stub_model(:user) do
+          include ActiveData::Model::Associations
+
           attribute :name
           embeds_many :projects,
             read: ->(reflection, object) {

@@ -5,6 +5,8 @@ require 'lib/active_data/model/nested_attributes'
 describe ActiveData::Model::Associations::NestedAttributes do
   before do
     stub_model :user do
+      include ActiveData::Model::Associations
+
       attribute :email, type: String
       embeds_one :profile
       embeds_many :projects

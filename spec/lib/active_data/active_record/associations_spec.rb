@@ -3,12 +3,16 @@ require 'spec_helper'
 describe ActiveData::ActiveRecord::Associations do
   before do
     stub_model(:project) do
+      include ActiveData::Model::Associations
+
       attribute :title, type: String
 
       validates :title, presence: true
     end
 
     stub_model(:profile) do
+      include ActiveData::Model::Associations
+
       attribute :first_name, type: String
       attribute :last_name, type: String
     end

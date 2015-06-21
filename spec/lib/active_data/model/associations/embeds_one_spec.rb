@@ -4,11 +4,15 @@ require 'spec_helper'
 describe ActiveData::Model::Associations::EmbedsOne do
   before do
     stub_model(:author) do
+      include ActiveData::Model::Associations
+
       attribute :name
       validates :name, presence: true
     end
 
     stub_model(:book) do
+      include ActiveData::Model::Associations
+
       attribute :title
       embeds_one :author
       define_save { true }

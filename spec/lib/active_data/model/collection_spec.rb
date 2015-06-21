@@ -2,9 +2,9 @@
 require 'spec_helper'
 
 describe ActiveData::Model::Collection do
-  let(:klass) do
-    Class.new do
-      include ActiveData::Model
+  let(:model) do
+    stub_model do
+      include ActiveData::Model::Collection
 
       attribute :name
 
@@ -18,29 +18,43 @@ describe ActiveData::Model::Collection do
     end
   end
 
-  class CollectionizableTest
-    include ActiveData::Model
+  let(:collectionize_hash) do
+    stub_model do
+      include ActiveData::Model::Collection
+      collectionize Hash
+    end
   end
 
-  let(:collection) { klass.instantiate_collection([{ name: 'Hello' }, { name: 'World' }, { name: 'Mars' }]) }
+  describe '.collection_class' do
+    specify { expect(model.collection_class).to be < Array }
+    specify { expect(model.collection_class.collectible).to eq(model) }
+    specify { expect(model.collection_class.new).to be_empty }
 
-  specify { expect(klass.collection_class).not_to be_nil }
-  specify { expect(klass.collection_class.collectible).to eq(klass) }
-  specify { expect(klass.collection_class.new).to be_empty }
-  specify { expect(CollectionizableTest.collection_class).to be < Array }
+    specify { expect(collectionize_hash.collection_class).to be < Hash }
+    specify { expect(collectionize_hash.collection_class.collectible).to eq(collectionize_hash) }
+    specify { expect(collectionize_hash.collection_class.new).to be_empty }
+  end
 
-  specify { expect(collection).to be_instance_of klass.collection_class }
-  specify { expect(collection.except_first).to be_instance_of klass.collection_class }
-  specify { expect(collection.no_mars).to be_instance_of klass.collection_class }
-  specify { expect(collection.except_first).to eq(klass.instantiate_collection([{ name: 'World' }, { name: 'Mars' }])) }
-  specify { expect(collection.no_mars).to eq(klass.instantiate_collection([{ name: 'Hello' }, { name: 'World' }])) }
-  specify { expect(collection.except_first.no_mars).to eq(klass.instantiate_collection([{ name: 'World' }])) }
-  specify { expect(collection.no_mars.except_first).to eq(klass.instantiate_collection([{ name: 'World' }])) }
+  describe '.collection' do
+    let(:collection) { model.collection([model.new(name: 'Hello'), model.new(name: 'World'), model.new(name: 'Mars')]) }
+
+    specify { expect(collection).to be_instance_of model.collection_class }
+    specify { expect { model.collection([model.new(name: 'Hello'), {}]) }.to raise_error ActiveData::AssociationTypeMismatch }
+
+    context 'scopes' do
+      specify { expect(collection.except_first).to be_instance_of model.collection_class }
+      specify { expect(collection.no_mars).to be_instance_of model.collection_class }
+      specify { expect(collection.except_first).to eq(model.collection([model.new(name: 'World'), model.new(name: 'Mars')])) }
+      specify { expect(collection.no_mars).to eq(model.collection([model.new(name: 'Hello'), model.new(name: 'World')])) }
+      specify { expect(collection.except_first.no_mars).to eq(model.collection([model.new(name: 'World')])) }
+      specify { expect(collection.no_mars.except_first).to eq(model.collection([model.new(name: 'World')])) }
+    end
+  end
 
   context do
     let!(:ancestor) do
-      Class.new do
-        include ActiveData::Model
+      stub_model do
+        include ActiveData::Model::Collection
       end
     end
 
