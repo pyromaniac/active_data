@@ -6,7 +6,9 @@ module ActiveData
 
         module ClassMethods
           def active_data_type_cast value
-            value.to_datetime rescue nil
+            value.try(:to_datetime)
+          rescue ArgumentError
+            nil
           end
         end
       end

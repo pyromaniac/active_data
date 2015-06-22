@@ -30,7 +30,7 @@ describe ActiveData::Model::Associations do
     specify { expect(Admin.reflections.keys).to eq([:projects, :admin_projects]) }
   end
 
-  context '.embeds_one' do
+  describe '.embeds_one' do
     before do
       stub_model(:author) do
         include ActiveData::Model::Associations

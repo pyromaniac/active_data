@@ -6,7 +6,9 @@ module ActiveData
 
         module ClassMethods
           def active_data_type_cast value
-            value.to_time rescue nil
+            value.is_a?(String) && ::Time.zone ? ::Time.zone.parse(value) : value.try(:to_time)
+          rescue ArgumentError
+            nil
           end
         end
       end
