@@ -28,6 +28,25 @@ module ActiveData
           attribute
         end
 
+        def create *args
+          new *args
+        end
+
+        def has_attribute? name
+          _attributes.key? name.to_s
+        end
+
+        def inspect
+          attributes = _attributes.map { |name, attribute| "#{name}: #{attribute.type}" }.join(', ')
+          "#{super}(#{attributes.presence || '<no attributes>'})"
+        end
+
+        def initialize_attributes
+          Hash[_attributes.keys.zip]
+        end
+
+      private
+
         def build_attribute name, options = {}, &block
           class_name = "ActiveData::Model::Attributes::#{(options.delete(:mode).to_s.presence || 'base').classify}"
           class_name.safe_constantize.new name, options, &block
@@ -40,32 +59,15 @@ module ActiveData
         def generated_instance_attributes_methods
           @generated_instance_attributes_methods ||= Module.new.tap { |proxy| include proxy }
         end
-
-        def initialize_attributes
-          Hash[_attributes.keys.zip]
-        end
-
-        def create attributes = {}
-          new attributes
-        end
-
-        def inspect
-          attributes = _attributes.map { |name, attribute| "#{name}: #{attribute.type}" }.join(', ')
-          "#{name}(#{attributes})"
-        end
-
-        def has_attribute? name
-          _attributes.key? name.to_s
-        end
       end
 
-      def freeze
-        @attributes = @attributes.clone.freeze
-        self
+      def initialize attributes = {}
+        @attributes = self.class.initialize_attributes
+        assign_attributes attributes
       end
 
-      def frozen?
-        @attributes.frozen?
+      def == other
+        other.instance_of?(self.class) && other.attributes == attributes
       end
 
       def write_attribute name, value
@@ -119,7 +121,23 @@ module ActiveData
       alias_method :attributes=, :assign_attributes
 
       def inspect
-        "#<#{self.class} #{attribute_names.map { |name| "#{name}: #{attribute_for_inspect(name)}" }.join(', ')}>"
+        attributes = attribute_names.map { |name| "#{name}: #{attribute_for_inspect(name)}" }.join(', ')
+        "#<#{super} #{attributes.presence || '<no attributes>'}>"
+      end
+
+      def initialize_copy _
+        @attributes = attributes.clone
+        @attributes_cache = attributes_cache.clone
+        super
+      end
+
+      def freeze
+        @attributes = @attributes.clone.freeze
+        self
+      end
+
+      def frozen?
+        @attributes.frozen?
       end
 
     private

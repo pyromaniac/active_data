@@ -117,16 +117,16 @@ module ActiveData
         # Initializes new instance with attributes passed and calls +save+
         # on it. Returns instance in any case.
         #
-        def create attributes = {}
-          new(attributes).tap(&:save)
+        def create *args
+          new(*args).tap(&:save)
         end
 
         # Initializes new instance with attributes passed and calls +save!+
         # on it. Returns instance in case of success and raises ActiveData::ValidationError
         # or ActiveData::ObjectNotSaved in case of validation or saving fail respectively.
         #
-        def create! attributes = {}
-          new(attributes).tap(&:save!)
+        def create! *args
+          new(*args).tap(&:save!)
         end
       end
 
@@ -268,6 +268,7 @@ module ActiveData
       end
 
       def save_object &block
+        save_associations! if defined?(save_associations!)
         result = persisted? ? update_object(&block) : create_object(&block)
         if result
           @destroyed = false

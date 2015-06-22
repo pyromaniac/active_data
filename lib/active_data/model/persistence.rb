@@ -5,8 +5,6 @@ module ActiveData
 
       included do
         include Collection
-
-        alias_method_chain :initialize, :persistence
       end
 
       module ClassMethods
@@ -29,18 +27,12 @@ module ActiveData
         end
       end
 
-      def initialize_with_persistence *_, &block
-        @persisted = false
-        @destroyed = false
-        initialize_without_persistence *_, &block
-      end
-
       def persisted?
-        @persisted
+        !!@persisted
       end
 
       def destroyed?
-        @destroyed
+        !!@destroyed
       end
     end
   end

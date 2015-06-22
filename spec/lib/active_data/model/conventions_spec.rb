@@ -8,6 +8,7 @@ describe ActiveData::Model::Conventions do
   specify { expect(model.i18n_scope).to eq(:active_data) }
   specify { expect(model.new).not_to be_persisted }
   specify { expect(model.new).to be_new_record }
+  specify { expect(model.new).to be_new_object }
   specify { expect(model.new.errors).to be_a ActiveModel::Errors }
   specify { expect(model.new.errors).to be_empty }
 end

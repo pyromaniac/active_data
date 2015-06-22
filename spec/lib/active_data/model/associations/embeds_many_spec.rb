@@ -226,6 +226,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
 
     context do
       let(:existing_user) { User.instantiate name: 'Rick', projects: [{title: 'Genesis'}, {title: 'Swordfish'}] }
+      before { Project.send(:include, ActiveData::Model::Callbacks) }
       before { Project.before_destroy { title == 'Genesis' } }
 
       specify { expect(existing_association.clear).to eq(false) }

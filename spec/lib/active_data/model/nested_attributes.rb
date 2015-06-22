@@ -4,6 +4,7 @@ shared_examples 'nested attributes' do
   before do
     stub_model :project do
       include ActiveData::Model::Associations
+      include ActiveData::Model::Primary
 
       primary_attribute
       attribute :title, type: String
@@ -11,6 +12,7 @@ shared_examples 'nested attributes' do
 
     stub_model :profile do
       include ActiveData::Model::Associations
+      include ActiveData::Model::Primary
 
       primary_attribute
       attribute :first_name, type: String
@@ -111,11 +113,20 @@ shared_examples 'nested attributes' do
       let(:projects) { 2.times.map { |i| Project.new(title: "Project #{i.next}") } }
       let(:user) { User.new projects: projects }
 
-      specify { expect { user.projects_attributes = [{id: projects.first.id.to_s, title: 'Project 3'}, {title: 'Project 4'}] }
+      specify { expect { user.projects_attributes = [
+          {id: projects.first.id.to_s, title: 'Project 3'},
+          {title: 'Project 4'}
+        ] }
         .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2', 'Project 4']) }
-      specify { expect { user.projects_attributes = {1 => {id: projects.first.id.to_s, title: 'Project 3'}, 2 => {title: 'Project 4'}} }
+      specify { expect { user.projects_attributes = {
+          1 => {id: projects.first.id.to_s, title: 'Project 3'},
+          2 => {title: 'Project 4'}
+        } }
         .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2', 'Project 4']) }
-      specify { expect { user.projects_attributes = [{id: projects.first.id.to_s, title: 'Project 3', _destroy: '1'}, {title: 'Project 4', _destroy: '1'}] }
+      specify { expect { user.projects_attributes = [
+          {id: projects.first.id.to_s, title: 'Project 3', _destroy: '1'},
+          {title: 'Project 4', _destroy: '1'}
+        ] }
         .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2']) }
       specify { expect { user.projects_attributes = [
           {id: projects.first.id.to_s, title: 'Project 3', _destroy: '1'},
@@ -127,7 +138,10 @@ shared_examples 'nested attributes' do
       context ':allow_destroy' do
         before { User.accepts_nested_attributes_for :projects, allow_destroy: true }
 
-        specify { expect { user.projects_attributes = [{id: projects.first.id.to_s, title: 'Project 3', _destroy: '1'}, {title: 'Project 4', _destroy: '1'}] }
+        specify { expect { user.projects_attributes = [
+            {id: projects.first.id.to_s, title: 'Project 3', _destroy: '1'},
+            {title: 'Project 4', _destroy: '1'}
+          ] }
           .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2']) }
         specify { expect { user.projects_attributes = [
             {id: projects.first.id.to_s, title: 'Project 3', _destroy: '1'},

@@ -3,7 +3,7 @@ require 'spec_helper'
 
 describe 'typecasting' do
   let(:klass) do
-    Class.new do
+    stub_class do
       include ActiveData::Model::Attributes
       attr_reader :name
 

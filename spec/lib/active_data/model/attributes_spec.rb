@@ -4,7 +4,7 @@ require 'spec_helper'
 describe ActiveData::Model::Attributes do
 
   let(:klass) do
-    Class.new do
+    stub_class do
       include ActiveData::Model::Attributes
       attr_accessor :name
 
@@ -24,11 +24,22 @@ describe ActiveData::Model::Attributes do
     end
   end
 
+  describe '.create' do
+    specify { expect(klass.create('Hello')).to be_a klass }
+    specify { expect(klass.create('Hello').name).to eq('Hello') }
+  end
+
   describe '.has_attribute?' do
     specify { expect(klass.has_attribute?(:hello)).to eq(true) }
     specify { expect(klass.has_attribute?('hello')).to eq(true) }
     specify { expect(klass.has_attribute?(:name)).to eq(false) }
     specify { expect(klass.has_attribute?(:foobar)).to eq(false) }
+  end
+
+  describe '.inspect' do
+    specify { expect(stub_model.inspect).to match(/#<Class:\w+>\(<no attributes>\)/) }
+    specify { expect(stub_model(:user).inspect).to eq('User(<no attributes>)') }
+    specify { expect(stub_model { attribute :count, type: Integer; attribute :object }.inspect).to match(/#<Class:\w+>\(count: Integer, object: Object\)/) }
   end
 
   describe '#assign_attributes' do

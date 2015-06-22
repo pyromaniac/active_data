@@ -149,6 +149,7 @@ describe ActiveData::Model::Associations::EmbedsOne do
       .to change { existing_book.read_attribute(:author) }.from('name' => 'Johny').to(nil) }
 
     context do
+      before { Author.send(:include, ActiveData::Model::Callbacks) }
       before { Author.before_destroy { false } }
       specify { expect(existing_association.clear).to eq(false) }
       specify { expect { existing_association.clear }

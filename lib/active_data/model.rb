@@ -23,17 +23,6 @@ module ActiveData
 
       include Conventions
       include Attributes
-
-      self.include_root_in_json = ActiveData.include_root_in_json
-    end
-
-    def initialize attributes = {}
-      @attributes = self.class.initialize_attributes
-      assign_attributes attributes
-    end
-
-    def == other
-      other.instance_of?(self.class) && other.attributes == attributes
     end
   end
 end

@@ -11,8 +11,7 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
-        include Callbacks
-        include Primary
+        include Lifecycle
         include NestedAttributes
 
         class_attribute :reflections, instance_reader: false, instance_writer: false
@@ -24,18 +23,6 @@ module ActiveData
             attribute reflection.name, mode: :association
             reflection.define_methods self
             self.reflections = reflections.merge(reflection.name => reflection)
-            if defined? before_save
-              callback_name = "update_#{reflection.name}_association"
-              before_save callback_name
-              class_eval <<-METHOD
-                def #{callback_name}
-                  association = association(:#{reflection.name})
-                  result = association.save!
-                  association.reload
-                  result
-                end
-              METHOD
-            end
           end
         end
       end
@@ -69,8 +56,21 @@ module ActiveData
         @_associations[name.to_sym] ||= self.class.reflect_on_association(name).build_association(self)
       end
 
+      def association_names
+        self.class.reflections.keys
+      end
+
+      def save_associations!
+        association_names.all? do |name|
+          association = association(name)
+          result = association.save!
+          association.reload
+          result
+        end
+      end
+
       def == other
-        super(other) && self.class.reflections.keys.all? do |association|
+        super && association_names.all? do |association|
           public_send(association) == other.public_send(association)
         end
       end
