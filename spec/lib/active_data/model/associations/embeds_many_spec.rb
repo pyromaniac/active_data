@@ -6,18 +6,19 @@ describe ActiveData::Model::Associations::EmbedsMany do
     stub_model(:dummy) do
       include ActiveData::Model::Associations
     end
+
     stub_model(:project) do
-      include ActiveData::Model::Associations
+      include ActiveData::Model::Lifecycle
 
       attribute :title
       validates :title, presence: true
     end
     stub_model(:user) do
+      include ActiveData::Model::Persistence
       include ActiveData::Model::Associations
 
       attribute :name
       embeds_many :projects
-      define_save { true }
     end
   end
 

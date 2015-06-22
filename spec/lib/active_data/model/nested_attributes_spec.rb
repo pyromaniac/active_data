@@ -12,6 +12,10 @@ describe ActiveData::Model::Associations::NestedAttributes do
       embeds_many :projects
 
       accepts_nested_attributes_for :profile, :projects
+
+      def save
+        save_associations!
+      end
     end
   end
 

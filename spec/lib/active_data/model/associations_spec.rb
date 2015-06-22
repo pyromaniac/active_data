@@ -8,7 +8,7 @@ describe ActiveData::Model::Associations do
         include ActiveData::Model::Associations
       end
       stub_model(:project) do
-        include ActiveData::Model::Associations
+        include ActiveData::Model::Lifecycle
       end
       stub_model(:user, Nobody) do
         include ActiveData::Model::Associations
@@ -33,12 +33,13 @@ describe ActiveData::Model::Associations do
   describe '.embeds_one' do
     before do
       stub_model(:author) do
-        include ActiveData::Model::Associations
+        include ActiveData::Model::Lifecycle
         attribute :name
       end
 
       stub_model(:book) do
         include ActiveData::Model::Associations
+
         attribute :title
         embeds_one :author
       end
@@ -50,7 +51,9 @@ describe ActiveData::Model::Associations do
     context ':read, :write' do
       before do
         stub_model(:book) do
+          include ActiveData::Model::Persistence
           include ActiveData::Model::Associations
+
           attribute :title
           embeds_one :author,
             read: ->(reflection, object) {
@@ -115,7 +118,7 @@ describe ActiveData::Model::Associations do
   describe '.embeds_many' do
     before do
       stub_model(:project) do
-        include ActiveData::Model::Associations
+        include ActiveData::Model::Lifecycle
         attribute :title
       end
       stub_model(:user) do
@@ -123,7 +126,6 @@ describe ActiveData::Model::Associations do
 
         attribute :name
         embeds_many :projects
-        define_save { true }
       end
     end
     let(:user) { User.new }
@@ -131,6 +133,7 @@ describe ActiveData::Model::Associations do
     context ':read, :write' do
       before do
         stub_model(:user) do
+          include ActiveData::Model::Persistence
           include ActiveData::Model::Associations
 
           attribute :name
@@ -178,7 +181,10 @@ describe ActiveData::Model::Associations do
 
       describe '#reload' do
         let(:project) { Project.new title: 'Project' }
-        before { user.update(projects: [project]) }
+        before do
+          user.update(projects: [project])
+          user.save_associations!
+        end
         before { user.projects.build }
 
         specify { expect(user.projects.count).to eq(2) }

@@ -46,6 +46,10 @@ module ActiveData
           load_target
         end
 
+        def writer object
+          replace object
+        end
+
         def replace object
           if object
             raise AssociationTypeMismatch.new(reflection.klass, object.class) unless object.is_a?(reflection.klass)
@@ -59,10 +63,6 @@ module ActiveData
           end
 
           target
-        end
-
-        def writer object
-          replace object
         end
 
       private

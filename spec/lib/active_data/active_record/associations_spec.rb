@@ -3,7 +3,7 @@ require 'spec_helper'
 describe ActiveData::ActiveRecord::Associations do
   before do
     stub_model(:project) do
-      include ActiveData::Model::Associations
+      include ActiveData::Model::Lifecycle
 
       attribute :title, type: String
 
@@ -11,7 +11,7 @@ describe ActiveData::ActiveRecord::Associations do
     end
 
     stub_model(:profile) do
-      include ActiveData::Model::Associations
+      include ActiveData::Model::Lifecycle
 
       attribute :first_name, type: String
       attribute :last_name, type: String

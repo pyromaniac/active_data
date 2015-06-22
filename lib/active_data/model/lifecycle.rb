@@ -270,21 +270,18 @@ module ActiveData
       def save_object &block
         save_associations! if defined?(save_associations!)
         result = persisted? ? update_object(&block) : create_object(&block)
-        if result
-          @destroyed = false
-          @persisted = true
-        end
-        !!result
+        mark_persisted! if result
+        result
       end
 
       def create_object &block
         performer = block || _create_performer || _save_performer
-        performer_exec(&performer)
+        !!performer_exec(&performer)
       end
 
       def update_object &block
         performer = block || _update_performer || _save_performer
-        performer_exec(&performer)
+        !!performer_exec(&performer)
       end
 
       def destroyable?
@@ -293,11 +290,8 @@ module ActiveData
 
       def destroy_object &block
         performer = block || _destroy_performer
-        result = performer_exec(&performer)
-        if result
-          @persisted = false
-          @destroyed = true
-        end
+        result = !!performer_exec(&performer)
+        mark_destroyed! if result
         result
       end
 

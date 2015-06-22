@@ -4,18 +4,18 @@ require 'spec_helper'
 describe ActiveData::Model::Associations::EmbedsOne do
   before do
     stub_model(:author) do
-      include ActiveData::Model::Associations
+      include ActiveData::Model::Lifecycle
 
       attribute :name
       validates :name, presence: true
     end
 
     stub_model(:book) do
+      include ActiveData::Model::Persistence
       include ActiveData::Model::Associations
 
       attribute :title
       embeds_one :author
-      define_save { true }
     end
   end
 
@@ -184,7 +184,11 @@ describe ActiveData::Model::Associations::EmbedsOne do
     let(:invalid_author) { Author.new }
 
     context 'new owner' do
-      let(:book) { Book.create }
+      let(:book) do
+        Book.new.tap do |book|
+          book.send(:mark_persisted!)
+        end
+      end
 
       specify { expect { association.writer(nil) }
         .not_to change { book.read_attribute(:author) } }

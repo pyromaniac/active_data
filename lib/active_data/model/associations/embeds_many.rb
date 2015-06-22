@@ -52,15 +52,15 @@ module ActiveData
           @proxy ||= CollectionProxy.new self
         end
 
+        def writer objects
+          replace objects
+        end
+
         def replace objects
           transaction do
             clear
             append(objects) or raise ActiveData::AssociationNotSaved
           end
-        end
-
-        def writer objects
-          replace objects
         end
 
         def concat *objects

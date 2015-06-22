@@ -25,7 +25,7 @@ module ActiveData
           end
         end
 
-        def respond_to_missing? method
+        def respond_to_missing? method, _
           super || collectible.respond_to?(method)
         end
 

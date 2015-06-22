@@ -2,12 +2,12 @@ require 'spec_helper'
 
 describe ActiveData::Validations do
   let(:main) do
-    Class.new do
+    stub_model do
       def self.model_name
         ActiveModel::Name.new(self, nil, "Main")
       end
 
-      include ActiveData::Model
+      include ActiveData::Model::Persistence
       include ActiveData::Model::Associations
       include ActiveData::Validations
 
@@ -25,7 +25,7 @@ describe ActiveData::Validations do
 
   class ValidatedAssoc
     include ActiveData::Model
-    include ActiveData::Model::Associations
+    include ActiveData::Model::Lifecycle
 
     attribute :name
 
@@ -34,7 +34,7 @@ describe ActiveData::Validations do
 
   class UnvalidatedAssoc
     include ActiveData::Model
-    include ActiveData::Model::Associations
+    include ActiveData::Model::Lifecycle
 
     attribute :name
   end

@@ -24,11 +24,6 @@ describe ActiveData::Model::Attributes do
     end
   end
 
-  describe '.create' do
-    specify { expect(klass.create('Hello')).to be_a klass }
-    specify { expect(klass.create('Hello').name).to eq('Hello') }
-  end
-
   describe '.has_attribute?' do
     specify { expect(klass.has_attribute?(:hello)).to eq(true) }
     specify { expect(klass.has_attribute?('hello')).to eq(true) }

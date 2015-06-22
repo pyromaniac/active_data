@@ -3,16 +3,16 @@ require 'spec_helper'
 shared_examples 'nested attributes' do
   before do
     stub_model :project do
-      include ActiveData::Model::Associations
       include ActiveData::Model::Primary
+      include ActiveData::Model::Lifecycle
 
       primary_attribute
       attribute :title, type: String
     end
 
     stub_model :profile do
-      include ActiveData::Model::Associations
       include ActiveData::Model::Primary
+      include ActiveData::Model::Lifecycle
 
       primary_attribute
       attribute :first_name, type: String

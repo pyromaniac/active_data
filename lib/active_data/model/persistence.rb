@@ -16,8 +16,7 @@ module ActiveData
           attributes.merge!(data.slice(*attributes.keys))
 
           instance.instance_variable_set(:@attributes, attributes)
-          instance.instance_variable_set(:@persisted, true)
-          instance.instance_variable_set(:@destroyed, false)
+          instance.send(:mark_persisted!)
 
           instance
         end
@@ -33,6 +32,30 @@ module ActiveData
 
       def destroyed?
         !!@destroyed
+      end
+
+      def marked_for_destruction?
+        @marked_for_destruction
+      end
+
+      def mark_for_destruction
+        @marked_for_destruction = true
+      end
+
+      def _destroy
+        marked_for_destruction?
+      end
+
+    private
+
+      def mark_persisted!
+        @persisted = true
+        @destroyed = false
+      end
+
+      def mark_destroyed!
+        @persisted = false
+        @destroyed = true
       end
     end
   end

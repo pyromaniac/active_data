@@ -28,10 +28,6 @@ module ActiveData
           attribute
         end
 
-        def create *args
-          new *args
-        end
-
         def has_attribute? name
           _attributes.key? name.to_s
         end

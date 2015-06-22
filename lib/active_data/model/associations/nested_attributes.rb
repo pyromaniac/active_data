@@ -149,18 +149,6 @@ module ActiveData
             NestedAttributesMethods.accepts_nested_attributes_for self, *attr_names
           end
         end
-
-        def mark_for_destruction
-          @marked_for_destruction = true
-        end
-
-        def marked_for_destruction?
-          @marked_for_destruction
-        end
-
-        def _destroy
-          marked_for_destruction?
-        end
       end
     end
   end

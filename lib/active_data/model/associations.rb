@@ -11,7 +11,6 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
-        include Lifecycle
         include NestedAttributes
 
         class_attribute :reflections, instance_reader: false, instance_writer: false
