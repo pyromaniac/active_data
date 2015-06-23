@@ -11,11 +11,11 @@ describe ActiveData::Model::Attributes do
       attribute :id
       attribute :hello
       attribute :string, type: String, default_blank: true, default: ->(record){ record.name }
-      attribute :count, type: Integer, default: 10
+      attribute :count, Integer, default: 10
       attribute(:calc, type: Integer) { 2 + 3 }
       attribute :enum, type: Integer, enum: [1, 2, 3]
       attribute :enum_with_default, type: Integer, enum: [1, 2, 3], default: 2
-      attribute :foo, type: Boolean, default: false
+      attribute :foo, Boolean, default: false
 
       def initialize name = nil
         @attributes = self.class.initialize_attributes

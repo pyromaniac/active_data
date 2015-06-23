@@ -33,6 +33,12 @@ describe ActiveData::Model::Attributes::Collection do
   end
 
   context 'integration' do
+    let(:model) do
+      stub_model do
+        collection :values, Integer
+      end
+    end
 
+    specify { expect(model.new(values: '42').values).to eq([42]) }
   end
 end

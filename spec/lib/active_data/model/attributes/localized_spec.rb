@@ -34,7 +34,7 @@ describe ActiveData::Model::Attributes::Localized do
       Class.new do
         include ActiveData::Model
 
-        attribute :name, type: String, mode: :localized
+        localized :name, type: String
       end
     end
     let(:translations) { { en: 'Hello', ru: 'Привет' } }

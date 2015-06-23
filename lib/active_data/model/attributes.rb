@@ -15,10 +15,19 @@ module ActiveData
         self._attributes = {}
 
         delegate :attribute_default, :has_attribute?, to: 'self.class'
+
+        [:collection, :dictionary, :localized].each do |mode|
+          define_singleton_method mode do |*args, &block|
+            options = args.extract_options!
+            attribute *args, options.merge(mode: mode), &block
+          end
+        end
       end
 
       module ClassMethods
-        def attribute name, options = {}, &block
+        def attribute name, *args, &block
+          options = args.extract_options!
+          options = options.merge(type: args.first) if args.first
           attribute = build_attribute(name, options, &block)
           self._attributes = _attributes.merge(attribute.name => attribute)
 

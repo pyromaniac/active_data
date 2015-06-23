@@ -9,8 +9,8 @@ module ActiveData
     #   class Book
     #     include ActiveData::Model
     #
-    #     attribute :id, type: Integer
-    #     attribute :title, type: String
+    #     attribute :id, Integer
+    #     attribute :title, String
     #
     #     define_save do
     #       REDIS.set(id, attributes.to_json)

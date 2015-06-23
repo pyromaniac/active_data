@@ -137,7 +137,6 @@ module ActiveData
             EOS
           end
         end
-
       end
     end
   end

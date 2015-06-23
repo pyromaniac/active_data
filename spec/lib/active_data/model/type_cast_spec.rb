@@ -7,17 +7,17 @@ describe 'typecasting' do
       include ActiveData::Model::Attributes
       attr_reader :name
 
-      attribute :string, type: String
+      attribute :string, String
       attribute :integer, type: Integer
       attribute :float, type: Float
-      attribute :big_decimal, type: BigDecimal
+      attribute :big_decimal, BigDecimal
       attribute :boolean, type: Boolean
       attribute :array, type: Array
-      attribute :date, type: Date
+      attribute :date, Date
       attribute :datetime, type: DateTime
       attribute :time, type: Time
       attribute :time_zone, type: ActiveSupport::TimeZone
-      attribute :uuid, type: ActiveData::UUID
+      attribute :uuid, ActiveData::UUID
 
       def initialize name = nil
         @attributes = self.class.initialize_attributes

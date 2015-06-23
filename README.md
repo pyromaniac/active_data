@@ -11,9 +11,9 @@ ActiveData is a ActiveModel-based frontend for your data. You might need to use 
 class ProfileForm
   include ActiveData::Model
 
-  attribute 'first_name', type: String
-  attribute 'last_name', type: String
-  attribute 'birth_date', type: Date
+  attribute 'first_name', String
+  attribute 'last_name', String
+  attribute 'birth_date', Date
 
   def full_name
     [first_name, last_name].reject(&:blank).join(' ')
@@ -48,10 +48,10 @@ end
 class Flight
   include ActiveData::Model
 
-  attribute :airline, type: String
-  attribute :number, type: String
-  attribute :departure, type: Time
-  attribute :arrival, type: Time
+  attribute :airline, String
+  attribute :number, String
+  attribute :departure, Time
+  attribute :arrival, Time
 
   validates :airline, :number, presence: true
 
@@ -80,8 +80,8 @@ end
 class Answer
   include ActiveData::Model
 
-  attribute :question_id, type: Integer
-  attribute :content, type: String
+  attribute :question_id, Integer
+  attribute :content, String
 
   validates :question_id, :content, presence: true
 end

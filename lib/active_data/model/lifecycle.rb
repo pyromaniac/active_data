@@ -15,8 +15,8 @@ module ActiveData
     #     include ActiveData::Model
     #     include ActiveData::Model::Lifecycle
     #
-    #     attribute :id, type: Integer
-    #     attribute :title, type: String
+    #     attribute :id, Integer
+    #     attribute :title, String
     #
     #     define_save do # executes in the instance scope
     #       REDIS.set(id, attributes.to_json)
@@ -31,8 +31,8 @@ module ActiveData
     #     include ActiveData::Model
     #     include ActiveData::Model::Lifecycle
     #
-    #     attribute :id, type: Integer
-    #     attribute :name, type: String
+    #     attribute :id, Integer
+    #     attribute :name, String
     #
     #     define_create do # will be called on create only
     #       REDIS.sadd('author_ids', id)

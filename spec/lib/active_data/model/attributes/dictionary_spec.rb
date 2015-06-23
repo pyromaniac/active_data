@@ -40,6 +40,12 @@ describe ActiveData::Model::Attributes::Dictionary do
   end
 
   context 'integration' do
+    let(:model) do
+      stub_model do
+        dictionary :values, Integer
+      end
+    end
 
+    specify { expect(model.new(values: {a: '42'}).values).to eq({'a' => 42}) }
   end
 end
