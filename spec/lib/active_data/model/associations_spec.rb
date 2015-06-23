@@ -112,6 +112,14 @@ describe ActiveData::Model::Associations do
       specify { expect(Book.new(author: author)).to eq(Book.new(author: author)) }
       specify { expect(Book.new(author: author)).not_to eq(Book.new(author: other)) }
       specify { expect(Book.new(author: author)).not_to eq(Book.new) }
+
+      context do
+        before { Book.send(:include, ActiveData::Model::Primary) }
+        let(:book) { Book.new(author: author) }
+
+        specify { expect(book).to eq(book.clone.tap { |b| b.update(author: author) }) }
+        specify { expect(book).to eq(book.clone.tap { |b| b.update(author: other) }) }
+      end
     end
   end
 
@@ -225,6 +233,14 @@ describe ActiveData::Model::Associations do
       specify { expect(User.new(projects: [project])).to eq(User.new(projects: [project])) }
       specify { expect(User.new(projects: [project])).not_to eq(User.new(projects: [other])) }
       specify { expect(User.new(projects: [project])).not_to eq(User.new) }
+
+      context do
+        before { User.send(:include, ActiveData::Model::Primary) }
+        let(:user) { User.new(projects: [project]) }
+
+        specify { expect(user).to eq(user.clone.tap { |b| b.projects(author: project) }) }
+        specify { expect(user).to eq(user.clone.tap { |b| b.projects(author: other) }) }
+      end
     end
   end
 end

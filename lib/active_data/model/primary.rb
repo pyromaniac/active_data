@@ -9,6 +9,7 @@ module ActiveData
 
       included do
         delegate :has_primary_attribute?, to: 'self.class'
+        alias_method_chain :==, :primary
       end
 
       module ClassMethods
@@ -25,11 +26,11 @@ module ActiveData
         send(ActiveData.primary_attribute)
       end
 
-      def == other
+      define_method :'=_with_primary=' do |other|
         other.instance_of?(self.class) &&
           has_primary_attribute? ?
             primary_attribute && primary_attribute == other.primary_attribute :
-            super
+            send(:'=_without_primary=', other)
       end
     end
   end
