@@ -30,11 +30,12 @@ describe ActiveData::Model::Persistence do
     context do
       subject(:instances) { model.instantiate_collection(name: 'Hello', foo: 'Bar') }
 
-      specify { expect(subject).to be_a ActiveData::Model::Scopes::ScopeProxy }
+      specify { expect(subject).to be_a Array }
       specify { expect(subject.first.instance_variable_get(:@attributes)).to eq({ name: 'Hello', count: nil }.stringify_keys) }
     end
 
     context do
+      before { model.send(:include, ActiveData::Model::Scopes) }
       subject(:instances) { model.instantiate_collection([{ name: 'Hello', foo: 'Bar' }, {name: 'World'}]) }
 
       specify { expect(subject).to be_a ActiveData::Model::Scopes::ScopeProxy }

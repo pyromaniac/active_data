@@ -3,10 +3,6 @@ module ActiveData
     module Persistence
       extend ActiveSupport::Concern
 
-      included do
-        include Scopes
-      end
-
       module ClassMethods
         def instantiate data
           data = data.stringify_keys
@@ -22,7 +18,9 @@ module ActiveData
         end
 
         def instantiate_collection data
-          scope(Array.wrap(data).map { |attrs| instantiate attrs }, true)
+          collection = Array.wrap(data).map { |attrs| instantiate attrs }
+          collection = scope(collection, true) if respond_to?(:scope)
+          collection
         end
       end
 

@@ -45,7 +45,7 @@ module ActiveData
 
         def build_attribute name, options = {}, &block
           class_name = "ActiveData::Model::Attributes::#{(options.delete(:mode).to_s.presence || 'base').classify}"
-          class_name.safe_constantize.new name, options, &block
+          class_name.constantize.new name, options, &block
         end
 
         def generated_class_attributes_methods

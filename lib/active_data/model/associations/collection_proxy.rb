@@ -10,6 +10,7 @@ module ActiveData
         alias_method :new, :build
         alias_method :<<, :concat
         alias_method :push, :concat
+        private :load_target
 
         def initialize(association)
           @association = association

@@ -268,7 +268,7 @@ module ActiveData
       end
 
       def save_object &block
-        save_associations! if defined?(save_associations!)
+        save_associations! if respond_to?(:save_associations!)
         result = persisted? ? update_object(&block) : create_object(&block)
         mark_persisted! if result
         result
