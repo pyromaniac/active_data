@@ -1,7 +1,7 @@
 module ActiveData
   module Model
     module Attributes
-      class Arrayed < Base
+      class Collection < Base
         module ModeMethods
         end
 

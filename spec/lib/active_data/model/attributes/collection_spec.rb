@@ -1,9 +1,9 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-describe ActiveData::Model::Attributes::Arrayed do
+describe ActiveData::Model::Attributes::Collection do
   def build_field(options = {}, &block)
-    described_class.new(:field, options.reverse_merge(mode: :arrayed), &block)
+    described_class.new(:field, options.reverse_merge(mode: :collection), &block)
   end
 
   describe '#read_value' do

@@ -30,14 +30,14 @@ describe ActiveData::Model::Persistence do
     context do
       subject(:instances) { model.instantiate_collection(name: 'Hello', foo: 'Bar') }
 
-      specify { expect(subject).to be_a ActiveData::Model::Collection::Proxy }
+      specify { expect(subject).to be_a ActiveData::Model::Scopes::ScopeProxy }
       specify { expect(subject.first.instance_variable_get(:@attributes)).to eq({ name: 'Hello', count: nil }.stringify_keys) }
     end
 
     context do
       subject(:instances) { model.instantiate_collection([{ name: 'Hello', foo: 'Bar' }, {name: 'World'}]) }
 
-      specify { expect(subject).to be_a ActiveData::Model::Collection::Proxy }
+      specify { expect(subject).to be_a ActiveData::Model::Scopes::ScopeProxy }
       specify { expect(subject.count).to eq(2) }
       specify { expect(subject.first.instance_variable_get(:@attributes)).to eq({ name: 'Hello', count: nil }.stringify_keys) }
       specify { expect(subject.second.instance_variable_get(:@attributes)).to eq({ name: 'World', count: nil }.stringify_keys) }

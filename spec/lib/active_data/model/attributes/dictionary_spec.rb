@@ -1,9 +1,9 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-describe ActiveData::Model::Attributes::Hashed do
+describe ActiveData::Model::Attributes::Dictionary do
   def build_field(options = {}, &block)
-    described_class.new(:field, options.reverse_merge(mode: :hashed), &block)
+    described_class.new(:field, options.reverse_merge(mode: :dictionary), &block)
   end
 
   describe '#read_value' do

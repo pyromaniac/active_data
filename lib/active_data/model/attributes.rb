@@ -1,6 +1,6 @@
 require 'active_data/model/attributes/base'
-require 'active_data/model/attributes/arrayed'
-require 'active_data/model/attributes/hashed'
+require 'active_data/model/attributes/collection'
+require 'active_data/model/attributes/dictionary'
 require 'active_data/model/attributes/localized'
 require 'active_data/model/attributes/association'
 

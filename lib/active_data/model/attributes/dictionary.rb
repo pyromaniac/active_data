@@ -1,7 +1,7 @@
 module ActiveData
   module Model
     module Attributes
-      class Hashed < Base
+      class Dictionary < Base
         module ModeMethods
         end
 

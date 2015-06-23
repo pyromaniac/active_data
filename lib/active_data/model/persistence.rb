@@ -4,7 +4,7 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
-        include Collection
+        include Scopes
       end
 
       module ClassMethods
@@ -22,7 +22,7 @@ module ActiveData
         end
 
         def instantiate_collection data
-          collection(Array.wrap(data).map { |attrs| instantiate attrs }, true)
+          scope(Array.wrap(data).map { |attrs| instantiate attrs }, true)
         end
       end
 
