@@ -2,7 +2,7 @@ module ActiveData
   module Model
     module Associations
       class Base
-        attr_accessor :reflection, :owner, :target
+        attr_accessor :reflection, :owner
 
         def initialize owner, reflection
           @owner, @reflection = owner, reflection
@@ -24,7 +24,7 @@ module ActiveData
 
         def reload
           reset
-          load_target
+          target
         end
 
         def transaction &block

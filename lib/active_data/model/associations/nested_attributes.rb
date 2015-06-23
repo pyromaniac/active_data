@@ -43,7 +43,7 @@ module ActiveData
             attributes = attributes.with_indifferent_access
 
             association = object.association(association_name)
-            existing_record = association.load_target
+            existing_record = association.target
 
             if existing_record && (options[:update_only] || existing_record.send(ActiveData.primary_attribute).to_s == attributes[ActiveData.primary_attribute.to_s].to_s)
               assign_to_or_mark_for_destruction(existing_record, attributes, options[:allow_destroy]) unless call_reject_if(object, association_name, attributes)
@@ -89,7 +89,7 @@ module ActiveData
                 unless reject_new_object?(object, association_name, attributes)
                   association.build(attributes.except(*UNASSIGNABLE_KEYS))
                 end
-              elsif existing_record = association.load_target.detect { |record| record.send(ActiveData.primary_attribute).to_s == attributes[ActiveData.primary_attribute.to_s].to_s }
+              elsif existing_record = association.target.detect { |record| record.send(ActiveData.primary_attribute).to_s == attributes[ActiveData.primary_attribute.to_s].to_s }
                 if !call_reject_if(object, association_name, attributes)
                   assign_to_or_mark_for_destruction(existing_record, attributes, options[:allow_destroy])
                 end

@@ -17,7 +17,7 @@ module ActiveData
         end
 
         def save
-          load_target ? (load_target.marked_for_destruction? ? load_target.destroy : load_target.save) : true
+          target ? (target.marked_for_destruction? ? target.destroy : target.save) : true
         end
 
         def save!
@@ -30,20 +30,20 @@ module ActiveData
           @target = object
         end
 
-        def load_target
-          return target if loaded?
+        def target
+          return @target if loaded?
           data = read_source
           self.target = data && reflection.klass.instantiate(data)
         end
 
         def clear
-          load_target.try(:destroy)
+          target.try(:destroy)
           reload.nil?
         end
 
         def reader force_reload = false
           reload if force_reload
-          load_target
+          target
         end
 
         def writer object

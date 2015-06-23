@@ -145,52 +145,44 @@ describe ActiveData::Model::Associations::EmbedsMany do
   end
 
   describe '#save' do
-    specify { expect { association.build; association.save }.to change { association.load_target.map(&:persisted?) }.to([false]) }
-    specify { expect { association.build(title: 'Genesis'); association.save }.to change { association.load_target.map(&:persisted?) }.to([true]) }
+    specify { expect { association.build; association.save }.to change { association.target.map(&:persisted?) }.to([false]) }
+    specify { expect { association.build(title: 'Genesis'); association.save }.to change { association.target.map(&:persisted?) }.to([true]) }
     specify { expect {
-      existing_association.load_target.first.mark_for_destruction
+      existing_association.target.first.mark_for_destruction
       existing_association.build(title: 'Swordfish');
       existing_association.save
-    }.to change { existing_association.load_target.map(&:destroyed?) }.to([true, false]) }
+    }.to change { existing_association.target.map(&:destroyed?) }.to([true, false]) }
     specify { expect {
-      existing_association.load_target.first.mark_for_destruction
+      existing_association.target.first.mark_for_destruction
       existing_association.build(title: 'Swordfish');
       existing_association.save
-    }.to change { existing_association.load_target.map(&:persisted?) }.to([false, true]) }
+    }.to change { existing_association.target.map(&:persisted?) }.to([false, true]) }
   end
 
   describe '#save!' do
     specify { expect { association.build; association.save! }.to raise_error ActiveData::AssociationNotSaved }
-    specify { expect { association.build(title: 'Genesis'); association.save! }.to change { association.load_target.map(&:persisted?) }.to([true]) }
+    specify { expect { association.build(title: 'Genesis'); association.save! }.to change { association.target.map(&:persisted?) }.to([true]) }
     specify { expect {
-      existing_association.load_target.first.mark_for_destruction
+      existing_association.target.first.mark_for_destruction
       existing_association.build(title: 'Swordfish');
       existing_association.save!
-    }.to change { existing_association.load_target.map(&:destroyed?) }.to([true, false]) }
+    }.to change { existing_association.target.map(&:destroyed?) }.to([true, false]) }
     specify { expect {
-      existing_association.load_target.first.mark_for_destruction
+      existing_association.target.first.mark_for_destruction
       existing_association.build(title: 'Swordfish');
       existing_association.save!
-    }.to change { existing_association.load_target.map(&:persisted?) }.to([false, true]) }
+    }.to change { existing_association.target.map(&:persisted?) }.to([false, true]) }
   end
 
   describe '#target' do
-    specify { expect(existing_association.target).to eq([]) }
-    specify do
-      existing_association.load_target
-      expect(existing_association.target).to eq(existing_user.projects)
-    end
+    specify { expect(association.target).to eq([]) }
+    specify { expect(existing_association.target).to eq(existing_user.projects) }
     specify { expect { association.build }.to change { association.target.count }.to(1) }
-  end
-
-  describe '#load_target' do
-    specify { expect(association.load_target).to eq([]) }
-    specify { expect(existing_association.load_target).to eq(existing_user.projects) }
   end
 
   describe '#loaded?' do
     specify { expect(association.loaded?).to eq(false) }
-    specify { expect { association.load_target }.to change { association.loaded? }.to(true) }
+    specify { expect { association.target }.to change { association.loaded? }.to(true) }
     specify { expect { association.build }.to change { association.loaded? }.to(true) }
     specify { expect { association.replace([]) }.to change { association.loaded? }.to(true) }
     specify { expect { existing_association.replace([]) }.to change { existing_association.loaded? }.to(true) }

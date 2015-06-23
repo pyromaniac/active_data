@@ -18,7 +18,7 @@ module ActiveData
         end
 
         def save
-          load_target.map { |object| object.marked_for_destruction? ? object.destroy : object.save }.all?
+          target.map { |object| object.marked_for_destruction? ? object.destroy : object.save }.all?
         end
 
         def save!
@@ -31,8 +31,8 @@ module ActiveData
           @target = objects
         end
 
-        def load_target
-          return target if loaded?
+        def target
+          return @target if loaded?
           data = read_source
           self.target = data ? reflection.klass.instantiate_collection(data) : []
         end
@@ -43,7 +43,7 @@ module ActiveData
         end
 
         def clear
-          transaction { load_target.all?(&:destroy!) } rescue ActiveData::ObjectNotDestroyed
+          transaction { target.all?(&:destroy!) } rescue ActiveData::ObjectNotDestroyed
           reload.empty?
         end
 
@@ -79,12 +79,12 @@ module ActiveData
             push_object object
           end
           result = owner.persisted? ? save : true
-          result && load_target
+          result && target
         end
 
         def push_object object
           setup_performers! object
-          load_target[load_target.size] = object
+          target[target.size] = object
         end
 
         def setup_performers! object
@@ -92,7 +92,7 @@ module ActiveData
 
           object.define_create do
             data = association.send(:read_source)
-            index = association.load_target.select do |object|
+            index = association.target.select do |object|
               object.persisted? || object === self
             end.index { |object| object === self }
 
@@ -102,7 +102,7 @@ module ActiveData
 
           object.define_update do
             data = association.send(:read_source)
-            index = association.load_target.select(&:persisted?).index { |object| object === self }
+            index = association.target.select(&:persisted?).index { |object| object === self }
 
             data[index] = attributes
             association.send(:write_source, data)
@@ -110,7 +110,7 @@ module ActiveData
 
           object.define_destroy do
             data = association.send(:read_source)
-            index = association.load_target.select(&:persisted?).index { |object| object === self }
+            index = association.target.select(&:persisted?).index { |object| object === self }
 
             data.delete_at(index) if index
             association.send(:write_source, data)

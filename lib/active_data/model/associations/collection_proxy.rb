@@ -4,13 +4,12 @@ module ActiveData
       class CollectionProxy
         include Enumerable
 
-        delegate :target, :load_target, :build, :create, :create!, :save, :save!,
+        delegate :target, :build, :create, :create!, :save, :save!,
           :loaded?, :reload, :clear, :concat, to: :@association
-        delegate :each, :size, :length, :first, :last, :empty?, :many?, :==, :dup, to: :load_target
+        delegate :each, :size, :length, :first, :last, :empty?, :many?, :==, :dup, to: :target
         alias_method :new, :build
         alias_method :<<, :concat
         alias_method :push, :concat
-        private :load_target
 
         def initialize(association)
           @association = association
@@ -22,8 +21,8 @@ module ActiveData
         alias_method :to_a, :to_ary
 
         def inspect
-          entries = load_target.take(10).map!(&:inspect)
-          entries[10] = '...' if load_target.size > 10
+          entries = target.take(10).map!(&:inspect)
+          entries[10] = '...' if target.size > 10
 
           "#<#{self.class.name} [#{entries.join(', ')}]>"
         end

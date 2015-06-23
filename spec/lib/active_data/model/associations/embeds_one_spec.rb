@@ -81,36 +81,31 @@ describe ActiveData::Model::Associations::EmbedsOne do
   end
 
   describe '#save' do
-    specify { expect { association.build; association.save }.to change { association.load_target.try(:persisted?) }.to(false) }
-    specify { expect { association.build(name: 'Fred'); association.save }.to change { association.load_target.try(:persisted?) }.to(true) }
-    specify { expect { existing_association.load_target.mark_for_destruction; existing_association.save }.to change { existing_association.load_target.destroyed? }.to(true) }
+    specify { expect { association.build; association.save }.to change { association.target.try(:persisted?) }.to(false) }
+    specify { expect { association.build(name: 'Fred'); association.save }.to change { association.target.try(:persisted?) }.to(true) }
+    specify { expect { existing_association.target.mark_for_destruction; existing_association.save }.to change { existing_association.target.destroyed? }.to(true) }
   end
 
   describe '#save!' do
     specify { expect { association.build; association.save! }.to raise_error ActiveData::AssociationNotSaved }
-    specify { expect { association.build(name: 'Fred'); association.save! }.to change { association.load_target.try(:persisted?) }.to(true) }
-    specify { expect { existing_association.load_target.mark_for_destruction; existing_association.save! }.to change { existing_association.load_target.destroyed? }.to(true) }
+    specify { expect { association.build(name: 'Fred'); association.save! }.to change { association.target.try(:persisted?) }.to(true) }
+    specify { expect { existing_association.target.mark_for_destruction; existing_association.save! }.to change { existing_association.target.destroyed? }.to(true) }
   end
 
   describe '#target' do
-    specify { expect(existing_association.target).to be_nil }
-    specify do
-      existing_association.load_target
-      expect(existing_association.target).to eq(existing_book.author)
-    end
-    specify { expect { association.build }.to change { association.target }.to(an_instance_of(Author)) }
   end
 
-  describe '#load_target' do
-    specify { expect(association.load_target).to eq(nil) }
-    specify { expect(existing_association.load_target).to eq(existing_book.author) }
+  describe '#target' do
+    specify { expect(association.target).to be_nil }
+    specify { expect(existing_association.target).to eq(existing_book.author) }
+    specify { expect { association.build }.to change { association.target }.to(an_instance_of(Author)) }
   end
 
   describe '#loaded?' do
     let(:new_author) { Author.new(name: 'Morty') }
 
     specify { expect(association.loaded?).to eq(false) }
-    specify { expect { association.load_target }.to change { association.loaded? }.to(true) }
+    specify { expect { association.target }.to change { association.loaded? }.to(true) }
     specify { expect { association.build }.to change { association.loaded? }.to(true) }
     specify { expect { association.replace(new_author) }.to change { association.loaded? }.to(true) }
     specify { expect { association.replace(nil) }.to change { association.loaded? }.to(true) }
