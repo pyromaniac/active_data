@@ -2,7 +2,7 @@
 require 'spec_helper'
 
 describe ActiveData::Model::Associations do
-  context 'inheritance' do
+  context do
     before do
       stub_model(:nobody) do
         include ActiveData::Model::Associations
@@ -24,205 +24,90 @@ describe ActiveData::Model::Associations do
       end
     end
 
-    specify { expect(Nobody.reflections.keys).to eq([]) }
-    specify { expect(User.reflections.keys).to eq([:projects]) }
-    specify { expect(Manager.reflections.keys).to eq([:managed_project]) }
-    specify { expect(Admin.reflections.keys).to eq([:projects, :admin_projects]) }
+    describe '#reflections' do
+      specify { expect(Nobody.reflections.keys).to eq([]) }
+      specify { expect(User.reflections.keys).to eq([:projects]) }
+      specify { expect(Manager.reflections.keys).to eq([:managed_project]) }
+      specify { expect(Admin.reflections.keys).to eq([:projects, :admin_projects]) }
+    end
+
+    describe '#reflect_on_association' do
+      specify { expect(Nobody.reflect_on_association(:blabla)).to be_nil }
+      specify { expect(Admin.reflect_on_association('projects')).to be_a ActiveData::Model::Associations::Reflections::EmbedsMany }
+      specify { expect(Manager.reflect_on_association(:managed_project)).to be_a ActiveData::Model::Associations::Reflections::EmbedsOne }
+    end
   end
 
-  describe '.embeds_one' do
-    before do
-      stub_model(:author) do
-        include ActiveData::Model::Lifecycle
-        attribute :name
-      end
-
-      stub_model(:book) do
+  context 'class determine errors' do
+    specify do
+      expect { stub_model do
         include ActiveData::Model::Associations
 
-        attribute :title
-        embeds_one :author
-      end
+        embeds_one :author, class_name: 'Borogoves'
+      end.reflect_on_association(:author).klass }.to raise_error(/Can not determine class for `#<Class:\w+>#author` association/)
     end
-    let(:book) { Book.new }
 
-    specify { expect(book.author).to be_nil }
+    specify do
+      expect { stub_model(:user) do
+        include ActiveData::Model::Associations
 
-    context ':read, :write' do
-      before do
-        stub_model(:book) do
-          include ActiveData::Model::Persistence
-          include ActiveData::Model::Associations
-
+        embeds_many :projects, class_name: 'Borogoves' do
           attribute :title
-          embeds_one :author,
-            read: ->(reflection, object) {
-              value = object.read_attribute(reflection.name)
-              JSON.parse(value) if value.present?
-            },
-            write: ->(reflection, object, value) {
-              object.write_attribute(reflection.name, value ? value.to_json : nil)
-            }
         end
-      end
-
-      let(:book) { Book.instantiate author: {name: 'Duke'}.to_json }
-      let(:author) { Author.new(name: 'Rick') }
-
-      specify { expect { book.author = author }
-        .to change { book.read_attribute(:author) }
-        .from({name: 'Duke'}.to_json).to({name: 'Rick'}.to_json) }
-    end
-
-    describe '#author=' do
-      let(:author) { Author.new name: 'Author' }
-      specify { expect { book.author = author }.to change { book.author }.from(nil).to(author) }
-      specify { expect { book.author = 'string' }.to raise_error ActiveData::AssociationTypeMismatch }
-
-      context do
-        let(:other) { Author.new name: 'Other' }
-        before { book.author = other }
-        specify { expect { book.author = author }.to change { book.author }.from(other).to(author) }
-        specify { expect { book.author = nil }.to change { book.author }.from(other).to(nil) }
-      end
-    end
-
-    describe '#build_author' do
-      let(:author) { Author.new name: 'Author' }
-      specify { expect(book.build_author(name: 'Author')).to eq(author) }
-      specify { expect { book.build_author(name: 'Author') }.to change { book.author }.from(nil).to(author) }
-    end
-
-    describe '#create_author' do
-      let(:author) { Author.new name: 'Author' }
-      specify { expect(book.create_author(name: 'Author')).to eq(author) }
-      specify { expect { book.create_author(name: 'Author') }.to change { book.author }.from(nil).to(author) }
-    end
-
-    describe '#create_author!' do
-      let(:author) { Author.new name: 'Author' }
-      specify { expect(book.create_author!(name: 'Author')).to eq(author) }
-      specify { expect { book.create_author!(name: 'Author') }.to change { book.author }.from(nil).to(author) }
-    end
-
-    describe '#==' do
-      let(:author) { Author.new name: 'Author' }
-      let(:other) { Author.new name: 'Other' }
-
-      specify { expect(Book.new(author: author)).to eq(Book.new(author: author)) }
-      specify { expect(Book.new(author: author)).not_to eq(Book.new(author: other)) }
-      specify { expect(Book.new(author: author)).not_to eq(Book.new) }
-
-      context do
-        before { Book.send(:include, ActiveData::Model::Primary) }
-        let(:book) { Book.new(author: author) }
-
-        specify { expect(book).to eq(book.clone.tap { |b| b.update(author: author) }) }
-        specify { expect(book).to eq(book.clone.tap { |b| b.update(author: other) }) }
-      end
+      end.reflect_on_association(:projects).klass }.to raise_error 'Can not determine superclass for `User#projects` association'
     end
   end
 
-  describe '.embeds_many' do
+  context do
     before do
       stub_model(:project) do
         include ActiveData::Model::Lifecycle
-        attribute :title
+
+        attribute :title, type: String
+
+        validates :title, presence: true
       end
+
+      stub_model(:profile) do
+        include ActiveData::Model::Lifecycle
+
+        attribute :first_name, type: String
+        attribute :last_name, type: String
+      end
+
       stub_model(:user) do
         include ActiveData::Model::Associations
 
-        attribute :name
         embeds_many :projects
+        embeds_one :profile
       end
     end
+
     let(:user) { User.new }
 
-    context ':read, :write' do
-      before do
-        stub_model(:user) do
-          include ActiveData::Model::Persistence
-          include ActiveData::Model::Associations
+    its(:projects) { should = [] }
+    its(:profile) { should = nil }
 
-          attribute :name
-          embeds_many :projects,
-            read: ->(reflection, object) {
-              value = object.read_attribute(reflection.name)
-              JSON.parse(value) if value.present?
-            },
-            write: ->(reflection, object, value) {
-              object.write_attribute(reflection.name, value.to_json)
-            }
-        end
-      end
-
-      let(:user) { User.instantiate name: 'Rick', projects: [{title: 'Genesis'}].to_json }
-      let(:new_project1) { Project.new(title: 'Project 1') }
-      let(:new_project2) { Project.new(title: 'Project 2') }
-
-      specify { expect { user.projects.concat([new_project1, new_project2]) }
-        .to change { user.read_attribute(:projects) }
-        .from([{title: 'Genesis'}].to_json)
-        .to([{title: 'Genesis'}, {title: 'Project 1'}, {title: 'Project 2'}].to_json) }
+    describe '#association' do
+      specify { expect(user.association(:projects)).to be_a(ActiveData::Model::Associations::EmbedsMany) }
+      specify { expect(user.association(:profile)).to be_a(ActiveData::Model::Associations::EmbedsOne) }
     end
 
-    describe '#projects' do
-      specify { expect(user.projects).to eq([]) }
-
-      describe '#build' do
-        let(:project) { Project.new title: 'Project' }
-        specify { expect(user.projects.build(title: 'Project')).to eq(project) }
-        specify { expect { user.projects.build(title: 'Project') }.to change { user.projects }.from([]).to([project]) }
-      end
-
-      describe '#create' do
-        let(:project) { Project.new title: 'Project' }
-        specify { expect(user.projects.create(title: 'Project')).to eq(project) }
-        specify { expect { user.projects.create(title: 'Project') }.to change { user.projects }.from([]).to([project]) }
-      end
-
-      describe '#create!' do
-        let(:project) { Project.new title: 'Project' }
-        specify { expect(user.projects.create!(title: 'Project')).to eq(project) }
-        specify { expect { user.projects.create!(title: 'Project') }.to change { user.projects }.from([]).to([project]) }
-      end
-
-      describe '#reload' do
-        let(:project) { Project.new title: 'Project' }
-        before do
-          user.update(projects: [project])
-          user.save_associations!
-        end
-        before { user.projects.build }
-
-        specify { expect(user.projects.count).to eq(2) }
-        specify { expect(user.projects.reload).to eq([project]) }
-      end
-
-      describe '#concat' do
-        let(:project) { Project.new title: 'Project' }
-        specify { expect { user.projects.concat project }.to change { user.projects }.from([]).to([project]) }
-        specify { expect { user.projects.concat project, 'string' }.to raise_error ActiveData::AssociationTypeMismatch }
-
-        context do
-          let(:other) { Project.new title: 'Other' }
-          before { user.projects = [other] }
-          specify { expect { user.projects.concat project }.to change { user.projects }.from([other]).to([other, project]) }
-        end
-      end
+    describe '#association_names' do
+      specify { expect(user.association_names).to eq([:projects, :profile]) }
     end
 
-    describe '#projects=' do
+    describe '#save_associations!' do
       let(:project) { Project.new title: 'Project' }
-      specify { expect { user.projects = [] }.not_to change { user.projects }.from([]) }
-      specify { expect { user.projects = [project] }.to change { user.projects }.from([]).to([project]) }
-      specify { expect { user.projects = [project, 'string'] }.to raise_error ActiveData::AssociationTypeMismatch }
+      let(:profile) { Profile.new first_name: 'Name' }
+      let(:user) { User.new(profile: profile, projects: [project]) }
+
+      specify { expect { user.save_associations! }.to change { user.read_attribute(:profile) }.from(nil).to('first_name' => 'Name', 'last_name' => nil) }
+      specify { expect { user.save_associations! }.to change { user.read_attribute(:projects) }.from(nil).to([{'title' => 'Project'}]) }
 
       context do
-        let(:other) { Project.new title: 'Other' }
-        before { user.projects = [other] }
-        specify { expect { user.projects = [project] }.to change { user.projects }.from([other]).to([project]) }
-        specify { expect { user.projects = [] }.to change { user.projects }.from([other]).to([]) }
+        let(:project) { Project.new }
+        specify { expect { user.save_associations! }.to raise_error ActiveData::AssociationNotSaved }
       end
     end
 

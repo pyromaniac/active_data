@@ -34,7 +34,7 @@ module ActiveData
 
         def inspect
           attributes = _attributes.map { |name, attribute| "#{name}: #{attribute.type}" }.join(', ')
-          "#{super}(#{attributes.presence || '<no attributes>'})"
+          "#{inspect_model_name} (#{attributes.presence || 'no attributes'})"
         end
 
         def initialize_attributes
@@ -54,6 +54,10 @@ module ActiveData
 
         def generated_instance_attributes_methods
           @generated_instance_attributes_methods ||= Module.new.tap { |proxy| include proxy }
+        end
+
+        def inspect_model_name
+          name.presence || "[anonymous model]:#{object_id}"
         end
       end
 
@@ -118,7 +122,7 @@ module ActiveData
 
       def inspect
         attributes = attribute_names.map { |name| "#{name}: #{attribute_for_inspect(name)}" }.join(', ')
-        "#<#{super} #{attributes.presence || '<no attributes>'}>"
+        "#<#{self.class.send(:inspect_model_name)}:#{object_id} (#{attributes.presence || 'no attributes'})>"
       end
 
       def initialize_copy _

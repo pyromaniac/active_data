@@ -17,10 +17,9 @@ module ActiveData
         self.reflections = {}
 
         { embeds_many: Reflections::EmbedsMany, embeds_one: Reflections::EmbedsOne }.each do |(name, reflection_class)|
-          define_singleton_method name do |*args|
-            reflection = reflection_class.new *args
+          define_singleton_method name do |*args, &block|
+            reflection = reflection_class.new self, *args, &block
             attribute reflection.name, mode: :association
-            reflection.define_methods self
             self.reflections = reflections.merge(reflection.name => reflection)
           end
         end

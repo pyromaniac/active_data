@@ -32,9 +32,10 @@ describe ActiveData::Model::Attributes do
   end
 
   describe '.inspect' do
-    specify { expect(stub_model.inspect).to match(/#<Class:\w+>\(<no attributes>\)/) }
-    specify { expect(stub_model(:user).inspect).to eq('User(<no attributes>)') }
-    specify { expect(stub_model { attribute :count, type: Integer; attribute :object }.inspect).to match(/#<Class:\w+>\(count: Integer, object: Object\)/) }
+    specify { expect(stub_model.inspect).to match(/\[anonymous model\]:\d+ \(no attributes\)/) }
+    specify { expect(stub_model(:user).inspect).to eq('User (no attributes)') }
+    specify { expect(stub_model { attribute :count, type: Integer; attribute :object }.inspect).to match(/\[anonymous model\]:\d+ \(count: Integer, object: Object\)/) }
+    specify { expect(stub_model(:user) { attribute :count, type: Integer; attribute :object }.inspect).to match(/User \(count: Integer, object: Object\)/) }
   end
 
   describe '#assign_attributes' do
@@ -44,6 +45,13 @@ describe ActiveData::Model::Attributes do
     specify { expect { subject.assign_attributes(attributes) }.not_to change { subject.id } }
     specify { expect { subject.assign_attributes(attributes) }.to change { subject.hello } }
     specify { expect { subject.assign_attributes(attributes) }.to change { subject.name } }
+  end
+
+  describe '#inspect' do
+    specify { expect(stub_model.new.inspect).to match(/#<\[anonymous model\]:\d+:\d+ \(no attributes\)>/) }
+    specify { expect(stub_model(:user).new.inspect).to match(/#<User:\d+ \(no attributes\)>/) }
+    specify { expect(stub_model { attribute :count, type: Integer; attribute :object }.new.inspect).to match(/#<\[anonymous model\]:\d+:\d+ \(count: nil, object: nil\)>/) }
+    specify { expect(stub_model(:user) { attribute :count, type: Integer; attribute :object }.new.inspect).to match(/#<User:\d+ \(count: nil, object: nil\)>/) }
   end
 
   context do

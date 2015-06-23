@@ -17,8 +17,10 @@ module ActiveData
             ActiveData::Model::Associations::EmbedsOne
           end
 
-          def define_methods target
-            target.class_eval <<-EOS
+        private
+
+          def define_methods!
+            owner.class_eval <<-EOS
               def #{name} force_reload = false
                 association(:#{name}).reader(force_reload)
               end

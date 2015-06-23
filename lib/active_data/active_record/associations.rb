@@ -18,9 +18,9 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
-        {embeds_many: Reflections::EmbedsMany, embeds_one: Reflections::EmbedsOne}.each do |(name, reflection_class)|
-          define_singleton_method name do |name, options = {}|
-            reflection = reflection_class.new(name, options.reverse_merge(
+        { embeds_many: Reflections::EmbedsMany, embeds_one: Reflections::EmbedsOne }.each do |(name, reflection_class)|
+          define_singleton_method name do |name, options = {}, &block|
+            reflection = reflection_class.new(self, name, options.reverse_merge(
               read: ->(reflection, object) {
                 value = object.read_attribute(reflection.name)
                 JSON.parse(value) if value.present?
@@ -28,8 +28,7 @@ module ActiveData
               write: ->(reflection, object, value) {
                 object.send(:write_attribute, reflection.name, value ? value.to_json : nil)
               }
-            ))
-            reflection.define_methods self
+            ), &block)
             if ::ActiveRecord::Reflection.respond_to? :add_reflection
               ::ActiveRecord::Reflection.add_reflection self, reflection.name, reflection
             else

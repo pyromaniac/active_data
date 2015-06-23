@@ -25,7 +25,6 @@ describe ActiveData::ActiveRecord::Associations do
     end
   end
 
-
   its(:projects) { should = [] }
   its(:profile) { should = nil }
 
@@ -89,5 +88,45 @@ describe ActiveData::ActiveRecord::Associations do
         expect(user.reload.profile.first_name).to eq('google.com')
       end
     end
+  end
+
+  context 'class determine errors' do
+    specify do
+      expect { stub_class(:book, ActiveRecord::Base) do
+        embeds_one :author, class_name: 'Borogoves'
+      end.reflect_on_association(:author).klass }.to raise_error 'Can not determine class for `Book#author` association'
+    end
+
+    specify do
+      expect { stub_class(:user, ActiveRecord::Base) do
+        embeds_many :projects, class_name: 'Borogoves' do
+          attribute :title
+        end
+      end.reflect_on_association(:projects).klass }.to raise_error 'Can not determine superclass for `User#projects` association'
+    end
+  end
+
+  context 'on the fly' do
+    before do
+      stub_class(:user, ActiveRecord::Base) do
+        embeds_many :projects do
+          attribute :title, type: String
+        end
+        embeds_one :profile, class_name: 'Profile' do
+          attribute :age, type: Integer
+        end
+      end
+    end
+
+    specify { expect(User.reflect_on_association(:projects).klass).to eq(User::Project) }
+    specify { expect(User.new.projects).to eq([]) }
+    specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.projects).to be_a(ActiveData::Model::Associations::CollectionProxy) }
+    specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.read_attribute(:projects)).to eq([{title: 'Project'}].to_json) }
+
+    specify { expect(User.reflect_on_association(:profile).klass).to eq(User::Profile) }
+    specify { expect(User.reflect_on_association(:profile).klass).to be < Profile }
+    specify { expect(User.new.profile).to be_nil }
+    specify { expect(User.new.tap { |u| u.create_profile(first_name: 'Profile') }.profile).to be_a(User::Profile) }
+    specify { expect(User.new.tap { |u| u.create_profile(first_name: 'Profile') }.read_attribute(:profile)).to eq({first_name: 'Profile', last_name: nil, age: nil}.to_json) }
   end
 end
