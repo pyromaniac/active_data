@@ -2,10 +2,10 @@ module ActiveData
   module Model
     module Primary
       extend ActiveSupport::Concern
-      DEFAULT_PRIMARY_ATTRIBUTE_OPTIONS = {
+      DEFAULT_PRIMARY_ATTRIBUTE_OPTIONS = -> { {
         type: ActiveData::UUID,
-        default: ->{ ActiveData::UUID.random_create }
-      }
+        default: -> { ActiveData::UUID.random_create }
+      } }
 
       included do
         delegate :has_primary_attribute?, to: 'self.class'
@@ -14,7 +14,7 @@ module ActiveData
 
       module ClassMethods
         def primary_attribute options = {}
-          attribute ActiveData.primary_attribute, options.presence || DEFAULT_PRIMARY_ATTRIBUTE_OPTIONS
+          attribute ActiveData.primary_attribute, options.presence || DEFAULT_PRIMARY_ATTRIBUTE_OPTIONS.call
         end
 
         def has_primary_attribute?
