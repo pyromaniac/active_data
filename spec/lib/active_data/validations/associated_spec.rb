@@ -9,7 +9,6 @@ describe ActiveData::Validations do
 
       include ActiveData::Model::Persistence
       include ActiveData::Model::Associations
-      include ActiveData::Validations
 
       attribute :name
 
