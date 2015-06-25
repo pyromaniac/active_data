@@ -4,10 +4,17 @@ describe ActiveData::ActiveRecord::Associations do
   before do
     stub_model(:project) do
       include ActiveData::Model::Lifecycle
+      include ActiveData::Model::Associations
 
       attribute :title, type: String
 
       validates :title, presence: true
+
+      embeds_one :author do
+        attribute :name, String
+
+        validates :name, presence: true
+      end
     end
 
     stub_model(:profile) do
@@ -65,28 +72,38 @@ describe ActiveData::ActiveRecord::Associations do
       specify { expect { user.projects << Project.new }
         .not_to change { user.read_attribute(:projects) } }
       specify { expect { user.projects << Project.new(title: 'First') }
-        .to change { user.read_attribute(:projects) }.from(nil)
-        .to([{title: 'First'}].to_json) }
-      specify { expect { user.projects << Project.new(title: 'First') }
         .to change { user.projects.reload.count }.from(0).to(1) }
-      specify do
+      specify {
         user.projects << Project.new(title: 'First')
         user.save
-        expect(user.reload.projects.first.title).to eq('First')
+        expect(user.reload.projects.first.title).to eq('First') }
+
+      context do
+        let(:project) { Project.new(title: 'First') }
+        before { project.build_author(name: 'Author') }
+
+        specify { expect { user.projects << project }
+          .to change { user.attributes['projects'] }.from(nil)
+          .to([{title: 'First', author: {name: 'Author'}}].to_json) }
+        specify { expect { user.projects << project; user.save }
+          .to change { user.reload.attributes['projects'] }.from(nil)
+          .to([{title: 'First', author: {name: 'Author'}}].to_json) }
       end
     end
 
     describe '#profile' do
       specify { expect { user.profile = Profile.new(first_name: 'google.com') }
-        .to change { user.read_attribute(:profile) }.from(nil)
-        .to({first_name: 'google.com', last_name: nil}.to_json) }
-      specify { expect { user.profile = Profile.new(first_name: 'google.com') }
         .to change { user.profile }.from(nil).to(an_instance_of(Profile)) }
-      specify do
+      specify {
         user.profile = Profile.new(first_name: 'google.com')
         user.save
-        expect(user.reload.profile.first_name).to eq('google.com')
-      end
+        expect(user.reload.profile.first_name).to eq('google.com') }
+      specify { expect { user.profile = Profile.new(first_name: 'google.com') }
+        .to change { user.attributes['profile'] }.from(nil)
+        .to({first_name: 'google.com', last_name: nil}.to_json) }
+      specify { expect { user.profile = Profile.new(first_name: 'google.com'); user.save }
+        .to change { user.reload.attributes['profile'] }.from(nil)
+        .to({first_name: 'google.com', last_name: nil}.to_json) }
     end
   end
 

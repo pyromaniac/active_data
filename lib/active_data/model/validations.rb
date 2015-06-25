@@ -10,7 +10,13 @@ module ActiveData
       end
 
       def validate! context = nil
-        valid?(context) or raise ActiveData::ValidationError.new(self)
+        valid?(context) || raise_validation_error
+      end
+
+    protected
+
+      def raise_validation_error
+        raise(ActiveData::ValidationError.new(self))
       end
     end
   end

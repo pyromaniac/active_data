@@ -62,21 +62,34 @@ describe ActiveData::Model::Associations do
     before do
       stub_model(:project) do
         include ActiveData::Model::Lifecycle
+        include ActiveData::Model::Associations
 
-        attribute :title, type: String
+        attribute :title, String
 
         validates :title, presence: true
+
+        embeds_one :author do
+          attribute :name, String
+
+          validates :name, presence: true
+        end
       end
 
       stub_model(:profile) do
         include ActiveData::Model::Lifecycle
 
-        attribute :first_name, type: String
-        attribute :last_name, type: String
+        attribute :first_name, String
+        attribute :last_name, String
+
+        validates :first_name, presence: true
       end
 
       stub_model(:user) do
         include ActiveData::Model::Associations
+
+        attribute :login
+
+        validates :login, presence: true
 
         embeds_many :projects
         embeds_one :profile
@@ -88,6 +101,30 @@ describe ActiveData::Model::Associations do
     its(:projects) { should = [] }
     its(:profile) { should = nil }
 
+    describe '#==' do
+      let(:project) { Project.new title: 'Project' }
+      let(:other) { Project.new title: 'Other' }
+
+      specify { expect(User.new(projects: [project])).to eq(User.new(projects: [project])) }
+      specify { expect(User.new(projects: [project])).not_to eq(User.new(projects: [other])) }
+      specify { expect(User.new(projects: [project])).not_to eq(User.new) }
+
+      specify { expect(User.new(projects: [project])).to eql(User.new(projects: [project])) }
+      specify { expect(User.new(projects: [project])).not_to eql(User.new(projects: [other])) }
+      specify { expect(User.new(projects: [project])).not_to eql(User.new) }
+
+      context do
+        before { User.send(:include, ActiveData::Model::Primary) }
+        let(:user) { User.new(projects: [project]) }
+
+        specify { expect(user).to eq(user.clone.tap { |b| b.projects(author: project) }) }
+        specify { expect(user).to eq(user.clone.tap { |b| b.projects(author: other) }) }
+
+        specify { expect(user).to eql(user.clone.tap { |b| b.projects(author: project) }) }
+        specify { expect(user).to eql(user.clone.tap { |b| b.projects(author: other) }) }
+      end
+    end
+
     describe '#association' do
       specify { expect(user.association(:projects)).to be_a(ActiveData::Model::Associations::EmbedsMany) }
       specify { expect(user.association(:profile)).to be_a(ActiveData::Model::Associations::EmbedsOne) }
@@ -98,12 +135,15 @@ describe ActiveData::Model::Associations do
     end
 
     describe '#save_associations!' do
-      let(:project) { Project.new title: 'Project' }
       let(:profile) { Profile.new first_name: 'Name' }
+      let(:project) { Project.new title: 'Project' }
       let(:user) { User.new(profile: profile, projects: [project]) }
+      before { project.build_author(name: 'Author') }
 
-      specify { expect { user.save_associations! }.to change { user.read_attribute(:profile) }.from(nil).to('first_name' => 'Name', 'last_name' => nil) }
-      specify { expect { user.save_associations! }.to change { user.read_attribute(:projects) }.from(nil).to([{'title' => 'Project'}]) }
+      specify { expect { user.save_associations! }.to change { user.attributes['profile'] }
+        .from(nil).to('first_name' => 'Name', 'last_name' => nil) }
+      specify { expect { user.save_associations! }.to change { user.attributes['projects'] }
+        .from(nil).to([{ 'title' => 'Project', 'author' => { 'name' => 'Author' } }]) }
 
       context do
         let(:project) { Project.new }
@@ -111,20 +151,68 @@ describe ActiveData::Model::Associations do
       end
     end
 
-    describe '#==' do
+    describe '#instantiate' do
+      before { User.send(:include, ActiveData::Model::Persistence) }
+      let(:profile) { Profile.new first_name: 'Name' }
       let(:project) { Project.new title: 'Project' }
-      let(:other) { Project.new title: 'Other' }
+      let(:user) { User.new(profile: profile, projects: [project]) }
+      before { project.build_author(name: 'Author') }
 
-      specify { expect(User.new(projects: [project])).to eq(User.new(projects: [project])) }
-      specify { expect(User.new(projects: [project])).not_to eq(User.new(projects: [other])) }
-      specify { expect(User.new(projects: [project])).not_to eq(User.new) }
+      specify { expect(User.instantiate(JSON.parse(user.to_json))).to eq(user) }
+      specify { expect(User.instantiate(JSON.parse(user.to_json))
+        .tap { |u| u.projects.first.author.name = 'Other' }).not_to eq(user) }
+    end
+
+    context '#validate_ancestry, #valid_ancestry?, #invalid_ancestry?' do
+      before { User.send(:include, ActiveData::Model::Persistence) }
+      let(:profile) { Profile.new first_name: 'Name' }
+      let(:project) { Project.new title: 'Project' }
+      let(:projects) { [project] }
+      let(:user) { User.new(login: 'Login', profile: profile, projects: projects) }
+      let(:author_attributes) { { name: 'Author' } }
+      before { project.build_author(author_attributes) }
+
+      specify { expect(user.validate_ancestry).to eq(true) }
+      specify { expect(user.validate_ancestry!).to eq(true) }
+      specify { expect { user.validate_ancestry! }.not_to raise_error }
+      specify { expect(user.valid_ancestry?).to eq(true) }
+      specify { expect(user.invalid_ancestry?).to eq(false) }
+      specify { expect{ user.validate_ancestry }.not_to change { user.errors.messages } }
 
       context do
-        before { User.send(:include, ActiveData::Model::Primary) }
-        let(:user) { User.new(projects: [project]) }
+        let(:author_attributes) { {} }
+        specify { expect(user.validate_ancestry).to eq(false) }
+        specify { expect { user.validate_ancestry! }.to raise_error ActiveData::ValidationError }
+        specify { expect(user.valid_ancestry?).to eq(false) }
+        specify { expect(user.invalid_ancestry?).to eq(true) }
+        specify { expect{ user.validate_ancestry }.to change { user.errors.messages }
+          .to(projects: [author: { name: ["can't be blank"] }]) }
+      end
 
-        specify { expect(user).to eq(user.clone.tap { |b| b.projects(author: project) }) }
-        specify { expect(user).to eq(user.clone.tap { |b| b.projects(author: other) }) }
+      context do
+        let(:profile) { Profile.new }
+        specify { expect(user.validate_ancestry).to eq(false) }
+        specify { expect { user.validate_ancestry! }.to raise_error ActiveData::ValidationError }
+        specify { expect(user.valid_ancestry?).to eq(false) }
+        specify { expect(user.invalid_ancestry?).to eq(true) }
+        specify { expect{ user.validate_ancestry }.to change { user.errors.messages }
+          .to(profile: { first_name: ["can't be blank"] }) }
+      end
+
+      context do
+        let(:projects) { [project, Project.new] }
+        specify { expect(user.validate_ancestry).to eq(false) }
+        specify { expect { user.validate_ancestry! }.to raise_error ActiveData::ValidationError }
+        specify { expect(user.valid_ancestry?).to eq(false) }
+        specify { expect(user.invalid_ancestry?).to eq(true) }
+        specify { expect{ user.validate_ancestry }.to change { user.errors.messages }
+          .to(projects: [nil, { title: ["can't be blank"] }]) }
+
+        context do
+          before { user.update(login: '') }
+          specify { expect{ user.validate_ancestry }.to change { user.errors.messages }
+            .to(projects: [nil, { title: ["can't be blank"] }], login: ["can't be blank"]) }
+        end
       end
     end
   end

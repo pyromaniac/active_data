@@ -49,6 +49,13 @@ module ActiveData
         end
       end
 
+      def == other
+        super && association_names.all? do |association|
+          public_send(association) == other.public_send(association)
+        end
+      end
+      alias_method :eql?, :==
+
       def association name
         @_associations ||= {}
         @_associations[name.to_sym] ||= self.class.reflect_on_association(name).build_association(self)
@@ -67,10 +74,42 @@ module ActiveData
         end
       end
 
-      def == other
-        super && association_names.all? do |association|
-          public_send(association) == other.public_send(association)
+      def valid_ancestry?
+        errors.clear
+        association_names.all? do |name|
+          association = association(name)
+          if association.collection?
+            association.target.each.with_index do |object, i|
+              object.respond_to?(:valid_ancestry?) ?
+                object.valid_ancestry? :
+                object.valid?
+
+              if object.errors.present?
+                (errors.messages[name] ||= [])[i] = object.errors.messages
+              end
+            end
+          else
+            if association.target
+              association.target.respond_to?(:valid_ancestry?) ?
+                association.target.valid_ancestry? :
+                association.target.valid?
+
+              if association.target.errors.present?
+                errors.messages[name] = association.target.errors.messages
+              end
+            end
+          end
         end
+        run_validations!
+      end
+      alias_method :validate_ancestry, :valid_ancestry?
+
+      def invalid_ancestry?
+        !valid_ancestry?
+      end
+
+      def validate_ancestry!
+        valid_ancestry? || raise_validation_error
       end
     end
   end

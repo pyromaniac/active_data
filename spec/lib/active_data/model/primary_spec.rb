@@ -14,10 +14,12 @@ describe ActiveData::Model::Primary do
     specify { expect(model.new.has_primary_attribute?).to eq(false) }
     specify { expect { model.new.primary_attribute }.to raise_error NoMethodError }
     specify { expect(model.new(name: 'Hello')).to eq(model.new(name: 'Hello')) }
+    specify { expect(model.new(name: 'Hello')).to eql(model.new(name: 'Hello')) }
 
     context do
       let(:object) { model.new(name: 'Hello') }
       specify { expect(object).not_to eq(object.clone.tap { |o| o.update(name: 'World') }) }
+      specify { expect(object).not_to eql(object.clone.tap { |o| o.update(name: 'World') }) }
     end
   end
 
@@ -35,10 +37,12 @@ describe ActiveData::Model::Primary do
     specify { expect(model.new.has_primary_attribute?).to eq(true) }
     specify { expect(model.new.primary_attribute).to be_a(ActiveData::UUID) }
     specify { expect(model.new(name: 'Hello')).not_to eq(model.new(name: 'Hello')) }
+    specify { expect(model.new(name: 'Hello')).not_to eql(model.new(name: 'Hello')) }
 
     context do
       let(:object) { model.new(name: 'Hello') }
       specify { expect(object).to eq(object.clone.tap { |o| o.update(name: 'World') }) }
+      specify { expect(object).to eql(object.clone.tap { |o| o.update(name: 'World') }) }
     end
   end
 
@@ -56,11 +60,14 @@ describe ActiveData::Model::Primary do
     specify { expect(model.new.has_primary_attribute?).to eq(true) }
     specify { expect(model.new.primary_attribute).to be_nil }
     specify { expect(model.new(name: 'Hello')).not_to eq(model.new(name: 'Hello')) }
+    specify { expect(model.new(name: 'Hello')).not_to eql(model.new(name: 'Hello')) }
     specify { expect(model.new(name: 'Hello').tap { |o| o.id = 1 }).not_to eq(model.new(name: 'Hello').tap { |o| o.id = 2 }) }
+    specify { expect(model.new(name: 'Hello').tap { |o| o.id = 1 }).not_to eql(model.new(name: 'Hello').tap { |o| o.id = 2 }) }
 
     context do
       let(:object) { model.new(name: 'Hello').tap { |o| o.id = 1 } }
       specify { expect(object).to eq(object.clone.tap { |o| o.update(name: 'World') }) }
+      specify { expect(object).to eql(object.clone.tap { |o| o.update(name: 'World') }) }
     end
   end
 end

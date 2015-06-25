@@ -14,7 +14,7 @@ module ActiveData
         class_attribute :_attributes, instance_writer: false
         self._attributes = {}
 
-        delegate :attribute_default, :has_attribute?, to: 'self.class'
+        delegate :attribute_names, :attribute_default, :has_attribute?, to: 'self.class'
 
         [:collection, :dictionary, :localized].each do |mode|
           define_singleton_method mode do |*args, &block|
@@ -37,6 +37,16 @@ module ActiveData
           attribute
         end
 
+        def attribute_names(include_associations = true)
+          if include_associations
+            _attributes.keys
+          else
+            _attributes.map do |name, attribute|
+              name unless attribute.is_a?(ActiveData::Model::Attributes::Association)
+            end.compact
+          end
+        end
+
         def has_attribute? name
           _attributes.key? name.to_s
         end
@@ -47,7 +57,7 @@ module ActiveData
         end
 
         def initialize_attributes
-          Hash[_attributes.keys.zip]
+          Hash[attribute_names.zip]
         end
 
       private
@@ -70,14 +80,15 @@ module ActiveData
         end
       end
 
-      def initialize attributes = {}
+      def initialize attrs = {}
         @attributes = self.class.initialize_attributes
-        assign_attributes attributes
+        assign_attributes attrs
       end
 
       def == other
-        other.instance_of?(self.class) && other.attributes == attributes
+        super || other.instance_of?(self.class) && other.attributes(false) == attributes(false)
       end
+      alias_method :eql?, :==
 
       def write_attribute name, value
         name = name.to_s
@@ -88,9 +99,7 @@ module ActiveData
 
       def read_attribute name
         name = name.to_s
-        if attributes_cache.key? name
-          attributes_cache[name]
-        else
+        attributes_cache.fetch(name) do
           attributes_cache[name] = _attributes[name].read_value(@attributes[name], self)
         end
       end
@@ -106,21 +115,17 @@ module ActiveData
         !value.nil? && !(value.respond_to?(:empty?) && value.empty?)
       end
 
-      def attributes
-        Hash[attribute_names.map { |name| [name, public_send(name)] }]
+      def attributes(include_associations = true)
+        Hash[attribute_names(include_associations).map { |name| [name, read_attribute(name)] }]
       end
 
-      def attribute_names
-        @attributes.keys
-      end
-
-      def update attributes
-        assign_attributes(attributes)
+      def update attrs
+        assign_attributes(attrs)
       end
       alias_method :update_attributes, :update
 
-      def assign_attributes attributes
-        (attributes.presence || {}).each do |(name, value)|
+      def assign_attributes attrs
+        (attrs.presence || {}).each do |(name, value)|
           name = name.to_s
           if (has_attribute?(name) || respond_to?("#{name}=")) && name != ActiveData.primary_attribute.to_s
             public_send("#{name}=", value)
@@ -130,7 +135,7 @@ module ActiveData
       alias_method :attributes=, :assign_attributes
 
       def inspect
-        attributes = attribute_names.map { |name| "#{name}: #{attribute_for_inspect(name)}" }.join(', ')
+        attributes = attribute_names(false).map { |name| "#{name}: #{attribute_for_inspect(name)}" }.join(', ')
         "#<#{self.class.send(:inspect_model_name)}:#{object_id} (#{attributes.presence || 'no attributes'})>"
       end
 

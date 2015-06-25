@@ -10,6 +10,7 @@ module ActiveData
       included do
         delegate :has_primary_attribute?, to: 'self.class'
         alias_method_chain :==, :primary
+        alias_method :eql?, :==
       end
 
       module ClassMethods
