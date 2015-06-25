@@ -7,6 +7,7 @@ require 'active_data/model/lifecycle'
 require 'active_data/model/persistence'
 require 'active_data/model/callbacks'
 require 'active_data/model/associations'
+require 'active_data/model/validations'
 
 module ActiveData
   module Model
@@ -17,12 +18,12 @@ module ActiveData
       extend ActiveModel::Translation
 
       include ActiveModel::Conversion
-      include ActiveModel::Validations
       include ActiveModel::Serialization
       include ActiveModel::Serializers::JSON
 
       include Conventions
       include Attributes
+      include Validations
     end
   end
 end

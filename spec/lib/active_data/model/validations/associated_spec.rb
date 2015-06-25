@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe ActiveData::Validations do
+describe ActiveData::Model::Validations::AssociatedValidator do
   let(:main) do
-    stub_model do
-      def self.model_name
-        ActiveModel::Name.new(self, nil, "Main")
-      end
+    stub_model(:main) do
+      # def self.model_name
+      #   ActiveModel::Name.new(self, nil, "Main")
+      # end
 
       include ActiveData::Model::Persistence
       include ActiveData::Model::Associations

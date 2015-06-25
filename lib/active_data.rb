@@ -5,6 +5,7 @@ require 'active_support/concern'
 require 'singleton'
 
 require 'active_model'
+
 require 'active_data/version'
 require 'active_data/errors'
 require 'active_data/config'
@@ -18,7 +19,6 @@ module ActiveData
 end
 
 require 'active_data/model'
-require 'active_data/validations'
 
 ActiveSupport.on_load :active_record do
   require 'active_data/active_record/associations'

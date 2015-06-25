@@ -7,10 +7,6 @@ module ActiveData
         self.include_root_in_json = ActiveData.include_root_in_json
       end
 
-      def errors
-        @errors ||= ActiveModel::Errors.new(self)
-      end
-
       def persisted?
         false
       end

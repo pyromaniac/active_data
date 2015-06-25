@@ -218,7 +218,7 @@ module ActiveData
       #
       def save! options = {}, &block
         raise ActiveData::UnsavableObject unless block || savable?
-        raise ActiveData::ValidationError unless valid?
+        validate!
         save_object(&block) or raise ActiveData::ObjectNotSaved
       end
 

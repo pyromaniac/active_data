@@ -12,7 +12,6 @@ module ActiveData
 
       included do
         include NestedAttributes
-        include ActiveData::Validations
 
         class_attribute :reflections, instance_reader: false, instance_writer: false
         self.reflections = {}
