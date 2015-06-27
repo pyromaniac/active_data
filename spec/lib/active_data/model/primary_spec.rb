@@ -69,5 +69,11 @@ describe ActiveData::Model::Primary do
       specify { expect(object).to eq(object.clone.tap { |o| o.update(name: 'World') }) }
       specify { expect(object).to eql(object.clone.tap { |o| o.update(name: 'World') }) }
     end
+
+    context do
+      let(:object) { model.new(name: 'Hello') }
+      specify { expect(object).to eq(object) }
+      specify { expect(object).to eql(object) }
+    end
   end
 end

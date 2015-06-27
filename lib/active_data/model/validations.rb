@@ -16,7 +16,7 @@ module ActiveData
     protected
 
       def raise_validation_error
-        raise(ActiveData::ValidationError.new(self))
+        raise ActiveData::ValidationError.new(self)
       end
     end
   end

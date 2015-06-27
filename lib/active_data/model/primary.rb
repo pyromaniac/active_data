@@ -30,7 +30,9 @@ module ActiveData
       define_method :'=_with_primary=' do |other|
         other.instance_of?(self.class) &&
           has_primary_attribute? ?
-            primary_attribute && primary_attribute == other.primary_attribute :
+            primary_attribute ?
+              primary_attribute == other.primary_attribute :
+              object_id == other.object_id :
             send(:'=_without_primary=', other)
       end
     end
