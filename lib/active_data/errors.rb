@@ -55,4 +55,17 @@ You can define it with:
       EOS
     end
   end
+
+  class TypecasterMissing < NoMethodError
+    def initialize *classes
+      super <<-EOS
+Could not find typecaster for #{classes}
+You can define it with:
+
+  ActiveData.typecaster('#{classes.first}') do |value|
+    # do some staff with value and options
+  end
+      EOS
+    end
+  end
 end

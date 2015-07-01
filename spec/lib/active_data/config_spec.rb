@@ -23,9 +23,18 @@ describe ActiveData::Config do
   end
 
   describe '#normalizer' do
-    its(:_normalizers) { should == {} }
     specify { expect { subject.normalizer(:name) { } }
       .to change { subject.normalizer(:name) rescue nil }.from(nil).to(an_instance_of(Proc)) }
     specify { expect { subject.normalizer(:wrong) }.to raise_error ActiveData::NormalizerMissing }
+  end
+
+  describe '#typecaster' do
+    specify { expect { subject.typecaster('Object') { } }
+      .to change { subject.typecaster(Time, Object) rescue nil }.from(nil).to(an_instance_of(Proc)) }
+    specify { expect { subject.typecaster('Object') { } }
+      .to change { subject.typecaster('time', 'object') rescue nil }.from(nil).to(an_instance_of(Proc)) }
+    specify { expect { subject.typecaster('Object') { } }
+      .to change { subject.typecaster(Object) rescue nil }.from(nil).to(an_instance_of(Proc)) }
+    specify { expect { subject.typecaster(Object) }.to raise_error ActiveData::TypecasterMissing }
   end
 end

@@ -1,4 +1,3 @@
-require 'active_data/model/extensions'
 require 'active_data/model/conventions'
 require 'active_data/model/attributes'
 require 'active_data/model/scopes'

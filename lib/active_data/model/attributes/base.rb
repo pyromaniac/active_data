@@ -14,11 +14,16 @@ module ActiveData
         end
 
         def type
-          @type ||= options[:type] || Object
+          @type ||= options[:type].is_a?(Class) ? options[:type] :
+            options[:type].present? ? options[:type].to_s.camelize.constantize : Object
         end
 
         def type_cast value
-          value.instance_of?(type) ? value : type.active_data_type_cast(value)
+          if value.instance_of?(type)
+            value
+          else
+            ActiveData.typecaster(type_parent_classes).call(value, type) unless value.nil?
+          end
         end
 
         def enum
@@ -136,6 +141,12 @@ module ActiveData
               end
             EOS
           end
+        end
+
+      private
+
+        def type_parent_classes
+          @type_parent_classes ||= type.ancestors.grep(Class)
         end
       end
     end

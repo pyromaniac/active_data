@@ -2,10 +2,11 @@ module ActiveData
   class Config
     include Singleton
 
-    attr_accessor :include_root_in_json, :i18n_scope, :primary_attribute, :_normalizers
+    attr_accessor :include_root_in_json, :i18n_scope, :primary_attribute,
+      :_normalizers, :_typecasters
 
     def self.delegated
-      public_instance_methods - self.superclass.public_instance_methods - Singleton.public_instance_methods
+      public_instance_methods - superclass.public_instance_methods - Singleton.public_instance_methods
     end
 
     def initialize
@@ -13,6 +14,7 @@ module ActiveData
       @i18n_scope = :active_data
       @primary_attribute = :id
       @_normalizers = {}
+      @_typecasters = {}
     end
 
     def normalizer name, &block
@@ -20,6 +22,17 @@ module ActiveData
         _normalizers[name.to_sym] = block
       else
         _normalizers[name.to_sym] or raise NormalizerMissing.new(name)
+      end
+    end
+
+    def typecaster *classes, &block
+      classes = classes.flatten
+      if block
+        _typecasters[classes.first.to_s.camelize] = block
+      else
+        _typecasters[classes.detect do |klass|
+          _typecasters[klass.to_s.camelize]
+        end.to_s.camelize] or raise TypecasterMissing.new(*classes)
       end
     end
   end

@@ -122,7 +122,7 @@ module ActiveData
           end
 
           def self.has_destroy_flag?(hash)
-            Boolean.active_data_type_cast(hash[DESTROY_ATTRIBUTE])
+            ActiveData.typecaster(Boolean).call(hash[DESTROY_ATTRIBUTE])
           end
 
           def self.reject_new_object?(object, association_name, attributes)

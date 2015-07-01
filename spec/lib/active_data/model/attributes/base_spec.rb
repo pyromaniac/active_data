@@ -13,6 +13,7 @@ describe ActiveData::Model::Attributes::Base do
   describe '#type' do
     specify { expect(build_field.type).to eq(Object) }
     specify { expect(build_field(type: String).type).to eq(String) }
+    specify { expect(build_field(type: :time).type).to eq(Time) }
   end
 
   describe '#type_cast' do
