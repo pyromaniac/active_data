@@ -1,3 +1,4 @@
+require 'tzinfo'
 require 'active_support'
 require 'active_support/deprecation'
 require 'active_support/core_ext'
@@ -84,7 +85,7 @@ module ActiveData
     case value
     when ActiveSupport::TimeZone
       value
-    when TZInfo::Timezone
+    when ::TZInfo::Timezone
       ActiveSupport::TimeZone[value.name]
     when String, Numeric, ActiveSupport::Duration
       value = Float(value) rescue value
