@@ -7,7 +7,7 @@ module ActiveData
 
         def read_value value, context
           normalize(Array.wrap(value).map do |value|
-            defaultize(enumerize(type_cast(value)), context)
+            defaultize(enumerize(type_cast(value), context), context)
           end, context)
         end
 

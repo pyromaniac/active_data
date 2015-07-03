@@ -23,18 +23,24 @@ describe ActiveData::Model::Attributes::Base do
   end
 
   describe '#enum' do
-    specify { expect(build_field.enum).to eq([].to_set) }
-    specify { expect(build_field(enum: []).enum).to eq([].to_set) }
-    specify { expect(build_field(enum: 'hello').enum).to eq(['hello'].to_set) }
-    specify { expect(build_field(enum: ['hello', 'world']).enum).to eq(['hello', 'world'].to_set) }
-    specify { expect(build_field(enum: [1..5]).enum).to eq([1..5].to_set) }
-    specify { expect(build_field(enum: 1..5).enum).to eq((1..5).to_a.to_set) }
+    specify { expect(build_field.enum(self)).to eq([].to_set) }
+    specify { expect(build_field(enum: []).enum(self)).to eq([].to_set) }
+    specify { expect(build_field(enum: 'hello').enum(self)).to eq(['hello'].to_set) }
+    specify { expect(build_field(enum: ['hello', 'world']).enum(self)).to eq(['hello', 'world'].to_set) }
+    specify { expect(build_field(enum: [1..5]).enum(self)).to eq([1..5].to_set) }
+    specify { expect(build_field(enum: 1..5).enum(self)).to eq((1..5).to_a.to_set) }
+    specify { expect(build_field(enum: -> { 1..5 }).enum(self)).to eq((1..5).to_a.to_set) }
+    specify { expect(build_field(enum: -> { 'hello' }).enum(self)).to eq(['hello'].to_set) }
+    specify { expect(build_field(enum: -> { ['hello', 42] }).enum(self)).to eq(['hello', 42].to_set) }
   end
 
   describe '#enumerize' do
-    specify { expect(build_field.enumerize('hello')).to eq('hello') }
-    specify { expect(build_field(enum: ['hello', 42]).enumerize('hello')).to eq('hello') }
-    specify { expect(build_field(enum: ['hello', 42]).enumerize('world')).to eq(nil) }
+    specify { expect(build_field.enumerize('hello', self)).to eq('hello') }
+    specify { expect(build_field(enum: ['hello', 42]).enumerize('hello', self)).to eq('hello') }
+    specify { expect(build_field(enum: ['hello', 42]).enumerize('world', self)).to eq(nil) }
+    specify { expect(build_field(enum: -> { 'hello' }).enumerize('hello', self)).to eq('hello') }
+    specify { expect(build_field(enum: -> { 1..5 }).enumerize(2, self)).to eq(2) }
+    specify { expect(build_field(enum: -> { 1..5 }).enumerize(42, self)).to eq(nil) }
   end
 
   describe '#default' do
