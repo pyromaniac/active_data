@@ -26,14 +26,40 @@ module ActiveData
           end
         end
 
-        def enum
-          enum = options[:enum] || options[:in]
-          enum = enum.to_a if enum.respond_to?(:to_a)
-          @enum ||= Array.wrap(enum).to_set
+        def enum context
+          if enumerizer.is_a?(Proc)
+            enum = if enumerizer.arity == 0
+              context.instance_exec(&enumerizer)
+            else
+              context.instance_exec(context, &enumerizer)
+            end
+
+            case enum
+            when Range
+              enum.to_a.to_set
+            when Set
+              enum
+            else
+              Array.wrap(enum).to_set
+            end
+          else
+            @enum ||= begin
+              enum = enumerizer.respond_to?(:to_a) ? enumerizer.to_a : enumerizer
+              Array.wrap(enum).to_set
+            end
+          end
         end
 
-        def enumerize value
-          value if enum.none? || enum.include?(value)
+        def enumerize value, context
+          value if enum(context).none? || enum(context).include?(value)
+        end
+
+        def enumerizer
+          @enumerizer ||= options[:enum] || options[:in]
+        end
+
+        def enumerizer?
+          @enumerizer_ ||= options.key?(:enum) || options.key?(:in)
         end
 
         def default
@@ -98,7 +124,7 @@ module ActiveData
         end
 
         def read_value value, context
-          normalize(defaultize(enumerize(type_cast(value)), context), context)
+          normalize(defaultize(enumerize(type_cast(value), context), context), context)
         end
 
         def read_value_before_type_cast value, context
@@ -124,7 +150,7 @@ module ActiveData
             end
 
             def #{name}_values
-              _attributes['#{name}'].enum.to_a
+              _attributes['#{name}'].enum(self).to_a
             end
 
             def #{name}_default
@@ -134,10 +160,10 @@ module ActiveData
         end
 
         def generate_class_methods context
-          if enum
+          if enumerizer? && !enumerizer.is_a?(Proc)
             context.class_eval <<-EOS
               def #{name}_values
-                _attributes['#{name}'].enum.to_a
+                _attributes['#{name}'].enum(nil).to_a
               end
             EOS
           end
