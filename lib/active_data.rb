@@ -63,7 +63,7 @@ module ActiveData
   typecaster('Date') do |value|
     begin
       value.to_date
-    rescue ArgumentError
+    rescue ArgumentError, NoMethodError
       nil
     end
   end

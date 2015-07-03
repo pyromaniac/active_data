@@ -261,8 +261,8 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { expect { association.writer([Dummy.new]) }
       .to raise_error ActiveData::AssociationTypeMismatch }
 
-    specify { expect { association.writer(nil) }.to raise_error }
-    specify { expect { association.writer(new_project1) }.to raise_error }
+    specify { expect { association.writer(nil) }.to raise_error NoMethodError }
+    specify { expect { association.writer(new_project1) }.to raise_error NoMethodError }
     specify { expect(association.writer([])).to eq([]) }
 
     specify { expect(association.writer([new_project1])).to eq([new_project1]) }
@@ -285,7 +285,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { expect { existing_association.writer([new_project1, Dummy.new, new_project2]) rescue nil }
       .not_to change { existing_association.reader } }
 
-    specify { expect { existing_association.writer(nil) }.to raise_error }
+    specify { expect { existing_association.writer(nil) }.to raise_error NoMethodError }
     specify { expect { existing_association.writer(nil) rescue nil }
       .not_to change { existing_user.read_attribute(:projects) } }
     specify { expect { existing_association.writer(nil) rescue nil }
@@ -314,7 +314,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { expect { association.concat(Dummy.new) }
       .to raise_error ActiveData::AssociationTypeMismatch }
 
-    specify { expect { association.concat(nil) }.to raise_error }
+    specify { expect { association.concat(nil) }.to raise_error ActiveData::AssociationTypeMismatch }
     specify { expect(association.concat([])).to eq([]) }
     specify { expect(existing_association.concat([])).to eq(existing_user.projects) }
     specify { expect(existing_association.concat).to eq(existing_user.projects) }
