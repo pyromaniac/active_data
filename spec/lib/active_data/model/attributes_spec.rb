@@ -4,10 +4,9 @@ require 'spec_helper'
 describe ActiveData::Model::Attributes do
   let(:model) do
     stub_model do
-      include ActiveData::Model::Primary
       include ActiveData::Model::Associations
 
-      primary_attribute
+      attribute :id
       attribute :full_name
 
       embeds_one(:embedded) {}
@@ -75,16 +74,16 @@ describe ActiveData::Model::Attributes do
   describe '#attributes' do
     specify { expect(stub_model.new.attributes).to eq({})  }
     specify { expect(model.new(full_name: 'Name').attributes)
-      .to match({'id' => instance_of(ActiveData::UUID), 'full_name' => 'Name', 'embedded' => nil, 'embeddeds' => nil})  }
+      .to match({'id' => nil, 'full_name' => 'Name', 'embedded' => nil, 'embeddeds' => nil})  }
     specify { expect(model.new(full_name: 'Name').attributes(false))
-      .to match({'id' => instance_of(ActiveData::UUID), 'full_name' => 'Name'})  }
+      .to match({'id' => nil, 'full_name' => 'Name'})  }
   end
 
   describe '#assign_attributes' do
     let(:attributes) { { id: 42, full_name: 'Name', missed: 'value' } }
     subject { model.new }
 
-    specify { expect { subject.assign_attributes(attributes) }.not_to change { subject.id } }
+    specify { expect { subject.assign_attributes(attributes) }.to change { subject.id }.to(42) }
     specify { expect { subject.assign_attributes(attributes) }.to change { subject.full_name }.to('Name') }
   end
 

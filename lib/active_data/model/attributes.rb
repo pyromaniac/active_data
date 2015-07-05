@@ -127,7 +127,8 @@ module ActiveData
       def assign_attributes attrs
         (attrs.presence || {}).each do |(name, value)|
           name = name.to_s
-          if (has_attribute?(name) || respond_to?("#{name}=")) && name != ActiveData.primary_attribute.to_s
+          sanitize = respond_to?(:primary_attribute) && name == ActiveData.primary_attribute.to_s
+          if (has_attribute?(name) || respond_to?("#{name}=")) && !sanitize
             public_send("#{name}=", value)
           end
         end

@@ -38,6 +38,8 @@ describe ActiveData::Model::Primary do
     specify { expect(model.new.primary_attribute).to be_a(ActiveData::UUID) }
     specify { expect(model.new(name: 'Hello')).not_to eq(model.new(name: 'Hello')) }
     specify { expect(model.new(name: 'Hello')).not_to eql(model.new(name: 'Hello')) }
+    specify { expect(model.new(id: 0).id).not_to eq(ActiveData::UUID.parse_int(0)) }
+    specify { expect(model.new.tap { |o| o.id = 0 }.id).to eq(ActiveData::UUID.parse_int(0)) }
 
     context do
       let(:object) { model.new(name: 'Hello') }
@@ -63,6 +65,8 @@ describe ActiveData::Model::Primary do
     specify { expect(model.new(name: 'Hello')).not_to eql(model.new(name: 'Hello')) }
     specify { expect(model.new(name: 'Hello').tap { |o| o.id = 1 }).not_to eq(model.new(name: 'Hello').tap { |o| o.id = 2 }) }
     specify { expect(model.new(name: 'Hello').tap { |o| o.id = 1 }).not_to eql(model.new(name: 'Hello').tap { |o| o.id = 2 }) }
+    specify { expect(model.new(id: 1).id).to be_nil }
+    specify { expect(model.new.tap { |o| o.id = 1 }.id).to eq(1) }
 
     context do
       let(:object) { model.new(name: 'Hello').tap { |o| o.id = 1 } }
