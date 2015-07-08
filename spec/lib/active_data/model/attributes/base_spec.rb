@@ -173,7 +173,7 @@ describe ActiveData::Model::Attributes::Base do
         specify { expect(build_field(normalizer: [:strip, { trim: { length: 4 } }]).normalize(' hello ', self)).to eq('hel') }
         specify { expect(build_field(normalizer: {strip: { }, trim: { length: 4 } }).normalize(' hello ', self)).to eq('hel') }
         specify { expect(build_field(normalizer: [:strip, { trim: { length: 4 } }, ->(v){ v.last(2) }])
-        .normalize(' hello ', self)).to eq('el') }
+          .normalize(' hello ', self)).to eq('el') }
       end
     end
   end

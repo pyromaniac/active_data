@@ -109,6 +109,7 @@ describe ActiveData::Model::Attributes do
         attribute :enum, Integer, enum: [1, 2, 3]
         attribute :enum_with_default, Integer, enum: [1, 2, 3], default: 2
         attribute :foo, Boolean, default: false
+        collection :array, enum: [1, 2, 3], default: 7
 
         def initialize name = nil
           @attributes = self.class.initialize_attributes
@@ -124,12 +125,16 @@ describe ActiveData::Model::Attributes do
     its(:string_default) { should == 'world' }
     its(:count_default) { should == 10 }
     its(:name) { should == 'world' }
-    its(:hello) { should be_nil }
+    its(:hello) { should eq(nil) }
+    its(:hello?) { should eq(false) }
     its(:count) { should == 10 }
+    its(:count?) { should eq(true) }
     its(:calc) { should == 5 }
-    specify { expect { subject.hello = 'worlds' } .to change { subject.hello } .from(nil).to('worlds') }
-    specify { expect { subject.count = 20 } .to change { subject.count } .from(10).to(20) }
-    specify { expect { subject.calc = 15 } .to change { subject.calc } .from(5).to(15) }
+    its(:enum?) { should eq(false) }
+    its(:enum_with_default?) { should eq(true) }
+    specify { expect { subject.hello = 'worlds' }.to change { subject.hello }.from(nil).to('worlds') }
+    specify { expect { subject.count = 20 }.to change { subject.count }.from(10).to(20) }
+    specify { expect { subject.calc = 15 }.to change { subject.calc }.from(5).to(15) }
 
     context 'enums' do
       specify { subject.enum = 3; expect(subject.enum).to eq(3) }
@@ -138,6 +143,13 @@ describe ActiveData::Model::Attributes do
       specify { subject.enum = 'hello'; expect(subject.enum).to eq(nil) }
       specify { subject.enum_with_default = 3; expect(subject.enum_with_default).to eq(3) }
       specify { subject.enum_with_default = 10; expect(subject.enum_with_default).to eq(2) }
+    end
+
+    context 'array' do
+      specify { subject.array = [2, 4]; expect(subject.array).to eq([2, 7]) }
+      specify { subject.array = [2, 4]; expect(subject.array?).to eq(true) }
+      specify { subject.array = [2, 4]; expect(subject.array_values).to eq([1, 2, 3]) }
+      specify { subject.array = [2, 4]; expect(subject.array_default).to eq(7) }
     end
 
     context 'attribute caching' do
