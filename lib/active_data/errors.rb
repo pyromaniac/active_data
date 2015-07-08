@@ -34,6 +34,9 @@ module ActiveData
   class AssociationNotSaved < ActiveDataError
   end
 
+  class AssociationObjectNotPersisted < ActiveDataError
+  end
+
   class AssociationTypeMismatch < ActiveDataError
     def initialize expected, got
       super "Expected `#{expected}` (##{expected.object_id}), but got `#{got}` (##{got.object_id})"
