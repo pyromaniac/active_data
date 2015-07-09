@@ -18,20 +18,14 @@ module ActiveData
           end
 
           def read_source object
-            if identifier = object.read_attribute(association_foreign_key)
-              klass.find(identifier)
-            end
+            object.read_attribute(reference_key)
           end
 
           def write_source object, value
-            identifier = value && value.send(association_primary_key)
-            object.write_attribute(association_foreign_key, identifier.presence)
-            true
+            object.write_attribute(reference_key, value)
           end
 
-          private
-
-          def association_foreign_key
+          def reference_key
             :"#{name}_id"
           end
 
@@ -39,9 +33,11 @@ module ActiveData
             :id
           end
 
+          private
+
           def define_methods!
             owner.class_eval <<-EOS
-              attribute(:#{association_foreign_key}, Integer) unless has_attribute?(:#{association_foreign_key})
+              attribute :#{reference_key}, Integer
 
               def #{name} force_reload = false
                 association(:#{name}).reader(force_reload)
@@ -49,18 +45,6 @@ module ActiveData
 
               def #{name}= value
                 association(:#{name}).writer(value)
-              end
-
-              def #{association_foreign_key}
-                if association(:#{name}).loaded?
-                  association(:#{name}).target.try(:#{association_primary_key})
-                else
-                  super
-                end
-              end
-
-              def #{association_foreign_key}= value
-                super.tap { association(:#{name}).reset }
               end
             EOS
           end

@@ -102,7 +102,7 @@ describe ActiveData::Model::Associations::ReferencesOne do
       specify { expect { association.writer(new_author) }
         .to change { association.reader.try(:attributes) }.from(nil).to('id' => 1, 'name' => 'Morty') }
       specify { expect { association.writer(new_author) }
-        .not_to change { book.read_attribute(:author_id) } }
+        .to change { book.read_attribute(:author_id) } }
 
 
       specify { expect { existing_association.writer(stub_class(:dummy, ActiveRecord::Base).new) rescue nil }
