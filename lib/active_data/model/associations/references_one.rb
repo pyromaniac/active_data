@@ -4,11 +4,12 @@ module ActiveData
   module Model
     module Associations
       class ReferencesOne < Base
-        delegate :association_primary_key, to: :reflection
-
         def save
-          @previous_identifier = read_source
-          target ? (target.marked_for_destruction? ? write_source(nil) : write_source(identifier)) : write_source(nil)
+          if target.present? && !target.marked_for_destruction?
+            write_source identifier
+          else
+            write_source nil
+          end
           true
         end
         alias_method :save!, :save
@@ -20,17 +21,7 @@ module ActiveData
 
         def target
           return @target if loaded?
-          identifier = read_source
-          self.target = identifier && reflection.klass.find(identifier)
-        end
-
-        def identifier
-          target.try(association_primary_key)
-        end
-
-        def reload
-          write_source(@previous_identifier) if defined?(@previous_identifier) && owner.new_record?
-          super
+          self.target = read_source && scope.first
         end
 
         def reader force_reload = false
@@ -52,7 +43,15 @@ module ActiveData
           target
         end
 
+        def scope
+          reflection.klass.where(reflection.association_primary_key => read_source)
+        end
+
         private
+
+        def identifier
+          target.try(reflection.association_primary_key)
+        end
 
         def source_changed?
           read_source != identifier

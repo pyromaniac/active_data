@@ -50,16 +50,10 @@ describe ActiveData::Model::Associations::ReferencesOne do
     specify { expect(existing_association.reload).to be_persisted }
 
     context do
-      before { association.writer(other) }
-      specify { expect { association.reload }
-        .to change { association.reader.name rescue nil }.from('Other').to(nil) }
-    end
-
-    context do
-      before { existing_association.writer(other) }
+      before { existing_association.reader.name = "New" }
       specify { expect { existing_association.reload }
-        .not_to change { existing_association.reader.name }
-        .from('Other') }
+        .to change { existing_association.reader.name }
+        .from('New').to('Johny') }
     end
   end
 
