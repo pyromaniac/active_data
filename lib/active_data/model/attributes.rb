@@ -39,6 +39,7 @@ module ActiveData
 
         def alias_attribute(alias_name, attribute_name)
           attribute = _attributes[attribute_name.to_s]
+          raise ArgumentError.new("Can't alias undefined attribute `#{attribute_name}` on #{self}") unless attribute
           attribute.generate_instance_alias_methods alias_name, generated_instance_attributes_methods
           attribute.generate_class_alias_methods alias_name, generated_class_attributes_methods
           attribute

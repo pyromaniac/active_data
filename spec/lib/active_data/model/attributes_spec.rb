@@ -32,6 +32,8 @@ describe ActiveData::Model::Attributes do
     specify { expect(model.new(t: 'Name').title).to eq('Name') }
     specify { expect(model.new(t: 'Name').title?).to eq(true) }
     specify { expect(model.new(t: 'Name').title_before_type_cast).to eq('Name') }
+
+    specify { expect { model.alias_attribute :foo, :bar }.to raise_error ArgumentError }
   end
 
   describe '.has_attribute?' do
