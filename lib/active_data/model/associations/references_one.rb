@@ -29,10 +29,6 @@ module ActiveData
           target
         end
 
-        def writer object
-          replace object
-        end
-
         def replace object
           unless object.nil?
             raise AssociationTypeMismatch.new(reflection.klass, object.class) unless object.is_a?(reflection.klass)
@@ -42,6 +38,7 @@ module ActiveData
           save!
           target
         end
+        alias_method :writer, :replace
 
         def scope
           reflection.klass.where(reflection.association_primary_key => read_source)
