@@ -25,7 +25,6 @@ module ActiveData
         }.each do |(name, reflection_class)|
           define_singleton_method name do |*args, &block|
             reflection = reflection_class.new self, *args, &block
-            attribute reflection.name, mode: :association
             self.reflections = reflections.merge(reflection.name => reflection)
           end
         end
@@ -40,7 +39,7 @@ module ActiveData
           attributes = _attributes.map do |name, attribute|
             data = if reflection = reflect_on_association(name)
               case reflection.macro
-              when :embeds_one
+              when :embeds_one, :references_one
                 reflection.klass
               when :embeds_many
                 "[#{reflection.klass}, ...]"
