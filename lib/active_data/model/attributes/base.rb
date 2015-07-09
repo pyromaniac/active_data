@@ -141,21 +141,32 @@ module ActiveData
               write_attribute('#{name}', value)
             end
 
-            def #{name}_before_type_cast
-              read_attribute_before_type_cast('#{name}')
-            end
-
             def #{name}?
               attribute_present?('#{name}')
             end
 
-            def #{name}_values
-              _attributes['#{name}'].enum(self).to_a
+            def #{name}_before_type_cast
+              read_attribute_before_type_cast('#{name}')
             end
 
             def #{name}_default
               _attributes['#{name}'].default_value(self)
             end
+
+            def #{name}_values
+              _attributes['#{name}'].enum(self).to_a
+            end
+          EOS
+        end
+
+        def generate_instance_alias_methods alias_name, context
+          context.class_eval <<-EOS
+            alias_method :#{alias_name}, :#{name}
+            alias_method :#{alias_name}=, :#{name}=
+            alias_method :#{alias_name}?, :#{name}?
+            alias_method :#{alias_name}_before_type_cast, :#{name}_before_type_cast
+            alias_method :#{alias_name}_default, :#{name}_default
+            alias_method :#{alias_name}_values, :#{name}_values
           EOS
         end
 
@@ -165,6 +176,14 @@ module ActiveData
               def #{name}_values
                 _attributes['#{name}'].enum(nil).to_a
               end
+            EOS
+          end
+        end
+
+        def generate_class_alias_methods alias_name, context
+          if enumerizer? && !enumerizer.is_a?(Proc)
+            context.class_eval <<-EOS
+              alias_method :#{alias_name}_values, :#{name}_values
             EOS
           end
         end

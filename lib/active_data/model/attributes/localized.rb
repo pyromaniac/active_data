@@ -67,7 +67,21 @@ module ActiveData
           EOS
         end
 
+        def generate_instance_alias_methods alias_name, context
+          context.class_eval <<-EOS
+            alias_method :#{alias_name}_translations, :#{name}_translations
+            alias_method :#{alias_name}_translations=, :#{name}_translations=
+            alias_method :#{alias_name}, :#{name}
+            alias_method :#{alias_name}=, :#{name}=
+            alias_method :#{alias_name}?, :#{name}?
+            alias_method :#{alias_name}_before_type_cast, :#{name}_before_type_cast
+          EOS
+        end
+
         def generate_class_methods context
+        end
+
+        def generate_class_alias_methods alias_name, context
         end
       end
     end

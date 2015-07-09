@@ -8,22 +8,43 @@ describe ActiveData::Model::Attributes do
 
       attribute :id
       attribute :full_name
+      alias_attribute :name, :full_name
+
+      localized :t
+      alias_attribute :title, :t
 
       embeds_one(:embedded) {}
       embeds_many(:embeddeds) {}
     end
   end
 
+  describe '.alias_attribute' do
+    specify { expect(model.new(name: 'Name').full_name).to eq('Name') }
+    specify { expect(model.new(full_name: 'Name').name).to eq('Name') }
+    specify { expect(model.new(full_name: 'Name').name?).to eq(true) }
+    specify { expect(model.new(full_name: 'Name').name_before_type_cast).to eq('Name') }
+    specify { expect(model.new(full_name: 'Name').name_default).to be_nil }
+    specify { expect(model.new(full_name: 'Name').name_values).to eq([]) }
+
+    specify { expect(model.new(title_translations: {ru: 'Name'}).t_translations).to eq('ru' => 'Name') }
+    specify { expect(model.new(t_translations: {ru: 'Name'}).title_translations).to eq('ru' => 'Name') }
+    specify { expect(model.new(title: 'Name').t).to eq('Name') }
+    specify { expect(model.new(t: 'Name').title).to eq('Name') }
+    specify { expect(model.new(t: 'Name').title?).to eq(true) }
+    specify { expect(model.new(t: 'Name').title_before_type_cast).to eq('Name') }
+  end
+
   describe '.has_attribute?' do
     specify { expect(model.has_attribute?(:full_name)).to eq(true) }
     specify { expect(model.has_attribute?('full_name')).to eq(true) }
+    specify { expect(model.has_attribute?(:name)).to eq(false) }
     specify { expect(model.has_attribute?(:foobar)).to eq(false) }
   end
 
   describe '.attribute_names' do
     specify { expect(stub_model.attribute_names).to eq([])  }
-    specify { expect(model.attribute_names).to eq(%w[id full_name embedded embeddeds]) }
-    specify { expect(model.attribute_names(false)).to eq(%w[id full_name])  }
+    specify { expect(model.attribute_names).to eq(%w[id full_name t embedded embeddeds]) }
+    specify { expect(model.attribute_names(false)).to eq(%w[id full_name t])  }
   end
 
   describe '.inspect' do
@@ -67,16 +88,16 @@ describe ActiveData::Model::Attributes do
 
   describe '#attribute_names' do
     specify { expect(stub_model.new.attribute_names).to eq([])  }
-    specify { expect(model.new.attribute_names).to eq(%w[id full_name embedded embeddeds]) }
-    specify { expect(model.new.attribute_names(false)).to eq(%w[id full_name])  }
+    specify { expect(model.new.attribute_names).to eq(%w[id full_name t embedded embeddeds]) }
+    specify { expect(model.new.attribute_names(false)).to eq(%w[id full_name t])  }
   end
 
   describe '#attributes' do
     specify { expect(stub_model.new.attributes).to eq({})  }
     specify { expect(model.new(full_name: 'Name').attributes)
-      .to match({'id' => nil, 'full_name' => 'Name', 'embedded' => nil, 'embeddeds' => nil})  }
+      .to match({'id' => nil, 'full_name' => 'Name', 't' => {}, 'embedded' => nil, 'embeddeds' => nil})  }
     specify { expect(model.new(full_name: 'Name').attributes(false))
-      .to match({'id' => nil, 'full_name' => 'Name'})  }
+      .to match({'id' => nil, 'full_name' => 'Name', 't' => {}})  }
   end
 
   describe '#assign_attributes' do

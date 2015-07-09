@@ -16,7 +16,13 @@ module ActiveData
         def generate_instance_methods context
         end
 
+        def generate_instance_alias_methods alias_name, context
+        end
+
         def generate_class_methods context
+        end
+
+        def generate_class_alias_methods alias_name, context
         end
       end
     end
