@@ -16,6 +16,10 @@ ActiveRecord::Schema.define do
     t.column :projects, :text
     t.column :profile, :text
   end
+
+  create_table :authors do |t|
+    t.column :name, :string
+  end
 end
 
 RSpec.configure do |config|

@@ -1,8 +1,10 @@
 require 'active_data/model/associations/reflections/embeds_many'
 require 'active_data/model/associations/reflections/embeds_one'
 require 'active_data/model/associations/reflections/embeds_many'
+require 'active_data/model/associations/reflections/references_one'
 require 'active_data/model/associations/embeds_one'
 require 'active_data/model/associations/embeds_many'
+require 'active_data/model/associations/references_one'
 require 'active_data/model/associations/nested_attributes'
 
 module ActiveData
@@ -16,10 +18,14 @@ module ActiveData
         class_attribute :reflections, instance_reader: false, instance_writer: false
         self.reflections = {}
 
-        { embeds_many: Reflections::EmbedsMany, embeds_one: Reflections::EmbedsOne }.each do |(name, reflection_class)|
+        {
+          embeds_many: Reflections::EmbedsMany,
+          embeds_one: Reflections::EmbedsOne,
+          references_one: Reflections::ReferencesOne
+        }.each do |(name, reflection_class)|
           define_singleton_method name do |*args, &block|
             reflection = reflection_class.new self, *args, &block
-            attribute reflection.name, mode: :association
+            reflection.attributes.each { |name, options| attribute(name, options) }
             self.reflections = reflections.merge(reflection.name => reflection)
           end
         end
@@ -34,7 +40,7 @@ module ActiveData
           attributes = _attributes.map do |name, attribute|
             data = if reflection = reflect_on_association(name)
               case reflection.macro
-              when :embeds_one
+              when :embeds_one, :references_one
                 reflection.klass
               when :embeds_many
                 "[#{reflection.klass}, ...]"
