@@ -33,12 +33,14 @@ module ActiveData
             :id
           end
 
+          def attributes
+            {reference_key => {type: Integer}}
+          end
+
           private
 
           def define_methods!
             owner.class_eval <<-EOS
-              attribute :#{reference_key}, Integer
-
               def #{name} force_reload = false
                 association(:#{name}).reader(force_reload)
               end

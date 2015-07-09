@@ -5,11 +5,6 @@ module ActiveData
     module Associations
       module Reflections
         class EmbedsMany < Base
-          def initialize(*)
-            super
-            owner.attribute name, mode: :association
-          end
-
           def macro
             :embeds_many
           end

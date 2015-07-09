@@ -5,11 +5,6 @@ module ActiveData
     module Associations
       module Reflections
         class EmbedsOne < Base
-          def initialize(*)
-            super
-            owner.attribute name, mode: :association
-          end
-
           def macro
             :embeds_one
           end
