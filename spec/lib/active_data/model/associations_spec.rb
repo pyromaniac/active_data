@@ -91,8 +91,8 @@ describe ActiveData::Model::Associations do
 
         validates :login, presence: true
 
-        embeds_many :projects
         embeds_one :profile
+        embeds_many :projects
       end
     end
 
@@ -131,7 +131,7 @@ describe ActiveData::Model::Associations do
     end
 
     describe '#association_names' do
-      specify { expect(user.association_names).to eq([:projects, :profile]) }
+      specify { expect(user.association_names).to eq([:profile, :projects]) }
     end
 
     describe '#save_associations!' do

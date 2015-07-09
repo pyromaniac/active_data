@@ -76,7 +76,7 @@ module ActiveData
 
       def valid_ancestry?
         errors.clear
-        association_names.all? do |name|
+        association_names.each do |name|
           association = association(name)
           if association.collection?
             association.target.each.with_index do |object, i|
