@@ -2,9 +2,11 @@ require 'active_data/model/associations/reflections/embeds_many'
 require 'active_data/model/associations/reflections/embeds_one'
 require 'active_data/model/associations/reflections/embeds_many'
 require 'active_data/model/associations/reflections/references_one'
+require 'active_data/model/associations/reflections/references_many'
 require 'active_data/model/associations/embeds_one'
 require 'active_data/model/associations/embeds_many'
 require 'active_data/model/associations/references_one'
+require 'active_data/model/associations/references_many'
 require 'active_data/model/associations/nested_attributes'
 
 module ActiveData
@@ -21,7 +23,8 @@ module ActiveData
         {
           embeds_many: Reflections::EmbedsMany,
           embeds_one: Reflections::EmbedsOne,
-          references_one: Reflections::ReferencesOne
+          references_one: Reflections::ReferencesOne,
+          references_many: Reflections::ReferencesMany
         }.each do |(name, reflection_class)|
           define_singleton_method name do |*args, &block|
             reflection = reflection_class.new self, *args, &block

@@ -5,6 +5,7 @@ module ActiveData
     module Associations
       class ReferencesOne < Base
         def save
+          return false if target && !target.persisted?
           if target.present? && !target.marked_for_destruction?
             write_source identifier
           else
@@ -12,7 +13,10 @@ module ActiveData
           end
           true
         end
-        alias_method :save!, :save
+
+        def save!
+          save or raise AssociationObjectNotPersisted
+        end
 
         def target= object
           loaded!
@@ -32,22 +36,25 @@ module ActiveData
         def replace object
           unless object.nil?
             raise AssociationTypeMismatch.new(reflection.klass, object.class) unless object.is_a?(reflection.klass)
-            raise AssociationObjectNotPersisted unless object.persisted?
           end
-          self.target = object
-          save!
+
+          transaction do
+            self.target = object
+            save!
+          end
+
           target
         end
         alias_method :writer, :replace
 
         def scope
-          reflection.klass.where(reflection.association_primary_key => read_source)
+          reflection.klass.where(reflection.primary_key => read_source)
         end
 
-        private
+      private
 
         def identifier
-          target.try(reflection.association_primary_key)
+          target.try(reflection.primary_key)
         end
 
         def source_changed?

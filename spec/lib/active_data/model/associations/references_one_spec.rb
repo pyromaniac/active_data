@@ -88,6 +88,8 @@ describe ActiveData::Model::Associations::ReferencesOne do
         .to raise_error ActiveData::AssociationTypeMismatch }
       specify { expect { association.writer(Author.new) }
         .to raise_error ActiveData::AssociationObjectNotPersisted }
+      specify { expect { association.writer(Author.new) rescue nil }
+        .not_to change { association.target } }
 
       specify { expect(association.writer(nil)).to be_nil }
       specify { expect(association.writer(new_author)).to eq(new_author) }

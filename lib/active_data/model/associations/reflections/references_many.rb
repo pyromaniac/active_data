@@ -4,21 +4,21 @@ module ActiveData
   module Model
     module Associations
       module Reflections
-        class ReferencesOne < ReferenceReflection
+        class ReferencesMany < ReferenceReflection
           def collection?
-            false
+            true
           end
 
           def association_class
-            ActiveData::Model::Associations::ReferencesOne
+            ActiveData::Model::Associations::ReferencesMany
           end
 
           def reference_key
-            :"#{name}_id"
+            :"#{name.to_s.singularize}_ids"
           end
 
           def attributes
-            {reference_key => {type: Integer}}
+            {reference_key => {type: Integer, mode: :collection}}
           end
         end
       end
