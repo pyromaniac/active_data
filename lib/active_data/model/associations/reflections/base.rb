@@ -14,6 +14,10 @@ module ActiveData
             define_methods!
           end
 
+          def macro
+            self.class.name.demodulize.underscore.to_sym
+          end
+
           def klass
             @klass ||= if evaluator
               superclass = options[:class_name].to_s.presence.try(:safe_constantize)
@@ -56,6 +60,10 @@ module ActiveData
 
           def attributes
             {name => {mode: :association}}
+          end
+
+          def inspect
+            "#{self.class.name.demodulize}(#{klass})"
           end
 
         private

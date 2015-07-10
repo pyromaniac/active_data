@@ -37,6 +37,10 @@ module ActiveData
           raise e
         end
 
+        def inspect
+          "#<#{reflection.macro.to_s.camelize} #{target.inspect.truncate(50, omission: collection? ? '...]' : '...')}>"
+        end
+
       private
 
         def read_source
@@ -45,6 +49,14 @@ module ActiveData
 
         def write_source value
           reflection.write_source owner, value
+        end
+
+        def target_for_inspect
+          if value.length > 50
+            "#{value[0..50]}...".inspect
+          else
+            value.inspect
+          end
         end
       end
     end

@@ -5,10 +5,6 @@ module ActiveData
     module Associations
       module Reflections
         class EmbedsMany < Base
-          def macro
-            :embeds_many
-          end
-
           def collection?
             true
           end

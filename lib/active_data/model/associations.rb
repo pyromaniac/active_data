@@ -36,22 +36,12 @@ module ActiveData
           reflections[name.to_sym]
         end
 
-        def inspect
-          attributes = _attributes.map do |name, attribute|
-            data = if reflection = reflect_on_association(name)
-              case reflection.macro
-              when :embeds_one, :references_one
-                reflection.klass
-              when :embeds_many
-                "[#{reflection.klass}, ...]"
-              end
-            else
-              attribute.type
-            end
-            "#{name}: #{data}"
-          end.join(', ')
+      private
 
-          "#{name}(#{attributes})"
+        def attributes_for_inspect
+          (reflections.map do |_, reflection|
+            "#{reflection.name}: #{reflection.inspect}"
+          end + [super]).join(', ')
         end
       end
 
@@ -116,6 +106,15 @@ module ActiveData
 
       def validate_ancestry!
         valid_ancestry? || raise_validation_error
+      end
+
+    private
+
+      def attributes_for_inspect
+        (association_names.map do |name|
+          association = association(name)
+          "#{name}: #{association.inspect}"
+        end + [super]).join(', ')
       end
     end
   end

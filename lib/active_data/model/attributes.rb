@@ -60,8 +60,7 @@ module ActiveData
         end
 
         def inspect
-          attributes = _attributes.map { |name, attribute| "#{name}: #{attribute.type}" }.join(', ')
-          "#{inspect_model_name} (#{attributes.presence || 'no attributes'})"
+          "#{original_inspect}(#{attributes_for_inspect.presence || 'no attributes'})"
         end
 
         def initialize_attributes
@@ -69,6 +68,10 @@ module ActiveData
         end
 
       private
+
+        def original_inspect
+          Object.method(:inspect).unbind.bind(self).call
+        end
 
         def build_attribute name, options = {}, &block
           class_name = "ActiveData::Model::Attributes::#{(options.delete(:mode).to_s.presence || 'base').classify}"
@@ -83,8 +86,10 @@ module ActiveData
           @generated_instance_attributes_methods ||= Module.new.tap { |proxy| include proxy }
         end
 
-        def inspect_model_name
-          name.presence || "[anonymous model]:#{object_id}"
+        def attributes_for_inspect
+          attribute_names(false).map do |name|
+            "#{name}: #{_attributes[name].type}"
+          end.join(', ')
         end
       end
 
@@ -144,8 +149,7 @@ module ActiveData
       alias_method :attributes=, :assign_attributes
 
       def inspect
-        attributes = attribute_names(false).map { |name| "#{name}: #{attribute_for_inspect(name)}" }.join(', ')
-        "#<#{self.class.send(:inspect_model_name)}:#{object_id} (#{attributes.presence || 'no attributes'})>"
+        "#<#{self.class.send(:original_inspect)} #{attributes_for_inspect.presence || '(no attributes)'}>"
       end
 
       def initialize_copy _
@@ -165,16 +169,18 @@ module ActiveData
 
     private
 
-      def attribute_for_inspect(name)
-        value = read_attribute(name)
-
-        if value.is_a?(String) && value.length > 50
-          "#{value[0..50]}...".inspect
-        elsif value.is_a?(Date) || value.is_a?(Time)
+      def value_for_inspect(value)
+        if value.is_a?(Date) || value.is_a?(Time)
           %("#{value.to_s(:db)}")
         else
-          value.inspect
+          value.inspect.truncate(50)
         end
+      end
+
+      def attributes_for_inspect
+        attribute_names(false).map do |name|
+          "#{name}: #{value_for_inspect(read_attribute(name))}"
+        end.join(', ')
       end
 
       def attributes_cache

@@ -5,10 +5,6 @@ module ActiveData
     module Associations
       module Reflections
         class EmbedsOne < Base
-          def macro
-            :embeds_one
-          end
-
           def collection?
             false
           end

@@ -101,6 +101,17 @@ describe ActiveData::Model::Associations do
     its(:projects) { should = [] }
     its(:profile) { should = nil }
 
+    describe '.inspect' do
+      specify { expect(User.inspect).to eq('User(profile: EmbedsOne(Profile), projects: EmbedsMany(Project), login: Object)') }
+    end
+
+    describe '#inspect' do
+      let(:profile) { Profile.new first_name: 'Name' }
+      let(:project) { Project.new title: 'Project' }
+      specify { expect(User.new(login: 'Login', profile: profile, projects: [project]).inspect)
+        .to eq('#<User profile: #<EmbedsOne #<Profile first_name: "Name", last_name: nil>>, projects: #<EmbedsMany [#<Project author: #<EmbedsOne nil>, title: "P...]>, login: "Login">') }
+    end
+
     describe '#==' do
       let(:project) { Project.new title: 'Project' }
       let(:other) { Project.new title: 'Other' }

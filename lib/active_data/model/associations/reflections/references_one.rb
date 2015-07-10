@@ -5,10 +5,6 @@ module ActiveData
     module Associations
       module Reflections
         class ReferencesOne < Base
-          def macro
-            :references_one
-          end
-
           def collection?
             false
           end
