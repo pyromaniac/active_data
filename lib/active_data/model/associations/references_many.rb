@@ -1,4 +1,5 @@
 require 'active_data/model/associations/base'
+require 'active_data/model/associations/collection_proxy'
 
 module ActiveData
   module Model
@@ -6,7 +7,7 @@ module ActiveData
       class ReferencesMany < Base
 
         def save
-          present_keys = target.reject { |t| t.marked_for_destruction? }.map(&reflection.association_primary_key)
+          present_keys = target.reject { |t| t.marked_for_destruction? }.map(&reflection.association_primary_key).uniq
           write_source(present_keys)
           true
         end
@@ -37,6 +38,7 @@ module ActiveData
 
         def concat(*objects)
           append objects.flatten
+          reader
         end
 
         def clear
@@ -51,7 +53,6 @@ module ActiveData
         private
 
         def append objects
-          puts "append #{objects.inspect}"
           objects.each do |object|
             raise AssociationTypeMismatch.new(reflection.klass, object.class) unless object.is_a?(reflection.klass)
             raise AssociationObjectNotPersisted unless object.persisted?

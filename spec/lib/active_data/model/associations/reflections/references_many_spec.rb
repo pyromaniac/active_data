@@ -1,7 +1,7 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-describe ActiveData::Model::Associations::Reflections::ReferencesOne do
+describe ActiveData::Model::Associations::Reflections::ReferencesMany do
   before do
     stub_class(:author, ActiveRecord::Base)
 
@@ -12,7 +12,11 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
       references_many :authors
     end
   end
+
+  let(:author) { Author.create!(name: 'Rick') }
+  let(:other) { Author.create!(name: 'John') }
   let(:book) { Book.new }
+  let(:book_with_author) { Book.new(authors: [author]) }
 
   specify { expect(book.authors).to be_empty }
 
@@ -26,7 +30,6 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
       end
     end
 
-    let(:author) { Author.create!(name: 'Rick') }
     let(:book) { Book.new }
 
     specify { expect { book.creators << author }
@@ -36,56 +39,59 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
   end
 
   describe '#author' do
-    it { expect { book.authors.build(name: 'Rick') }.to raise_error ActiveData::OperationNotSupported }
-    it { expect { book.authors.create(name: 'Rick') }.to raise_error ActiveData::OperationNotSupported }
-    it { expect { book.authors.create!(name: 'Rick') }.to raise_error ActiveData::OperationNotSupported }
+    describe '#clear' do
+      it { expect { book_with_author.authors.clear }.to change { book_with_author.authors }.from([author]).to([]) }
+    end
 
     describe '#reload' do
-      before { book.authors << author }
-      it { expect { book.authors.reload }.to change { book.authors }.from([author]).to([]) }
+      before { book.authors << author.tap { |a| a.name = 'Don Juan' } }
+      it { expect { book.authors.reload }.to change { book.authors.map(&:name) }.from(['Don Juan']).to(['Rick']) }
     end
 
     describe '#concat' do
       it { expect { book.authors.concat author }.to change { book.authors }.from([]).to([author]) }
+      it { expect { book.authors << author << other }.to change { book.authors }.from([]).to([author, other]) }
       context 'no duplication' do
-        before { book.authors << author}
+        before { book.authors << author }
         it { expect { book.authors.concat author }.not_to change { book.authors }.from([author]) }
       end
     end
   end
 
-  describe '#author=' do
-    let(:author) { Author.create! name: 'Author' }
+  describe '#author_ids' do
+    it { expect(book_with_author.author_ids).to eq([author.id]) }
+    it { expect { book_with_author.author_ids << other.id }.to change { book_with_author.authors }.from([author]).to([author, other]) }
+    it { expect { book_with_author.author_ids = [other.id] }.to change { book_with_author.authors }.from([author]).to([other]) }
+  end
+
+  describe '#authors=' do
     specify { expect { book.authors = [author] }.to change { book.authors }.from([]).to([author]) }
     specify { expect { book.authors = ['string'] }.to raise_error ActiveData::AssociationTypeMismatch }
 
     context do
-      let(:other) { Author.create! name: 'Other' }
-      before { book.author = other }
-      specify { expect { book.author = author }.to change { book.author }.from(other).to(author) }
-      specify { expect { book.author = author }.to change { book.author_id }.from(other.id).to(author.id) }
-      specify { expect { book.author = nil }.to change { book.author }.from(other).to(nil) }
-      specify { expect { book.author = nil }.to change { book.author_id }.from(other.id).to(nil) }
+      before { book.authors = [other] }
+      specify { expect { book.authors = [author] }.to change { book.authors }.from([other]).to([author]) }
+      specify { expect { book.authors = [author] }.to change { book.author_ids }.from([other.id]).to([author.id]) }
+      specify { expect { book.authors = [] }.to change { book.authors }.from([other]).to([]) }
+      specify { expect { book.authors = [] }.to change { book.author_ids }.from([other.id]).to([]) }
     end
 
     context 'model not persisted' do
       let(:author) { Author.new }
-      specify { expect { book.author = author }.to raise_error ActiveData::AssociationObjectNotPersisted }
+      specify { expect { book.authors = [author] }.to raise_error ActiveData::AssociationObjectNotPersisted }
     end
   end
 
-  describe '#author_id=' do
-    let(:author) { Author.create!(name: 'Author') }
-    specify { expect { book.author_id = author.id }.to change { book.author_id }.from(nil).to(author.id) }
-    specify { expect { book.author_id = author.id }.to change { book.author }.from(nil).to(author) }
+  describe '#author_ids=' do
+    specify { expect { book.author_ids = [author.id] }.to change { book.author_ids }.from([]).to([author.id]) }
+    specify { expect { book.author_ids = [author.id] }.to change { book.authors }.from([]).to([author]) }
 
     context do
-      let(:other) { Author.create!(name: 'Other') }
-      before { book.author = other }
-      specify { expect { book.author_id = author.id }.to change { book.author_id }.from(other.id).to(author.id) }
-      specify { expect { book.author_id = author.id }.to change { book.author }.from(other).to(author) }
-      specify { expect { book.author_id = nil }.to change { book.author_id }.from(other.id).to(nil) }
-      specify { expect { book.author_id = nil }.to change { book.author }.from(other).to(nil) }
+      before { book.authors = [other] }
+      specify { expect { book.author_ids = [author.id] }.to change { book.author_ids }.from([other.id]).to([author.id]) }
+      specify { expect { book.author_ids = [author.id] }.to change { book.authors }.from([other]).to([author]) }
+      specify { expect { book.author_ids = [] }.to change { book.author_ids }.from([other.id]).to([]) }
+      specify { expect { book.author_ids = [] }.to change { book.authors }.from([other]).to([]) }
     end
   end
 end
