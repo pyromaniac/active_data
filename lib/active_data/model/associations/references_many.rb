@@ -54,7 +54,7 @@ module ActiveData
           reflection.klass.where(reflection.primary_key => read_source)
         end
 
-        private
+      private
 
         def append objects
           objects.each do |object|

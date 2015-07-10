@@ -21,7 +21,7 @@ module ActiveData
             :id
           end
 
-          private
+        private
 
           def define_methods!
             owner.class_eval <<-EOS
