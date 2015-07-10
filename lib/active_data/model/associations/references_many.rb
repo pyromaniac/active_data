@@ -7,11 +7,15 @@ module ActiveData
       class ReferencesMany < Base
 
         def save
-          present_keys = target.reject { |t| t.marked_for_destruction? }.map(&reflection.association_primary_key).uniq
+          return false unless target.all?(&:persisted?)
+          present_keys = target.reject { |t| t.marked_for_destruction? }.map(&reflection.primary_key)
           write_source(present_keys)
           true
         end
-        alias_method :save!, :save
+
+        def save!
+          save or raise AssociationObjectNotPersisted
+        end
 
         def target= object
           loaded!
@@ -47,23 +51,23 @@ module ActiveData
         end
 
         def scope
-          reflection.klass.where(reflection.association_primary_key => read_source)
+          reflection.klass.where(reflection.primary_key => read_source)
         end
 
         private
 
         def append objects
           objects.each do |object|
+            next if target.include?(object)
             raise AssociationTypeMismatch.new(reflection.klass, object.class) unless object.is_a?(reflection.klass)
-            raise AssociationObjectNotPersisted unless object.persisted?
             target[target.size] = object
-            save
+            save!
           end
           target
         end
 
         def identifiers
-          target.map(&reflection.association_primary_key)
+          target.map(&reflection.primary_key)
         end
 
         def source_changed?

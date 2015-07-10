@@ -83,6 +83,10 @@ describe ActiveData::Model::Associations::ReferencesMany do
 
     specify { expect { association.writer([Dummy.new]) }
       .to raise_error ActiveData::AssociationTypeMismatch }
+    specify { expect { association.writer([Author.new]) }
+      .to raise_error ActiveData::AssociationObjectNotPersisted }
+    specify { expect { existing_association.writer([Author.new]) rescue nil }
+      .not_to change { existing_association.target } }
 
     specify { expect { association.writer(nil) }.to raise_error NoMethodError }
     specify { expect { association.writer(new_author1) }.to raise_error NoMethodError }

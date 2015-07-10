@@ -39,6 +39,10 @@ describe ActiveData::Model::Associations::Reflections::ReferencesMany do
   end
 
   describe '#author' do
+    it { expect(book.authors).not_to respond_to(:build) }
+    it { expect(book.authors).not_to respond_to(:create) }
+    it { expect(book.authors).not_to respond_to(:create!) }
+
     describe '#clear' do
       it { expect { book_with_author.authors.clear }.to change { book_with_author.authors }.from([author]).to([]) }
     end

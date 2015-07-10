@@ -5,6 +5,7 @@ module ActiveData
     module Associations
       class EmbeddedCollectionProxy < CollectionProxy
         delegate :build, :create, :create!, to: :@association
+        alias_method :new, :build
       end
     end
   end
