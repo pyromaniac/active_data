@@ -1,5 +1,5 @@
 require 'active_data/model/associations/base'
-require 'active_data/model/associations/collection_proxy'
+require 'active_data/model/associations/referenced_collection_proxy'
 
 module ActiveData
   module Model
@@ -29,7 +29,7 @@ module ActiveData
 
         def reader force_reload = false
           reload if force_reload || source_changed?
-          @proxy ||= CollectionProxy.new self
+          @proxy ||= ReferencedCollectionProxy.new self
         end
 
         def replace objects

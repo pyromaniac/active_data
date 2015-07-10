@@ -4,7 +4,9 @@ require 'spec_helper'
 describe ActiveData::Model::Associations::ReferencesMany do
   before do
     stub_model(:dummy)
-    stub_class(:author, ActiveRecord::Base)
+    stub_class(:author, ActiveRecord::Base) do
+      scope :name_starts_with_a, -> { where('name LIKE "a%"') }
+    end
 
     stub_model(:book) do
       include ActiveData::Model::Persistence
@@ -27,6 +29,12 @@ describe ActiveData::Model::Associations::ReferencesMany do
   describe 'book#association' do
     specify { expect(association).to be_a described_class }
     specify { expect(association).to eq(book.association(:authors)) }
+  end
+
+  describe '#scope' do
+    specify { expect(association.scope).to be_a ActiveRecord::Relation }
+    specify { expect(association.scope).to respond_to(:where) }
+    specify { expect(association.scope).to respond_to(:name_starts_with_a) }
   end
 
   describe '#target' do
@@ -57,6 +65,7 @@ describe ActiveData::Model::Associations::ReferencesMany do
 
   describe '#reader' do
     specify { expect(association.reader).to eq([]) }
+    specify { expect(association.reader).to be_a ActiveData::Model::Associations::ReferencedCollectionProxy }
 
     specify { expect(existing_association.reader.first).to be_a Author }
     specify { expect(existing_association.reader.first).to be_persisted }
@@ -74,6 +83,11 @@ describe ActiveData::Model::Associations::ReferencesMany do
       specify { expect(existing_association.reader.last.name).to eq('Ben') }
       specify { expect(existing_association.reader(true).size).to eq(2) }
       specify { expect(existing_association.reader(true).last.name).to eq('Ben') }
+    end
+
+    context 'proxy missing method delection' do
+      specify { expect(existing_association.reader).to respond_to(:where) }
+      specify { expect(existing_association.reader).to respond_to(:name_starts_with_a) }
     end
   end
 

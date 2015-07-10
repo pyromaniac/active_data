@@ -3,7 +3,9 @@ require 'spec_helper'
 
 describe ActiveData::Model::Associations::Reflections::ReferencesMany do
   before do
-    stub_class(:author, ActiveRecord::Base)
+    stub_class(:author, ActiveRecord::Base) do
+      scope :name_starts_with_a, -> { where('name LIKE "a%"') }
+    end
 
     stub_model(:book) do
       include ActiveData::Model::Associations
@@ -59,6 +61,12 @@ describe ActiveData::Model::Associations::Reflections::ReferencesMany do
         before { book.authors << author }
         it { expect { book.authors.concat author }.not_to change { book.authors }.from([author]) }
       end
+    end
+
+    context 'scope missing method delegation' do
+      it { expect(book_with_author.authors.scope).to be_a ActiveRecord::Relation }
+      it { expect(book_with_author.authors.where(name: 'John')).to be_a ActiveRecord::Relation }
+      it { expect(book_with_author.authors.name_starts_with_a).to be_a ActiveRecord::Relation }
     end
   end
 
