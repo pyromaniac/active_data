@@ -30,6 +30,7 @@ module ActiveData
             reflection = reflection_class.new self, *args, &block
             reflection.attributes.each { |name, options| attribute(name, options) }
             self.reflections = reflections.merge(reflection.name => reflection)
+            reflection
           end
         end
       end
