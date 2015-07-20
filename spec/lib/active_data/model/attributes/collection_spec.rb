@@ -7,7 +7,7 @@ describe ActiveData::Model::Attributes::Collection do
   end
 
   describe '#read_value' do
-    let(:field) { build_field(type: String, normalizer: ->(v){ v.uniq.compact }, default: 'world', enum: ['hello', '42']) }
+    let(:field) { build_field(type: String, normalizer: ->(v){ v.uniq.compact }, default: :world, enum: ['hello', '42']) }
 
     specify { expect(field.read_value(nil, self)).to eq([]) }
     specify { expect(field.read_value([nil], self)).to eq(['world']) }
@@ -20,7 +20,7 @@ describe ActiveData::Model::Attributes::Collection do
   end
 
   describe '#read_value_before_type_cast' do
-    let(:field) { build_field(type: String, default: 'world', enum: ['hello', '42']) }
+    let(:field) { build_field(type: String, default: :world, enum: ['hello', '42']) }
 
     specify { expect(field.read_value_before_type_cast(nil, self)).to eq([]) }
     specify { expect(field.read_value_before_type_cast([nil], self)).to eq([nil]) }

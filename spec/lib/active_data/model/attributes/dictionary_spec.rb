@@ -8,7 +8,7 @@ describe ActiveData::Model::Attributes::Dictionary do
 
   describe '#read_value' do
     let(:field) { build_field(type: String, normalizer: ->(v){ v.delete_if { |k, _| k == 'x' } },
-      default: 'world', enum: ['hello', '42']) }
+      default: :world, enum: ['hello', '42']) }
 
     specify { expect(field.read_value(nil, self)).to eq({}) }
     specify { expect(field.read_value({}, self)).to eq({}) }
@@ -28,7 +28,7 @@ describe ActiveData::Model::Attributes::Dictionary do
   end
 
   describe '#read_value_before_type_cast' do
-    let(:field) { build_field(type: String, default: 'world', enum: ['hello', '42']) }
+    let(:field) { build_field(type: String, default: :world, enum: ['hello', '42']) }
 
     specify { expect(field.read_value_before_type_cast(nil, self)).to eq({}) }
     specify { expect(field.read_value_before_type_cast({}, self)).to eq({}) }

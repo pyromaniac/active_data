@@ -95,9 +95,15 @@ module ActiveData
           end
         end
 
-        def defaultize value, context
+        def defaultize value, context, type_cast = true
           use_default = default_blank? && value.respond_to?(:empty?) ? value.empty? : value.nil?
-          use_default ? default_value(context) : value
+          if use_default
+            default = default_value(context)
+            default = type_cast(default, context) if type_cast
+            default
+          else
+            value
+          end
         end
 
         def normalizers
@@ -128,7 +134,7 @@ module ActiveData
         end
 
         def read_value_before_type_cast value, context
-          defaultize(value, context)
+          defaultize(value, context, false)
         end
 
         def generate_instance_methods context

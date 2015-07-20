@@ -127,7 +127,7 @@ describe ActiveData::Model::Attributes do
         attribute :id
         attribute :hello
         attribute :string, String, default_blank: true, default: ->(record){ record.name }
-        attribute :count, Integer, default: 10
+        attribute :count, Integer, default: '10'
         attribute(:calc, Integer) { 2 + 3 }
         attribute :enum, Integer, enum: [1, 2, 3]
         attribute :enum_with_default, Integer, enum: [1, 2, 3], default: 2
@@ -146,11 +146,12 @@ describe ActiveData::Model::Attributes do
     specify { expect(model.enum_values).to eq([1, 2, 3]) }
     its(:enum_values) { should == [1, 2, 3] }
     its(:string_default) { should == 'world' }
-    its(:count_default) { should == 10 }
+    its(:count_default) { should == '10' }
     its(:name) { should == 'world' }
     its(:hello) { should eq(nil) }
     its(:hello?) { should eq(false) }
     its(:count) { should == 10 }
+    its(:count_before_type_cast) { should == '10' }
     its(:count?) { should eq(true) }
     its(:calc) { should == 5 }
     its(:enum?) { should eq(false) }
