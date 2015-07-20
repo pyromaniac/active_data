@@ -17,9 +17,9 @@ describe ActiveData::Model::Attributes::Base do
   end
 
   describe '#type_cast' do
-    specify { expect(build_field.type_cast('hello')).to eq('hello') }
-    specify { expect(build_field(type: Integer).type_cast(42)).to eq(42) }
-    specify { expect(build_field(type: Integer).type_cast('42')).to eq(42) }
+    specify { expect(build_field.type_cast('hello', self)).to eq('hello') }
+    specify { expect(build_field(type: Integer).type_cast(42, self)).to eq(42) }
+    specify { expect(build_field(type: Integer).type_cast('42', self)).to eq(42) }
   end
 
   describe '#enum' do

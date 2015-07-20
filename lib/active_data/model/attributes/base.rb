@@ -18,11 +18,11 @@ module ActiveData
             options[:type].present? ? options[:type].to_s.camelize.constantize : Object
         end
 
-        def type_cast value
+        def type_cast value, context
           if value.instance_of?(type)
             value
           else
-            ActiveData.typecaster(type_parent_classes).call(value, type) unless value.nil?
+            context.instance_exec(value, type, &ActiveData.typecaster(type_parent_classes)) unless value.nil?
           end
         end
 
@@ -124,7 +124,7 @@ module ActiveData
         end
 
         def read_value value, context
-          normalize(defaultize(enumerize(type_cast(value), context), context), context)
+          normalize(defaultize(enumerize(type_cast(value, context), context), context), context)
         end
 
         def read_value_before_type_cast value, context

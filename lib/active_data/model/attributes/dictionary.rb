@@ -14,7 +14,7 @@ module ActiveData
           hash = hash.stringify_keys.slice(*keys) if keys.present?
 
           normalize(Hash[hash.map do |key, value|
-            [key, defaultize(enumerize(type_cast(value), context), context)]
+            [key, defaultize(enumerize(type_cast(value, context), context), context)]
           end].with_indifferent_access, context).with_indifferent_access
         end
 
