@@ -126,11 +126,11 @@ describe ActiveData::Model::Attributes do
 
         attribute :id
         attribute :hello
-        attribute :string, String, default_blank: true, default: ->(record){ record.name }
+        attribute :string, String, default: ->(record){ record.name }
         attribute :count, Integer, default: '10'
         attribute(:calc, Integer) { 2 + 3 }
         attribute :enum, Integer, enum: [1, 2, 3]
-        attribute :enum_with_default, Integer, enum: [1, 2, 3], default: 2
+        attribute :enum_with_default, Integer, enum: [1, 2, 3], default: '2'
         attribute :foo, Boolean, default: false
         collection :array, enum: [1, 2, 3], default: 7
 
@@ -166,11 +166,11 @@ describe ActiveData::Model::Attributes do
       specify { subject.enum = 10; expect(subject.enum).to eq(nil) }
       specify { subject.enum = 'hello'; expect(subject.enum).to eq(nil) }
       specify { subject.enum_with_default = 3; expect(subject.enum_with_default).to eq(3) }
-      specify { subject.enum_with_default = 10; expect(subject.enum_with_default).to eq(2) }
+      specify { subject.enum_with_default = 10; expect(subject.enum_with_default).to be_nil }
     end
 
     context 'array' do
-      specify { subject.array = [2, 4]; expect(subject.array).to eq([2, 7]) }
+      specify { subject.array = [2, 4]; expect(subject.array).to eq([2, nil]) }
       specify { subject.array = [2, 4]; expect(subject.array?).to eq(true) }
       specify { subject.array = [2, 4]; expect(subject.array_values).to eq([1, 2, 3]) }
       specify { subject.array = [2, 4]; expect(subject.array_default).to eq(7) }

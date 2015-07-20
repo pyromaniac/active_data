@@ -62,27 +62,7 @@ module ActiveData
           @enumerizer_ ||= options.key?(:enum) || options.key?(:in)
         end
 
-        def default
-          @default ||= options[:default]
-        end
-
-        def default?
-          @default_ ||= options.key?(:default)
-        end
-
-        def default_blank
-          @default_blank ||= options[:default_blank]
-        end
-
-        def default_blank?
-          @default_blank_ ||= options.key?(:default_blank)
-        end
-
-        def defaultizer
-          @defaultizer ||= default? ? default : default_blank
-        end
-
-        def default_value context
+        def default context
           case defaultizer
           when Proc
             if defaultizer.arity == 0
@@ -95,19 +75,16 @@ module ActiveData
           end
         end
 
-        def defaultize value, context, type_cast = true
-          use_default = default_blank? && value.respond_to?(:empty?) ? value.empty? : value.nil?
-          if use_default
-            default = default_value(context)
-            default = type_cast(default, context) if type_cast
-            default
-          else
-            value
-          end
+        def defaultize value, context
+          value.nil? ? default(context) : value
         end
 
-        def normalizers
-          @normalizers ||= Array.wrap(options[:normalize] || options[:normalizer] || options[:normalizers])
+        def defaultizer
+          @defaultizer ||= options[:default]
+        end
+
+        def defaultizer?
+          @default_ ||= options.key?(:default)
         end
 
         def normalize value, context
@@ -129,12 +106,16 @@ module ActiveData
           end
         end
 
+        def normalizers
+          @normalizers ||= Array.wrap(options[:normalize] || options[:normalizer] || options[:normalizers])
+        end
+
         def read_value value, context
-          normalize(defaultize(enumerize(type_cast(value, context), context), context), context)
+          normalize(enumerize(type_cast(defaultize(value, context), context), context), context)
         end
 
         def read_value_before_type_cast value, context
-          defaultize(value, context, false)
+          defaultize(value, context)
         end
 
         def generate_instance_methods context
@@ -156,7 +137,7 @@ module ActiveData
             end
 
             def #{name}_default
-              _attributes['#{name}'].default_value(self)
+              _attributes['#{name}'].default(self)
             end
 
             def #{name}_values

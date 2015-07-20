@@ -43,26 +43,19 @@ describe ActiveData::Model::Attributes::Base do
     specify { expect(build_field(enum: -> { 1..5 }).enumerize(42, self)).to eq(nil) }
   end
 
+  describe '#defaultizer' do
+    specify { expect(build_field.defaultizer).to be_nil }
+    specify { expect(build_field(default: 42).defaultizer).to eq(42) }
+    specify { expect(build_field { }.defaultizer).to be_a Proc }
+  end
+
   describe '#default' do
-    specify { expect(build_field.default).to be_nil }
-    specify { expect(build_field(default: 42).default).to eq(42) }
-    specify { expect(build_field { }.default).to be_a Proc }
-  end
-
-  describe '#default_blank' do
-    specify { expect(build_field.default_blank).to be_nil }
-    specify { expect(build_field(default_blank: 42).default_blank).to eq(42) }
-  end
-
-  describe '#default_value' do
     let(:default) { 42 }
 
-    specify { expect(build_field.default_value(self)).to eq(nil) }
-    specify { expect(build_field(default_blank: 'hello').default_value(self)).to eq('hello') }
-    specify { expect(build_field(default: 'hello').default_value(self)).to eq('hello') }
-    specify { expect(build_field(default: 'hello1', default_blank: 'hello2').default_value(self)).to eq('hello1') }
-    specify { expect(build_field { default }.default_value(self)).to eq(42) }
-    specify { expect(build_field { |context| context.default }.default_value(self)).to eq(42) }
+    specify { expect(build_field.default(self)).to eq(nil) }
+    specify { expect(build_field(default: 'hello').default(self)).to eq('hello') }
+    specify { expect(build_field { default }.default(self)).to eq(42) }
+    specify { expect(build_field { |context| context.default }.default(self)).to eq(42) }
   end
 
   describe '#defaultize' do
@@ -78,54 +71,6 @@ describe ActiveData::Model::Attributes::Base do
       let(:field) { build_field(default: ->(instance) { instance.value }) }
 
       specify { expect(field.defaultize(nil, self)).to eq('value') }
-    end
-
-    context 'default_blank: false' do
-      let(:field) { build_field(default: 'world') }
-
-      specify { expect(field.defaultize('hello', self)).to eq('hello') }
-      specify { expect(field.defaultize('', self)).to eq('') }
-      specify { expect(field.defaultize(nil, self)).to eq('world') }
-
-      context do
-        let(:field) { build_field(type: Boolean, default: true) }
-
-        specify { expect(field.defaultize(nil, self)).to eq(true) }
-        specify { expect(field.defaultize(true, self)).to eq(true) }
-        specify { expect(field.defaultize(false, self)).to eq(false) }
-      end
-    end
-
-    context 'default_blank: value' do
-      let(:field) { build_field(default_blank: 'world') }
-
-      specify { expect(field.defaultize('hello', self)).to eq('hello') }
-      specify { expect(field.defaultize('', self)).to eq('world') }
-      specify { expect(field.defaultize(nil, self)).to eq('world') }
-
-      context do
-        let(:field) { build_field(type: Boolean, default_blank: true) }
-
-        specify { expect(field.defaultize(nil, self)).to eq(true) }
-        specify { expect(field.defaultize(true, self)).to eq(true) }
-        specify { expect(field.defaultize(false, self)).to eq(false) }
-      end
-    end
-
-    context 'default_blank: true' do
-      let(:field) { build_field(default: 'world', default_blank: true) }
-
-      specify { expect(field.defaultize('hello', self)).to eq('hello') }
-      specify { expect(field.defaultize('', self)).to eq('world') }
-      specify { expect(field.defaultize(nil, self)).to eq('world') }
-
-      context do
-        let(:field) { build_field(type: Boolean, default_blank: true, default: true) }
-
-        specify { expect(field.defaultize(nil, self)).to eq(true) }
-        specify { expect(field.defaultize(true, self)).to eq(true) }
-        specify { expect(field.defaultize(false, self)).to eq(false) }
-      end
     end
   end
 
@@ -179,20 +124,22 @@ describe ActiveData::Model::Attributes::Base do
   end
 
   describe '#read_value' do
-    let(:field) { build_field(type: String, normalizer: ->(v){ v ? v.strip : v }, default: 'world', enum: ['hello', '42']) }
+    let(:field) { build_field(type: String, normalizer: ->(v){ v ? v.strip : v }, default: :world, enum: ['hello', '42', 'world']) }
 
     specify { expect(field.read_value(nil, self)).to eq('world') }
+    specify { expect(field.read_value(:world, self)).to eq('world') }
     specify { expect(field.read_value('hello', self)).to eq('hello') }
-    specify { expect(field.read_value(' hello ', self)).to eq('world') }
+    specify { expect(field.read_value(' hello ', self)).to eq(nil) }
     specify { expect(field.read_value(42, self)).to eq('42') }
-    specify { expect(field.read_value(43, self)).to eq('world') }
-    specify { expect(field.read_value('', self)).to eq('world') }
+    specify { expect(field.read_value(43, self)).to eq(nil) }
+    specify { expect(field.read_value('', self)).to eq(nil) }
   end
 
   describe '#read_value_before_type_cast' do
-    let(:field) { build_field(type: String, normalizer: ->(v){ v.strip }, default: 'world', enum: ['hello', '42']) }
+    let(:field) { build_field(type: String, normalizer: ->(v){ v.strip }, default: :world, enum: ['hello', '42', 'world']) }
 
-    specify { expect(field.read_value_before_type_cast(nil, self)).to eq('world') }
+    specify { expect(field.read_value_before_type_cast(nil, self)).to eq(:world) }
+    specify { expect(field.read_value_before_type_cast(:world, self)).to eq(:world) }
     specify { expect(field.read_value_before_type_cast('hello', self)).to eq('hello') }
     specify { expect(field.read_value_before_type_cast(42, self)).to eq(42) }
     specify { expect(field.read_value_before_type_cast(43, self)).to eq(43) }

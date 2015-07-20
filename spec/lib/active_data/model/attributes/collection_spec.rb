@@ -7,29 +7,51 @@ describe ActiveData::Model::Attributes::Collection do
   end
 
   describe '#read_value' do
-    let(:field) { build_field(type: String, normalizer: ->(v){ v.uniq.compact }, default: :world, enum: ['hello', '42']) }
+    let(:field) { build_field(type: String, normalizer: ->(v){ v.uniq }, default: :world, enum: ['hello', '42']) }
 
     specify { expect(field.read_value(nil, self)).to eq([]) }
-    specify { expect(field.read_value([nil], self)).to eq(['world']) }
+    specify { expect(field.read_value([nil], self)).to eq([nil]) }
     specify { expect(field.read_value('hello', self)).to eq(['hello']) }
     specify { expect(field.read_value([42], self)).to eq(['42']) }
-    specify { expect(field.read_value([43], self)).to eq(['world']) }
-    specify { expect(field.read_value([''], self)).to eq(['world']) }
+    specify { expect(field.read_value([43], self)).to eq([nil]) }
+    specify { expect(field.read_value([43, 44], self)).to eq([nil]) }
+    specify { expect(field.read_value([''], self)).to eq([nil]) }
     specify { expect(field.read_value(['hello', 42], self)).to eq(['hello', '42']) }
-    specify { expect(field.read_value(['hello', false], self)).to eq(['hello', 'world']) }
+    specify { expect(field.read_value(['hello', false], self)).to eq(['hello', nil]) }
+
+    context do
+      let(:field) { build_field(type: String, normalizer: ->(v){ v.uniq }, default: :world) }
+
+      specify { expect(field.read_value(nil, self)).to eq([]) }
+      specify { expect(field.read_value([nil, nil], self)).to eq(['world']) }
+      specify { expect(field.read_value('hello', self)).to eq(['hello']) }
+      specify { expect(field.read_value([42], self)).to eq(['42']) }
+      specify { expect(field.read_value([''], self)).to eq(['']) }
+    end
   end
 
   describe '#read_value_before_type_cast' do
     let(:field) { build_field(type: String, default: :world, enum: ['hello', '42']) }
 
     specify { expect(field.read_value_before_type_cast(nil, self)).to eq([]) }
-    specify { expect(field.read_value_before_type_cast([nil], self)).to eq([nil]) }
+    specify { expect(field.read_value_before_type_cast([nil], self)).to eq([:world]) }
     specify { expect(field.read_value_before_type_cast('hello', self)).to eq(['hello']) }
     specify { expect(field.read_value_before_type_cast([42], self)).to eq([42]) }
     specify { expect(field.read_value_before_type_cast([43], self)).to eq([43]) }
+    specify { expect(field.read_value_before_type_cast([43, 44], self)).to eq([43, 44]) }
     specify { expect(field.read_value_before_type_cast([''], self)).to eq(['']) }
     specify { expect(field.read_value_before_type_cast(['hello', 42], self)).to eq(['hello', 42]) }
     specify { expect(field.read_value_before_type_cast(['hello', false], self)).to eq(['hello', false]) }
+
+    context do
+      let(:field) { build_field(type: String, default: :world) }
+
+      specify { expect(field.read_value_before_type_cast(nil, self)).to eq([]) }
+      specify { expect(field.read_value_before_type_cast([nil, nil], self)).to eq([:world, :world]) }
+      specify { expect(field.read_value_before_type_cast('hello', self)).to eq(['hello']) }
+      specify { expect(field.read_value_before_type_cast([42], self)).to eq([42]) }
+      specify { expect(field.read_value_before_type_cast([''], self)).to eq(['']) }
+    end
   end
 
   context 'integration' do
