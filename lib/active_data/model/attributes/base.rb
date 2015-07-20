@@ -97,10 +97,10 @@ module ActiveData
                 context.instance_exec(value, &normalizer)
               when Hash
                 normalizer.inject(value) do |value, (name, options)|
-                  context.instance_exec(value, options, &ActiveData.normalizer(name))
+                  context.instance_exec(value, options, self, &ActiveData.normalizer(name))
                 end
               else
-                context.instance_exec(value, {}, &ActiveData.normalizer(normalizer.to_s))
+                context.instance_exec(value, {}, self, &ActiveData.normalizer(normalizer.to_s))
               end
             end
           end

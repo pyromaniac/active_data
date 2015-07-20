@@ -100,6 +100,10 @@ describe ActiveData::Model::Attributes::Base do
         ActiveData.normalizer(:trim) do |value, options|
           value.first(length || options[:length] || 2)
         end
+        ActiveData.normalizer(:reset) do |value, options, attribute|
+          empty = value.respond_to?(:empty?) ? value.empty? : value.nil?
+          empty ? attribute.default(self) : value
+        end
       end
 
       let(:length) { nil }
@@ -111,6 +115,10 @@ describe ActiveData::Model::Attributes::Base do
       specify { expect(build_field(normalizer: {strip: { }, trim: { length: 4 } }).normalize(' hello ', self)).to eq('hell') }
       specify { expect(build_field(normalizer: [:strip, { trim: { length: 4 } }, ->(v){ v.last(2) }])
         .normalize(' hello ', self)).to eq('ll') }
+      specify { expect(build_field(normalizer: :reset).normalize('', self)).to eq(nil) }
+      specify { expect(build_field(normalizer: [:strip, :reset]).normalize('   ', self)).to eq(nil) }
+      specify { expect(build_field(normalizer: :reset, default: '!!!').normalize(nil, self)).to eq('!!!') }
+      specify { expect(build_field(normalizer: :reset, default: '!!!').normalize('', self)).to eq('!!!') }
 
       context do
         let(:length) { 3 }
