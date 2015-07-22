@@ -2,9 +2,6 @@ module ActiveData
   module Model
     module Attributes
       class Dictionary < Base
-        module ModeMethods
-        end
-
         def keys
           @keys = Array.wrap(options[:keys]).map(&:to_s)
         end

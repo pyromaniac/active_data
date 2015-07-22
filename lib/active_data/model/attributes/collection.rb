@@ -2,9 +2,6 @@ module ActiveData
   module Model
     module Attributes
       class Collection < Base
-        module ModeMethods
-        end
-
         def read_value value, context
           normalize(Array.wrap(value).map do |value|
             enumerize(type_cast(defaultize(value, context), context), context)

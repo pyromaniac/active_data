@@ -5,6 +5,7 @@ describe ActiveData::Model::Attributes do
   let(:model) do
     stub_model do
       include ActiveData::Model::Associations
+      include ActiveData::Model::Localization
 
       attribute :id
       attribute :full_name

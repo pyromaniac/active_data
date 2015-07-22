@@ -2,9 +2,6 @@ module ActiveData
   module Model
     module Attributes
       class Association < Base
-        module ModeMethods
-        end
-
         def read_value value, context
           value
         end

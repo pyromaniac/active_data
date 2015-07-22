@@ -3,7 +3,7 @@ require 'spec_helper'
 
 describe ActiveData::Model::Attributes::Collection do
   def build_field(options = {}, &block)
-    described_class.new(:field, options.reverse_merge(mode: :collection), &block)
+    described_class.new(:field, options, &block)
   end
 
   describe '#read_value' do

@@ -16,7 +16,7 @@ module ActiveData
 
         delegate :attribute_names, :attribute_default, :has_attribute?, to: 'self.class'
 
-        [:collection, :dictionary, :localized].each do |mode|
+        [:collection, :dictionary].each do |mode|
           define_singleton_method mode do |*args, &block|
             options = args.extract_options!
             attribute *args, options.merge(mode: mode), &block
@@ -31,7 +31,6 @@ module ActiveData
           attribute = build_attribute(name, options, &block)
           self._attributes = _attributes.merge(attribute.name => attribute)
 
-          include attribute.class::ModeMethods
           attribute.generate_instance_methods generated_instance_attributes_methods
           attribute.generate_class_methods generated_class_attributes_methods
           attribute

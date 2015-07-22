@@ -3,7 +3,7 @@ require 'spec_helper'
 
 describe ActiveData::Model::Attributes::Localized do
   def build_field(options = {}, &block)
-    described_class.new(:field, options.reverse_merge(mode: :localized), &block)
+    described_class.new(:field, options, &block)
   end
 
   describe '#read_value' do
@@ -54,6 +54,7 @@ describe ActiveData::Model::Attributes::Localized do
     let(:klass) do
       Class.new do
         include ActiveData::Model
+        include ActiveData::Model::Localization
 
         localized :name, type: String
       end

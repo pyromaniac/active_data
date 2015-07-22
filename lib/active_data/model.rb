@@ -7,6 +7,7 @@ require 'active_data/model/persistence'
 require 'active_data/model/callbacks'
 require 'active_data/model/associations'
 require 'active_data/model/validations'
+require 'active_data/model/localization'
 
 module ActiveData
   module Model
