@@ -1,5 +1,3 @@
-require 'active_data/model/associations/reflections/base'
-
 module ActiveData
   module Model
     module Associations
@@ -16,6 +14,7 @@ module ActiveData
         private
 
           def define_methods!
+            owner.add_attribute(ActiveData::Model::Attributes::Reflections::Association, name) if owner < ActiveData::Model::Attributes
             owner.class_eval <<-EOS
               def #{name} force_reload = false
                 association(:#{name}).reader(force_reload)

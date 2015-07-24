@@ -1,13 +1,20 @@
-require 'active_data/model/associations/reflections/embeds_many'
+require 'active_data/model/associations/reflections/base'
 require 'active_data/model/associations/reflections/embeds_one'
 require 'active_data/model/associations/reflections/embeds_many'
+require 'active_data/model/associations/reflections/reference_reflection'
 require 'active_data/model/associations/reflections/references_one'
 require 'active_data/model/associations/reflections/references_many'
+
+require 'active_data/model/associations/base'
 require 'active_data/model/associations/embeds_one'
 require 'active_data/model/associations/embeds_many'
 require 'active_data/model/associations/references_one'
 require 'active_data/model/associations/references_many'
 require 'active_data/model/associations/nested_attributes'
+
+require 'active_data/model/associations/collection_proxy'
+require 'active_data/model/associations/embedded_collection_proxy'
+require 'active_data/model/associations/referenced_collection_proxy'
 
 module ActiveData
   module Model
@@ -28,7 +35,6 @@ module ActiveData
         }.each do |(name, reflection_class)|
           define_singleton_method name do |*args, &block|
             reflection = reflection_class.new self, *args, &block
-            reflection.attributes.each { |name, options| attribute(name, options) }
             self.reflections = reflections.merge(reflection.name => reflection)
             reflection
           end
@@ -46,6 +52,11 @@ module ActiveData
           (reflections.map do |_, reflection|
             "#{reflection.name}: #{reflection.inspect}"
           end + [super]).join(', ')
+        end
+
+        def generated_associations_methods
+          @generated_associations_methods ||= const_set(:GeneratedAssociationsMethods, Module.new)
+            .tap { |proxy| include proxy }
         end
       end
 

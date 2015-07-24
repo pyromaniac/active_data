@@ -22,7 +22,7 @@ module ActiveData
           entries = target.take(10).map!(&:inspect)
           entries[10] = '...' if target.size > 10
 
-          "#<#{self.class.name} [#{entries.join(', ')}]>"
+          "#<#{self.class.name.demodulize} [#{entries.join(', ')}]>"
         end
       end
     end

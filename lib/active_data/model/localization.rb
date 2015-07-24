@@ -5,8 +5,7 @@ module ActiveData
 
       module ClassMethods
         def localized *args, &block
-          options = args.extract_options!
-          attribute *args, options.merge(mode: :localized), &block
+          add_attribute(ActiveData::Model::Attributes::Reflections::Localized, *args, &block)
         end
 
         def fallbacks locale

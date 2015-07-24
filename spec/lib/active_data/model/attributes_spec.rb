@@ -19,24 +19,6 @@ describe ActiveData::Model::Attributes do
     end
   end
 
-  describe '.alias_attribute' do
-    specify { expect(model.new(name: 'Name').full_name).to eq('Name') }
-    specify { expect(model.new(full_name: 'Name').name).to eq('Name') }
-    specify { expect(model.new(full_name: 'Name').name?).to eq(true) }
-    specify { expect(model.new(full_name: 'Name').name_before_type_cast).to eq('Name') }
-    specify { expect(model.new(full_name: 'Name').name_default).to be_nil }
-    specify { expect(model.new(full_name: 'Name').name_values).to eq([]) }
-
-    specify { expect(model.new(title_translations: {ru: 'Name'}).t_translations).to eq('ru' => 'Name') }
-    specify { expect(model.new(t_translations: {ru: 'Name'}).title_translations).to eq('ru' => 'Name') }
-    specify { expect(model.new(title: 'Name').t).to eq('Name') }
-    specify { expect(model.new(t: 'Name').title).to eq('Name') }
-    specify { expect(model.new(t: 'Name').title?).to eq(true) }
-    specify { expect(model.new(t: 'Name').title_before_type_cast).to eq('Name') }
-
-    specify { expect { model.alias_attribute :foo, :bar }.to raise_error ArgumentError }
-  end
-
   describe '.has_attribute?' do
     specify { expect(model.has_attribute?(:full_name)).to eq(true) }
     specify { expect(model.has_attribute?('full_name')).to eq(true) }
@@ -118,7 +100,7 @@ describe ActiveData::Model::Attributes do
     specify { expect(stub_model(:user) { attribute :count, type: Integer; attribute :object }.new.inspect).to match(/#<User count: nil, object: nil>/) }
   end
 
-  context 'attributes' do
+  context 'attributes integration' do
     let(:model) do
       stub_class do
         include ActiveData::Model::Attributes
@@ -144,7 +126,6 @@ describe ActiveData::Model::Attributes do
 
     subject { model.new('world') }
 
-    specify { expect(model.enum_values).to eq([1, 2, 3]) }
     its(:enum_values) { should == [1, 2, 3] }
     its(:string_default) { should == 'world' }
     its(:count_default) { should == '10' }

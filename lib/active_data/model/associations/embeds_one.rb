@@ -1,5 +1,3 @@
-require 'active_data/model/associations/base'
-
 module ActiveData
   module Model
     module Associations

@@ -2,51 +2,53 @@
 require 'spec_helper'
 
 describe ActiveData::Model::Attributes::Localized do
-  def build_field(options = {}, &block)
-    described_class.new(:field, options, &block)
+  def attribute(*args)
+    options = args.extract_options!
+    reflection = ActiveData::Model::Attributes::Reflections::Localized.new(:field, options)
+    described_class.new(args.first || Object.new, reflection)
   end
 
   describe '#read_value' do
-    let(:field) { build_field(type: String, default: :world, enum: ['hello', '42']) }
+    let(:field) { attribute(type: String, default: :world, enum: ['hello', '42']) }
 
-    specify { expect(field.read_value(nil, self)).to eq({}) }
-    specify { expect(field.read_value({ en: 'hello' }, self)).to eq({ 'en' => 'hello' }) }
-    specify { expect(field.read_value({ en: 42 }, self)).to eq({ 'en' => '42' }) }
-    specify { expect(field.read_value({ en: 43 }, self)).to eq({ 'en' => nil }) }
-    specify { expect(field.read_value({ en: '' }, self)).to eq({ 'en' => nil }) }
-    specify { expect(field.read_value({ en: nil }, self)).to eq({ 'en' => nil }) }
-    specify { expect(field.read_value({ en: 'hello', ru: 42 }, self)).to eq({ 'en' => 'hello', 'ru' => '42' }) }
+    specify { expect(field.read_value(nil)).to eq({}) }
+    specify { expect(field.read_value({ en: 'hello' })).to eq({ 'en' => 'hello' }) }
+    specify { expect(field.read_value({ en: 42 })).to eq({ 'en' => '42' }) }
+    specify { expect(field.read_value({ en: 43 })).to eq({ 'en' => nil }) }
+    specify { expect(field.read_value({ en: '' })).to eq({ 'en' => nil }) }
+    specify { expect(field.read_value({ en: nil })).to eq({ 'en' => nil }) }
+    specify { expect(field.read_value({ en: 'hello', ru: 42 })).to eq({ 'en' => 'hello', 'ru' => '42' }) }
 
     context do
-      let(:field) { build_field(type: String, default: :world) }
+      let(:field) { attribute(type: String, default: :world) }
 
-      specify { expect(field.read_value(nil, self)).to eq({}) }
-      specify { expect(field.read_value({ en: 'hello' }, self)).to eq({ 'en' => 'hello' }) }
-      specify { expect(field.read_value({ en: 42 }, self)).to eq({ 'en' => '42' }) }
-      specify { expect(field.read_value({ en: '' }, self)).to eq({ 'en' => '' }) }
-      specify { expect(field.read_value({ en: nil }, self)).to eq({ 'en' => 'world' }) }
+      specify { expect(field.read_value(nil)).to eq({}) }
+      specify { expect(field.read_value({ en: 'hello' })).to eq({ 'en' => 'hello' }) }
+      specify { expect(field.read_value({ en: 42 })).to eq({ 'en' => '42' }) }
+      specify { expect(field.read_value({ en: '' })).to eq({ 'en' => '' }) }
+      specify { expect(field.read_value({ en: nil })).to eq({ 'en' => 'world' }) }
     end
   end
 
   describe '#read_value_before_type_cast' do
-    let(:field) { build_field(type: String, default: :world, enum: ['hello', '42']) }
+    let(:field) { attribute(type: String, default: :world, enum: ['hello', '42']) }
 
-    specify { expect(field.read_value_before_type_cast(nil, self)).to eq({}) }
-    specify { expect(field.read_value_before_type_cast({ en: 'hello' }, self)).to eq({ 'en' => 'hello' }) }
-    specify { expect(field.read_value_before_type_cast({ en: 42 }, self)).to eq({ 'en' => 42 }) }
-    specify { expect(field.read_value_before_type_cast({ en: 43 }, self)).to eq({ 'en' => 43 }) }
-    specify { expect(field.read_value_before_type_cast({ en: '' }, self)).to eq({ 'en' => '' }) }
-    specify { expect(field.read_value_before_type_cast({ en: nil }, self)).to eq({ 'en' => :world }) }
-    specify { expect(field.read_value_before_type_cast({ en: 'hello', ru: 42 }, self)).to eq({ 'en' => 'hello', 'ru' => 42 }) }
+    specify { expect(field.read_value_before_type_cast(nil)).to eq({}) }
+    specify { expect(field.read_value_before_type_cast({ en: 'hello' })).to eq({ 'en' => 'hello' }) }
+    specify { expect(field.read_value_before_type_cast({ en: 42 })).to eq({ 'en' => 42 }) }
+    specify { expect(field.read_value_before_type_cast({ en: 43 })).to eq({ 'en' => 43 }) }
+    specify { expect(field.read_value_before_type_cast({ en: '' })).to eq({ 'en' => '' }) }
+    specify { expect(field.read_value_before_type_cast({ en: nil })).to eq({ 'en' => :world }) }
+    specify { expect(field.read_value_before_type_cast({ en: 'hello', ru: 42 })).to eq({ 'en' => 'hello', 'ru' => 42 }) }
 
     context do
-      let(:field) { build_field(type: String, default: :world) }
+      let(:field) { attribute(type: String, default: :world) }
 
-      specify { expect(field.read_value_before_type_cast(nil, self)).to eq({}) }
-      specify { expect(field.read_value_before_type_cast({ en: 'hello' }, self)).to eq({ 'en' => 'hello' }) }
-      specify { expect(field.read_value_before_type_cast({ en: 42 }, self)).to eq({ 'en' => 42 }) }
-      specify { expect(field.read_value_before_type_cast({ en: '' }, self)).to eq({ 'en' => '' }) }
-      specify { expect(field.read_value_before_type_cast({ en: nil }, self)).to eq({ 'en' => :world }) }
+      specify { expect(field.read_value_before_type_cast(nil)).to eq({}) }
+      specify { expect(field.read_value_before_type_cast({ en: 'hello' })).to eq({ 'en' => 'hello' }) }
+      specify { expect(field.read_value_before_type_cast({ en: 42 })).to eq({ 'en' => 42 }) }
+      specify { expect(field.read_value_before_type_cast({ en: '' })).to eq({ 'en' => '' }) }
+      specify { expect(field.read_value_before_type_cast({ en: nil })).to eq({ 'en' => :world }) }
     end
   end
 

@@ -2,14 +2,14 @@ module ActiveData
   module Model
     module Attributes
       class Collection < Base
-        def read_value value, context
+        def read_value value
           normalize(Array.wrap(value).map do |value|
-            enumerize(type_cast(defaultize(value, context), context), context)
-          end, context)
+            enumerize(typecast(defaultize(value)))
+          end)
         end
 
-        def read_value_before_type_cast value, context
-          Array.wrap(value).map { |value| defaultize(value, context) }
+        def read_value_before_type_cast value
+          Array.wrap(value).map { |value| defaultize(value) }
         end
       end
     end

@@ -1,9 +1,16 @@
+require 'active_data/model/attributes/reflections/base'
+require 'active_data/model/attributes/reflections/attribute'
+require 'active_data/model/attributes/reflections/collection'
+require 'active_data/model/attributes/reflections/dictionary'
+require 'active_data/model/attributes/reflections/localized'
+require 'active_data/model/attributes/reflections/association'
+
 require 'active_data/model/attributes/base'
+require 'active_data/model/attributes/attribute'
 require 'active_data/model/attributes/collection'
 require 'active_data/model/attributes/dictionary'
 require 'active_data/model/attributes/localized'
 require 'active_data/model/attributes/association'
-
 
 module ActiveData
   module Model
@@ -11,37 +18,33 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
-        class_attribute :_attributes, instance_writer: false
+        class_attribute :_attributes, instance_reader: false, instance_writer: false
         self._attributes = {}
 
-        delegate :attribute_names, :attribute_default, :has_attribute?, to: 'self.class'
+        delegate :attribute_names, :has_attribute?, to: 'self.class'
 
-        [:collection, :dictionary].each do |mode|
-          define_singleton_method mode do |*args, &block|
-            options = args.extract_options!
-            attribute *args, options.merge(mode: mode), &block
+        %w[attribute collection dictionary].each do |kind|
+          define_singleton_method kind do |*args, &block|
+            add_attribute("ActiveData::Model::Attributes::Reflections::#{kind.camelize}".constantize, *args, &block)
           end
         end
       end
 
       module ClassMethods
-        def attribute name, *args, &block
-          options = args.extract_options!
-          options = options.merge(type: args.first) if args.first
-          attribute = build_attribute(name, options, &block)
+        def add_attribute(reflection_class, *args, &block)
+          attribute = reflection_class.build(generated_attributes_methods, *args, &block)
           self._attributes = _attributes.merge(attribute.name => attribute)
-
-          attribute.generate_instance_methods generated_instance_attributes_methods
-          attribute.generate_class_methods generated_class_attributes_methods
           attribute
         end
 
+        def reflect_on_attribute(name)
+          _attributes[name.to_s]
+        end
+
         def alias_attribute(alias_name, attribute_name)
-          attribute = _attributes[attribute_name.to_s]
+          attribute = reflect_on_attribute(attribute_name)
           raise ArgumentError.new("Can't alias undefined attribute `#{attribute_name}` on #{self}") unless attribute
-          attribute.generate_instance_alias_methods alias_name, generated_instance_attributes_methods
-          attribute.generate_class_alias_methods alias_name, generated_class_attributes_methods
-          attribute
+          attribute.alias_attribute alias_name, generated_attributes_methods
         end
 
         def attribute_names(include_associations = true)
@@ -49,7 +52,7 @@ module ActiveData
             _attributes.keys
           else
             _attributes.map do |name, attribute|
-              name unless attribute.is_a?(ActiveData::Model::Attributes::Association)
+              name unless attribute.is_a?(ActiveData::Model::Attributes::Reflections::Association)
             end.compact
           end
         end
@@ -58,12 +61,12 @@ module ActiveData
           _attributes.key? name.to_s
         end
 
-        def inspect
-          "#{original_inspect}(#{attributes_for_inspect.presence || 'no attributes'})"
-        end
-
         def initialize_attributes
           Hash[attribute_names.zip]
+        end
+
+        def inspect
+          "#{original_inspect}(#{attributes_for_inspect.presence || 'no attributes'})"
         end
 
       private
@@ -72,23 +75,15 @@ module ActiveData
           Object.method(:inspect).unbind.bind(self).call
         end
 
-        def build_attribute name, options = {}, &block
-          class_name = "ActiveData::Model::Attributes::#{(options.delete(:mode).to_s.presence || 'base').classify}"
-          class_name.constantize.new name, options, &block
-        end
-
-        def generated_class_attributes_methods
-          @generated_class_attributes_methods ||= Module.new.tap { |proxy| extend proxy }
-        end
-
-        def generated_instance_attributes_methods
-          @generated_instance_attributes_methods ||= Module.new.tap { |proxy| include proxy }
-        end
-
         def attributes_for_inspect
           attribute_names(false).map do |name|
-            "#{name}: #{_attributes[name].type}"
+            "#{name}: #{reflect_on_attribute(name).type}"
           end.join(', ')
+        end
+
+        def generated_attributes_methods
+          @generated_attributes_methods ||= const_set(:GeneratedAttirbutesMethods, Module.new)
+            .tap { |proxy| include proxy }
         end
       end
 
@@ -102,6 +97,10 @@ module ActiveData
       end
       alias_method :eql?, :==
 
+      def attribute(name)
+        (@_attributes ||= {})[name.to_s] ||= self.class.reflect_on_attribute(name).build_attribute(self)
+      end
+
       def write_attribute name, value
         name = name.to_s
         attributes_cache.delete name
@@ -112,14 +111,14 @@ module ActiveData
       def read_attribute name
         name = name.to_s
         attributes_cache.fetch(name) do
-          attributes_cache[name] = _attributes[name].read_value(@attributes[name], self)
+          attributes_cache[name] = attribute(name).read_value(@attributes[name])
         end
       end
       alias_method :[], :read_attribute
 
       def read_attribute_before_type_cast name
         name = name.to_s
-        _attributes[name].read_value_before_type_cast(@attributes[name], self)
+        attribute(name).read_value_before_type_cast(@attributes[name])
       end
 
       def attribute_present? name

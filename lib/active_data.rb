@@ -40,7 +40,7 @@ module ActiveData
 
   singleton_class.delegate *ActiveData::Config.delegated, to: :config
 
-  typecaster('Object') { |value, type| value if value.class < type }
+  typecaster('Object') { |value, attribute| value if value.class < attribute.type }
   typecaster('String') { |value| value.to_s }
   typecaster('Array') do |value|
     case value

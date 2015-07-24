@@ -1,5 +1,3 @@
-require 'active_data/model/associations/reflections/base'
-
 module ActiveData
   module Model
     module Associations

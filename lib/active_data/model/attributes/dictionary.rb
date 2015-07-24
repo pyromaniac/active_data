@@ -2,24 +2,22 @@ module ActiveData
   module Model
     module Attributes
       class Dictionary < Base
-        def keys
-          @keys = Array.wrap(options[:keys]).map(&:to_s)
-        end
+        delegate :keys, to: :reflection
 
-        def read_value hash, context
+        def read_value hash
           hash = hash.presence || {}
           hash = hash.stringify_keys.slice(*keys) if keys.present?
 
           normalize(Hash[hash.map do |key, value|
-            [key, enumerize(type_cast(defaultize(value, context), context), context)]
-          end].with_indifferent_access, context).with_indifferent_access
+            [key, enumerize(typecast(defaultize(value)))]
+          end].with_indifferent_access).with_indifferent_access
         end
 
-        def read_value_before_type_cast hash, context
+        def read_value_before_type_cast hash
           hash = hash.presence || {}
 
           Hash[hash.map do |key, value|
-            [key, defaultize(value, context)]
+            [key, defaultize(value)]
           end].with_indifferent_access
         end
       end

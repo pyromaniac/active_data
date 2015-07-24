@@ -1,6 +1,3 @@
-require 'active_data/model/associations/base'
-require 'active_data/model/associations/embedded_collection_proxy'
-
 module ActiveData
   module Model
     module Associations

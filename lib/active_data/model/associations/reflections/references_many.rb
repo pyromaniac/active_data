@@ -1,5 +1,3 @@
-require 'active_data/model/associations/reflections/reference_reflection'
-
 module ActiveData
   module Model
     module Associations
@@ -17,8 +15,11 @@ module ActiveData
             :"#{name.to_s.singularize}_ids"
           end
 
-          def attributes
-            {reference_key => {type: Integer, mode: :collection}}
+        private
+
+          def define_methods!
+            owner.collection(reference_key, Integer) if owner < ActiveData::Model::Attributes
+            super
           end
         end
       end

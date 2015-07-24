@@ -1,5 +1,3 @@
-require 'active_data/model/associations/collection_proxy'
-
 module ActiveData
   module Model
     module Associations

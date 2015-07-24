@@ -58,10 +58,6 @@ module ActiveData
             (options[:write] || WRITE).call(self, object, value)
           end
 
-          def attributes
-            {name => {mode: :association}}
-          end
-
           def inspect
             "#{self.class.name.demodulize}(#{klass})"
           end
