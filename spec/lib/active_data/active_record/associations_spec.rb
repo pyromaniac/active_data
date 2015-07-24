@@ -111,7 +111,7 @@ describe ActiveData::ActiveRecord::Associations do
     specify do
       expect { stub_class(:book, ActiveRecord::Base) do
         embeds_one :author, class_name: 'Borogoves'
-      end.reflect_on_association(:author).klass }.to raise_error 'Can not determine class for `Book#author` association'
+      end.reflect_on_association(:author).klass }.to raise_error NameError
     end
 
     specify do
@@ -119,7 +119,7 @@ describe ActiveData::ActiveRecord::Associations do
         embeds_many :projects, class_name: 'Borogoves' do
           attribute :title
         end
-      end.reflect_on_association(:projects).klass }.to raise_error 'Can not determine superclass for `User#projects` association'
+      end.reflect_on_association(:projects).klass }.to raise_error NameError
     end
   end
 

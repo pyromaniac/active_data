@@ -34,7 +34,7 @@ module ActiveData
           references_many: Reflections::ReferencesMany
         }.each do |(name, reflection_class)|
           define_singleton_method name do |*args, &block|
-            reflection = reflection_class.new self, *args, &block
+            reflection = reflection_class.build self, generated_associations_methods, *args, &block
             self.reflections = reflections.merge(reflection.name => reflection)
             reflection
           end

@@ -6,12 +6,30 @@ module ActiveData
           READ = ->(reflection, object) { object.read_attribute reflection.name }
           WRITE = ->(reflection, object, value) { object.write_attribute reflection.name, value }
 
-          attr_reader :owner, :name, :options, :evaluator
+          attr_reader :name, :options
           attr_accessor :parent_reflection
+          delegate :association_class, to: 'self.class'
 
-          def initialize owner, name, options = {}, &block
-            @owner, @name, @options, @evaluator = owner, name.to_sym, options, block
-            define_methods!
+          def self.build target, generated_methods, name, options = {}, &block
+            if block
+              superclass = options[:class_name].to_s.presence.try(:constantize)
+              klass = Class.new(superclass || Object) do
+                include ActiveData::Model
+                include ActiveData::Model::Lifecycle
+              end
+              target.const_set(name.to_s.classify, klass)
+              klass.class_eval(&block)
+              options[:class] = klass
+            end
+            new(name, options)
+          end
+
+          def self.association_class
+            @association_class ||= "ActiveData::Model::Associations::#{name.demodulize}".constantize
+          end
+
+          def initialize name, options = {}
+            @name, @options = name.to_sym, options
           end
 
           def macro
@@ -19,23 +37,7 @@ module ActiveData
           end
 
           def klass
-            @klass ||= if evaluator
-              superclass = options[:class_name].to_s.presence.try(:safe_constantize)
-              raise "Can not determine superclass for `#{owner}##{name}` association" if options[:class_name].present? && !superclass
-              klass = Class.new(superclass || Object) do
-                include ActiveData::Model
-                include ActiveData::Model::Lifecycle
-              end
-              owner.const_set(name.to_s.classify, klass)
-              klass.class_eval(&evaluator)
-              klass
-            else
-              klass = class_name.safe_constantize or raise "Can not determine class for `#{owner}##{name}` association"
-            end
-          end
-
-          def class_name
-            @class_name ||= (options[:class_name].presence || name.to_s.classify).to_s
+            @klass ||= options[:class] || (options[:class_name].presence || name.to_s.classify).to_s.constantize
           end
 
           def validate?
@@ -47,7 +49,7 @@ module ActiveData
           end
 
           def build_association object
-            association_class.new object, self
+            self.class.association_class.new object, self
           end
 
           def read_source object
@@ -60,12 +62,6 @@ module ActiveData
 
           def inspect
             "#{self.class.name.demodulize}(#{klass})"
-          end
-
-        private
-
-          def define_methods!
-            raise NotImplementedError
           end
         end
       end

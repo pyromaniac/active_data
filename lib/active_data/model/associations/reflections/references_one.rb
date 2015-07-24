@@ -3,22 +3,18 @@ module ActiveData
     module Associations
       module Reflections
         class ReferencesOne < ReferenceReflection
+          def self.build target, generated_methods, name, options = {}, &block
+            reflection = super
+            target.attribute(reflection.reference_key, Integer) if target < ActiveData::Model::Attributes
+            reflection
+          end
+
           def collection?
             false
           end
 
-          def association_class
-            ActiveData::Model::Associations::ReferencesOne
-          end
-
           def reference_key
             :"#{name}_id"
-          end
-
-        private
-          def define_methods!
-            owner.attribute(reference_key, Integer) if owner < ActiveData::Model::Attributes
-            super
           end
         end
       end

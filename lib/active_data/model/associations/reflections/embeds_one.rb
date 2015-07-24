@@ -3,19 +3,12 @@ module ActiveData
     module Associations
       module Reflections
         class EmbedsOne < Base
-          def collection?
-            false
-          end
-
-          def association_class
-            ActiveData::Model::Associations::EmbedsOne
-          end
-
-        private
-
-          def define_methods!
-            owner.add_attribute(ActiveData::Model::Attributes::Reflections::Association, name) if owner < ActiveData::Model::Attributes
-            owner.class_eval <<-EOS
+          def self.build target, generated_methods, name, options = {}, &block
+            reflection = super
+            if target < ActiveData::Model::Attributes
+              target.add_attribute(ActiveData::Model::Attributes::Reflections::Association, name)
+            end
+            generated_methods.class_eval <<-EOS
               def #{name} force_reload = false
                 association(:#{name}).reader(force_reload)
               end
@@ -36,6 +29,11 @@ module ActiveData
                 association(:#{name}).create!(attributes)
               end
             EOS
+            reflection
+          end
+
+          def collection?
+            false
           end
         end
       end

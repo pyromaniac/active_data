@@ -20,7 +20,7 @@ module ActiveData
       included do
         { embeds_many: Reflections::EmbedsMany, embeds_one: Reflections::EmbedsOne }.each do |(name, reflection_class)|
           define_singleton_method name do |name, options = {}, &block|
-            reflection = reflection_class.new(self, name, options.reverse_merge(
+            reflection = reflection_class.build(self, self, name, options.reverse_merge(
               read: ->(reflection, object) {
                 value = object.read_attribute(reflection.name)
                 JSON.parse(value) if value.present?
