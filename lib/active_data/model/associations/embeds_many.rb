@@ -31,7 +31,7 @@ module ActiveData
         def target
           return @target if loaded?
           data = read_source
-          self.target = data ? reflection.klass.instantiate_collection(data) : []
+          self.target = reflection.klass.instantiate_collection(data)
         end
 
         def reset

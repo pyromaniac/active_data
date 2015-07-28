@@ -118,7 +118,7 @@ describe ActiveData::Model::Attributes do
         collection :array, enum: [1, 2, 3], default: 7
 
         def initialize name = nil
-          @attributes = self.class.initialize_attributes
+          @attributes = {}
           @name = name
         end
       end

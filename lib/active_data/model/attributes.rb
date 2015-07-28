@@ -61,10 +61,6 @@ module ActiveData
           _attributes.key? name.to_s
         end
 
-        def initialize_attributes
-          Hash[attribute_names.zip]
-        end
-
         def inspect
           "#{original_inspect}(#{attributes_for_inspect.presence || 'no attributes'})"
         end
@@ -88,7 +84,7 @@ module ActiveData
       end
 
       def initialize attrs = {}
-        @attributes = self.class.initialize_attributes
+        @attributes = {}
         assign_attributes attrs
       end
 
