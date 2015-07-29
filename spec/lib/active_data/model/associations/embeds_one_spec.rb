@@ -93,12 +93,23 @@ describe ActiveData::Model::Associations::EmbedsOne do
   end
 
   describe '#target' do
-  end
-
-  describe '#target' do
     specify { expect(association.target).to be_nil }
     specify { expect(existing_association.target).to eq(existing_book.author) }
     specify { expect { association.build }.to change { association.target }.to(an_instance_of(Author)) }
+  end
+
+  describe '#default' do
+    before { Book.embeds_one :author, default: -> { { name: 'Default' } } }
+    let(:new_author) { Author.new(name: 'Morty') }
+    let(:existing_book) { Book.instantiate title: 'My Life' }
+
+    specify { expect(association.target.name).to eq('Default') }
+    specify { expect { association.replace(new_author) }.to change { association.target.name }.to eq('Morty') }
+    specify { expect { association.replace(nil) }.to change { association.target }.to be_nil }
+
+    specify { expect(existing_association.target).to be_nil }
+    specify { expect { existing_association.replace(new_author) }.to change { existing_association.target }.to(an_instance_of(Author)) }
+    specify { expect { existing_association.replace(nil) }.not_to change { existing_association.target } }
   end
 
   describe '#loaded?' do

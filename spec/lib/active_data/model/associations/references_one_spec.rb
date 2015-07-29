@@ -64,6 +64,20 @@ describe ActiveData::Model::Associations::ReferencesOne do
     specify { expect(existing_association.reader).to be_persisted }
   end
 
+  describe '#default' do
+    before { Book.references_one :author, default: ->(book) { author.id } }
+    let(:existing_book) { Book.instantiate title: 'My Life' }
+
+    specify { expect(association.target).to eq(author) }
+    specify { expect { association.replace(other) }.to change { association.target }.to(other) }
+    specify { expect { association.replace(nil) }.to change { association.target }.to be_nil }
+
+    specify { expect(existing_association.target).to be_nil }
+    specify { expect { existing_association.replace(other) }.to change { existing_association.target }.to(other) }
+    specify { expect { existing_association.replace(nil) }.not_to change { existing_association.target } }
+  end
+
+
   describe '#writer' do
     let(:new_author) { Author.create(name: 'Morty') }
 

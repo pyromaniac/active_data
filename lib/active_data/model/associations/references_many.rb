@@ -19,9 +19,20 @@ module ActiveData
           @target = object.to_a
         end
 
-        def target
-          return @target if loaded?
-          self.target = read_source.present? ? scope.to_a : []
+        def load_target
+          source = read_source
+          source.present? ? scope(source).to_a : default
+        end
+
+        def default
+          unless evar_loaded?
+            default = Array.wrap(reflection.default(owner))
+            if default.all? { |object| object.is_a?(reflection.klass) }
+              default
+            else
+              scope(default).to_a
+            end if default.present?
+          end || []
         end
 
         def reader force_reload = false
@@ -47,8 +58,8 @@ module ActiveData
           reload.empty?
         end
 
-        def scope
-          reflection.klass.where(reflection.primary_key => read_source)
+        def scope source = read_source
+          reflection.klass.where(reflection.primary_key => source)
         end
 
       private

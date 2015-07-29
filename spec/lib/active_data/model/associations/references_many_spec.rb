@@ -43,6 +43,19 @@ describe ActiveData::Model::Associations::ReferencesMany do
     specify { expect { association.concat author }.to change { association.target.count }.to(1) }
   end
 
+  describe '#default' do
+    before { Book.references_many :authors, default: ->(book) { author.id } }
+    let(:existing_book) { Book.instantiate title: 'Genesis' }
+
+    specify { expect(association.target).to eq([author]) }
+    specify { expect { association.replace([other]) }.to change { association.target }.to([other]) }
+    specify { expect { association.replace([]) }.to change { association.target }.to eq([]) }
+
+    specify { expect(existing_association.target).to eq([]) }
+    specify { expect { existing_association.replace([other]) }.to change { existing_association.target }.to([other]) }
+    specify { expect { existing_association.replace([]) }.not_to change { existing_association.target } }
+  end
+
   describe '#loaded?' do
     specify { expect(association.loaded?).to eq(false) }
     specify { expect { association.target }.to change { association.loaded? }.to(true) }

@@ -21,9 +21,20 @@ module ActiveData
           @target = object
         end
 
-        def target
-          return @target if loaded?
-          self.target = read_source && scope.first
+        def load_target
+          source = read_source
+          source ? scope(source).first : default
+        end
+
+        def default
+          unless evar_loaded?
+            default = reflection.default(owner)
+            if default.is_a?(reflection.klass)
+              default
+            else
+              scope(default).first
+            end if default
+          end
         end
 
         def reader force_reload = false
@@ -45,8 +56,8 @@ module ActiveData
         end
         alias_method :writer, :replace
 
-        def scope
-          reflection.klass.where(reflection.primary_key => read_source)
+        def scope source = read_source
+          reflection.klass.where(reflection.primary_key => source)
         end
 
       private

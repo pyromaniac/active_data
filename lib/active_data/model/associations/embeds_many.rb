@@ -28,10 +28,20 @@ module ActiveData
           @target = objects
         end
 
-        def target
-          return @target if loaded?
-          data = read_source
-          self.target = reflection.klass.instantiate_collection(data)
+        def load_target
+          source = read_source
+          source.present? ? reflection.klass.instantiate_collection(source) : default
+        end
+
+        def default
+          unless evar_loaded?
+            default = Array.wrap(reflection.default(owner))
+            if default.all? { |object| object.is_a?(reflection.klass) }
+              default
+            else
+              reflection.klass.instantiate_collection(default)
+            end if default.present?
+          end || []
         end
 
         def reset
@@ -88,29 +98,29 @@ module ActiveData
           association = self
 
           object.define_create do
-            data = association.send(:read_source)
-            index = association.target.select do |object|
-              object.persisted? || object === self
-            end.index { |object| object === self }
+            source = association.send(:read_source)
+            index = association.target.select do |one|
+              one.persisted? || one === self
+            end.index { |one| one === self }
 
-            data.insert(index, attributes)
-            association.send(:write_source, data)
+            source.insert(index, attributes)
+            association.send(:write_source, source)
           end
 
           object.define_update do
-            data = association.send(:read_source)
-            index = association.target.select(&:persisted?).index { |object| object === self }
+            source = association.send(:read_source)
+            index = association.target.select(&:persisted?).index { |one| one === self }
 
-            data[index] = attributes
-            association.send(:write_source, data)
+            source[index] = attributes
+            association.send(:write_source, source)
           end
 
           object.define_destroy do
-            data = association.send(:read_source)
-            index = association.target.select(&:persisted?).index { |object| object === self }
+            source = association.send(:read_source)
+            index = association.target.select(&:persisted?).index { |one| one === self }
 
-            data.delete_at(index) if index
-            association.send(:write_source, data)
+            source.delete_at(index) if index
+            association.send(:write_source, source)
           end
         end
       end

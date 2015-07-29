@@ -7,6 +7,7 @@ module ActiveData
 
         def initialize owner, reflection
           @owner, @reflection = owner, reflection
+          @evar_loaded = owner.persisted?
           reset
         end
 
@@ -15,12 +16,22 @@ module ActiveData
           @target = nil
         end
 
+        def evar_loaded?
+          !!@evar_loaded
+        end
+
         def loaded?
           !!@loaded
         end
 
         def loaded!
+          @evar_loaded = true
           @loaded = true
+        end
+
+        def target
+          return @target if loaded?
+          self.target = load_target
         end
 
         def reload

@@ -60,6 +60,19 @@ module ActiveData
             (options[:write] || WRITE).call(self, object, value)
           end
 
+          def default object
+            defaultizer = options[:default]
+            if defaultizer.is_a?(Proc)
+              if defaultizer.arity != 0
+                defaultizer.call(object)
+              else
+                object.instance_exec(&defaultizer)
+              end
+            else
+              defaultizer
+            end
+          end
+
           def inspect
             "#{self.class.name.demodulize}(#{klass})"
           end

@@ -45,7 +45,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
       expect(user.read_attribute(:projects)).to eq([{'title' => 'Project 2'}, {'title' => 'Project 4'}])
       p2.destroy!.destroy!
       expect(user.read_attribute(:projects)).to eq([{'title' => 'Project 4'}])
-      p5 = user.projects.create(title: 'Project 5')
+      user.projects.create(title: 'Project 5')
       expect(user.read_attribute(:projects)).to eq([{'title' => 'Project 4'}, {'title' => 'Project 5'}])
       p3.destroy!
       user.projects.first.destroy!
@@ -178,6 +178,20 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { expect(association.target).to eq([]) }
     specify { expect(existing_association.target).to eq(existing_user.projects) }
     specify { expect { association.build }.to change { association.target.count }.to(1) }
+  end
+
+  describe '#default' do
+    before { User.embeds_many :projects, default: -> { { title: 'Default' } } }
+    let(:new_project) { Project.new(title: 'Project') }
+    let(:existing_user) { User.instantiate name: 'Rick' }
+
+    specify { expect(association.target.map(&:title)).to eq(['Default']) }
+    specify { expect { association.replace([new_project]) }.to change { association.target.map(&:title) }.to eq(['Project']) }
+    specify { expect { association.replace([]) }.to change { association.target }.to([]) }
+
+    specify { expect(existing_association.target).to eq([]) }
+    specify { expect { existing_association.replace([new_project]) }.to change { existing_association.target.map(&:title) }.to(['Project']) }
+    specify { expect { existing_association.replace([]) }.not_to change { existing_association.target } }
   end
 
   describe '#loaded?' do

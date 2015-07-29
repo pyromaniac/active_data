@@ -28,10 +28,20 @@ module ActiveData
           @target = object
         end
 
-        def target
-          return @target if loaded?
-          data = read_source
-          self.target = data && reflection.klass.instantiate(data)
+        def load_target
+          source = read_source
+          source ? reflection.klass.instantiate(source) : default
+        end
+
+        def default
+          unless evar_loaded?
+            default = reflection.default(owner)
+            if default.is_a?(reflection.klass)
+              default
+            else
+              reflection.klass.instantiate(default)
+            end if default
+          end
         end
 
         def clear
