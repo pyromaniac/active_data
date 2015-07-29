@@ -40,6 +40,39 @@ describe ActiveData::Model::Associations::Reflections::ReferencesMany do
       .to change { book.creator_ids }.from([]).to([author.id]) }
   end
 
+  describe ':primary_key' do
+    before do
+      stub_model(:book) do
+        include ActiveData::Model::Associations
+        collection :author_names, String
+        references_many :authors, primary_key: 'name'
+      end
+    end
+
+    let(:author) { Author.create!(name: 'Rick') }
+
+    specify { expect { book.author_names = [author.name] }
+      .to change { book.authors }.from([]).to([author]) }
+    specify { expect { book.authors = [author] }
+      .to change { book.author_names }.from([]).to([author.name]) }
+  end
+
+  describe ':reference_key' do
+    before do
+      stub_model(:book) do
+        include ActiveData::Model::Associations
+        references_many :authors, reference_key: 'identify'
+      end
+    end
+
+    let(:author) { Author.create!(name: 'Rick') }
+
+    specify { expect { book.identify = [author.id] }
+      .to change { book.authors }.from([]).to([author]) }
+    specify { expect { book.authors = [author] }
+      .to change { book.identify }.from([]).to([author.id]) }
+  end
+
   describe '#author' do
     it { expect(book.authors).not_to respond_to(:build) }
     it { expect(book.authors).not_to respond_to(:create) }

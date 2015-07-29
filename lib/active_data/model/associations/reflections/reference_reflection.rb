@@ -25,12 +25,8 @@ module ActiveData
             object.write_attribute(reference_key, value)
           end
 
-          def reference_key
-            raise NotImplementedError
-          end
-
           def primary_key
-            :id
+            @primary_key ||= options[:primary_key].presence.try(:to_sym) || :id
           end
         end
       end

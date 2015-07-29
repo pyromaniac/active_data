@@ -25,14 +25,45 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
         references_one :creator, class_name: 'Author'
       end
     end
-
     let(:author) { Author.create!(name: 'Rick') }
-    let(:book) { Book.new }
 
     specify { expect { book.creator = author }
       .to change { book.creator }.from(nil).to(author) }
     specify { expect { book.creator = author }
       .to change { book.creator_id }.from(nil).to(author.id) }
+  end
+
+  describe ':primary_key' do
+    before do
+      stub_model(:book) do
+        include ActiveData::Model::Associations
+        attribute :author_name, String
+        references_one :author, primary_key: 'name'
+      end
+    end
+
+    let(:author) { Author.create!(name: 'Rick') }
+
+    specify { expect { book.author_name = author.name }
+      .to change { book.author }.from(nil).to(author) }
+    specify { expect { book.author = author }
+      .to change { book.author_name }.from(nil).to(author.name) }
+  end
+
+  describe ':reference_key' do
+    before do
+      stub_model(:book) do
+        include ActiveData::Model::Associations
+        references_one :author, reference_key: 'identify'
+      end
+    end
+
+    let(:author) { Author.create!(name: 'Rick') }
+
+    specify { expect { book.identify = author.id }
+      .to change { book.author }.from(nil).to(author) }
+    specify { expect { book.author = author }
+      .to change { book.identify }.from(nil).to(author.id) }
   end
 
   describe '#author=' do

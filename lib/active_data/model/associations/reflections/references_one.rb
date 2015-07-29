@@ -5,7 +5,9 @@ module ActiveData
         class ReferencesOne < ReferenceReflection
           def self.build target, generated_methods, name, options = {}, &block
             reflection = super
-            target.attribute(reflection.reference_key, Integer) if target < ActiveData::Model::Attributes
+            if target < ActiveData::Model::Attributes && !target.has_attribute?(reflection.reference_key)
+              target.attribute(reflection.reference_key, Integer)
+            end
             reflection
           end
 
@@ -14,7 +16,8 @@ module ActiveData
           end
 
           def reference_key
-            :"#{name}_id"
+            @reference_key ||= options[:reference_key].presence.try(:to_sym) ||
+              :"#{name}_#{primary_key}"
           end
         end
       end
