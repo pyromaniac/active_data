@@ -8,6 +8,29 @@ describe ActiveData::Model::Attributes::Base do
     described_class.new(args.first || Object.new, reflection)
   end
 
+  describe '#read' do
+    let(:field) { attribute(type: String, normalizer: ->(v){ v ? v.strip : v }, default: :world, enum: ['hello', '42', 'world']) }
+
+    specify { expect(field.tap { |r| r.write(nil) }.read).to eq('world') }
+    specify { expect(field.tap { |r| r.write(:world) }.read).to eq('world') }
+    specify { expect(field.tap { |r| r.write('hello') }.read).to eq('hello') }
+    specify { expect(field.tap { |r| r.write(' hello ') }.read).to eq(nil) }
+    specify { expect(field.tap { |r| r.write(42) }.read).to eq('42') }
+    specify { expect(field.tap { |r| r.write(43) }.read).to eq(nil) }
+    specify { expect(field.tap { |r| r.write('') }.read).to eq(nil) }
+  end
+
+  describe '#read_before_type_cast' do
+    let(:field) { attribute(type: String, normalizer: ->(v){ v.strip }, default: :world, enum: ['hello', '42', 'world']) }
+
+    specify { expect(field.tap { |r| r.write(nil) }.read_before_type_cast).to eq(:world) }
+    specify { expect(field.tap { |r| r.write(:world) }.read_before_type_cast).to eq(:world) }
+    specify { expect(field.tap { |r| r.write('hello') }.read_before_type_cast).to eq('hello') }
+    specify { expect(field.tap { |r| r.write(42) }.read_before_type_cast).to eq(42) }
+    specify { expect(field.tap { |r| r.write(43) }.read_before_type_cast).to eq(43) }
+    specify { expect(field.tap { |r| r.write('') }.read_before_type_cast).to eq('') }
+  end
+
   describe '#default' do
     let(:owner) { double(value: 42) }
 
@@ -108,28 +131,5 @@ describe ActiveData::Model::Attributes::Base do
           .normalize(' hello ')).to eq('el') }
       end
     end
-  end
-
-  describe '#read_value' do
-    let(:field) { attribute(type: String, normalizer: ->(v){ v ? v.strip : v }, default: :world, enum: ['hello', '42', 'world']) }
-
-    specify { expect(field.read_value(nil)).to eq('world') }
-    specify { expect(field.read_value(:world)).to eq('world') }
-    specify { expect(field.read_value('hello')).to eq('hello') }
-    specify { expect(field.read_value(' hello ')).to eq(nil) }
-    specify { expect(field.read_value(42)).to eq('42') }
-    specify { expect(field.read_value(43)).to eq(nil) }
-    specify { expect(field.read_value('')).to eq(nil) }
-  end
-
-  describe '#read_value_before_type_cast' do
-    let(:field) { attribute(type: String, normalizer: ->(v){ v.strip }, default: :world, enum: ['hello', '42', 'world']) }
-
-    specify { expect(field.read_value_before_type_cast(nil)).to eq(:world) }
-    specify { expect(field.read_value_before_type_cast(:world)).to eq(:world) }
-    specify { expect(field.read_value_before_type_cast('hello')).to eq('hello') }
-    specify { expect(field.read_value_before_type_cast(42)).to eq(42) }
-    specify { expect(field.read_value_before_type_cast(43)).to eq(43) }
-    specify { expect(field.read_value_before_type_cast('')).to eq('') }
   end
 end

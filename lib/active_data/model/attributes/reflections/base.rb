@@ -25,8 +25,8 @@ module ActiveData
             raise NotImplementedError, 'Attribute aliasing is not supported'
           end
 
-          def build_attribute owner
-            self.class.attribute_class.new owner, self
+          def build_attribute owner, raw_value
+            self.class.attribute_class.new(owner, self).tap { |a| a.write(raw_value) }
           end
 
           def type

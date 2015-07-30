@@ -8,70 +8,70 @@ describe ActiveData::Model::Attributes::Dictionary do
     described_class.new(args.first || Object.new, reflection)
   end
 
-  describe '#read_value' do
+  describe '#read' do
     let(:field) { attribute(type: String, normalizer: ->(v){ v.delete_if { |_, v| v == nil } },
       default: :world, enum: ['hello', '42']) }
 
-    specify { expect(field.read_value(nil)).to eq({}) }
-    specify { expect(field.read_value({})).to eq({}) }
-    specify { expect(field.read_value({a: nil})).to eq({}) }
-    specify { expect(field.read_value({a: ''})).to eq({}) }
-    specify { expect(field.read_value({a: 1})).to eq({}) }
-    specify { expect(field.read_value({a: 42})).to eq({'a' => '42'}) }
-    specify { expect(field.read_value({a: 'hello', b: '42'})).to eq({'a' => 'hello', 'b' => '42'}) }
-    specify { expect(field.read_value({a: 'hello', b: '1'})).to eq({'a' => 'hello'}) }
-    specify { expect(field.read_value({a: 'hello', x: '42'})).to eq({'a' => 'hello', 'x' => '42'}) }
+    specify { expect(field.tap { |r| r.write(nil) }.read).to eq({}) }
+    specify { expect(field.tap { |r| r.write({}) }.read).to eq({}) }
+    specify { expect(field.tap { |r| r.write({a: nil}) }.read).to eq({}) }
+    specify { expect(field.tap { |r| r.write({a: ''}) }.read).to eq({}) }
+    specify { expect(field.tap { |r| r.write({a: 1}) }.read).to eq({}) }
+    specify { expect(field.tap { |r| r.write({a: 42}) }.read).to eq({'a' => '42'}) }
+    specify { expect(field.tap { |r| r.write({a: 'hello', b: '42'}) }.read).to eq({'a' => 'hello', 'b' => '42'}) }
+    specify { expect(field.tap { |r| r.write({a: 'hello', b: '1'}) }.read).to eq({'a' => 'hello'}) }
+    specify { expect(field.tap { |r| r.write({a: 'hello', x: '42'}) }.read).to eq({'a' => 'hello', 'x' => '42'}) }
 
     context do
       let(:field) { attribute(type: String, normalizer: ->(v){ v.delete_if { |_, v| v == nil } },
         default: :world) }
 
-      specify { expect(field.read_value(nil)).to eq({}) }
-      specify { expect(field.read_value({})).to eq({}) }
-      specify { expect(field.read_value({a: 1})).to eq({'a' => '1'}) }
-      specify { expect(field.read_value({a: nil, b: nil})).to eq({'a' => 'world', 'b' => 'world'}) }
-      specify { expect(field.read_value({a: ''})).to eq({'a' => ''}) }
+      specify { expect(field.tap { |r| r.write(nil) }.read).to eq({}) }
+      specify { expect(field.tap { |r| r.write({}) }.read).to eq({}) }
+      specify { expect(field.tap { |r| r.write({a: 1}) }.read).to eq({'a' => '1'}) }
+      specify { expect(field.tap { |r| r.write({a: nil, b: nil}) }.read).to eq({'a' => 'world', 'b' => 'world'}) }
+      specify { expect(field.tap { |r| r.write({a: ''}) }.read).to eq({'a' => ''}) }
     end
 
     context 'with :keys' do
       let(:field) { attribute(type: String, keys: ['a', :b]) }
 
-      specify { expect(field.read_value(nil)).to eq({}) }
-      specify { expect(field.read_value({})).to eq({}) }
-      specify { expect(field.read_value({a: 1, 'b' => 2, c: 3, 'd' => 4})).to eq({'a' => '1', 'b' => '2'}) }
-      specify { expect(field.read_value({a: 1, c: 3, 'd' => 4})).to eq({'a' => '1'}) }
+      specify { expect(field.tap { |r| r.write(nil) }.read).to eq({}) }
+      specify { expect(field.tap { |r| r.write({}) }.read).to eq({}) }
+      specify { expect(field.tap { |r| r.write({a: 1, 'b' => 2, c: 3, 'd' => 4}) }.read).to eq({'a' => '1', 'b' => '2'}) }
+      specify { expect(field.tap { |r| r.write({a: 1, c: 3, 'd' => 4}) }.read).to eq({'a' => '1'}) }
     end
   end
 
-  describe '#read_value_before_type_cast' do
+  describe '#read_before_type_cast' do
     let(:field) { attribute(type: String, default: :world, enum: ['hello', '42']) }
 
-    specify { expect(field.read_value_before_type_cast(nil)).to eq({}) }
-    specify { expect(field.read_value_before_type_cast({})).to eq({}) }
-    specify { expect(field.read_value_before_type_cast({a: 1})).to eq({'a' => 1}) }
-    specify { expect(field.read_value_before_type_cast({a: nil})).to eq({'a' => :world}) }
-    specify { expect(field.read_value_before_type_cast({a: ''})).to eq({'a' => ''}) }
-    specify { expect(field.read_value_before_type_cast({a: 42})).to eq({'a' => 42}) }
-    specify { expect(field.read_value_before_type_cast({a: 'hello', b: '42'})).to eq({'a' => 'hello', 'b' => '42'}) }
-    specify { expect(field.read_value_before_type_cast({a: 'hello', b: '1'})).to eq({'a' => 'hello', 'b' => '1'}) }
-    specify { expect(field.read_value_before_type_cast({a: 'hello', x: '42'})).to eq({'a' => 'hello', 'x' => '42'}) }
+    specify { expect(field.tap { |r| r.write(nil) }.read_before_type_cast).to eq({}) }
+    specify { expect(field.tap { |r| r.write({}) }.read_before_type_cast).to eq({}) }
+    specify { expect(field.tap { |r| r.write({a: 1}) }.read_before_type_cast).to eq({'a' => 1}) }
+    specify { expect(field.tap { |r| r.write({a: nil}) }.read_before_type_cast).to eq({'a' => :world}) }
+    specify { expect(field.tap { |r| r.write({a: ''}) }.read_before_type_cast).to eq({'a' => ''}) }
+    specify { expect(field.tap { |r| r.write({a: 42}) }.read_before_type_cast).to eq({'a' => 42}) }
+    specify { expect(field.tap { |r| r.write({a: 'hello', b: '42'}) }.read_before_type_cast).to eq({'a' => 'hello', 'b' => '42'}) }
+    specify { expect(field.tap { |r| r.write({a: 'hello', b: '1'}) }.read_before_type_cast).to eq({'a' => 'hello', 'b' => '1'}) }
+    specify { expect(field.tap { |r| r.write({a: 'hello', x: '42'}) }.read_before_type_cast).to eq({'a' => 'hello', 'x' => '42'}) }
 
     context do
       let(:field) { attribute(type: String, default: :world) }
 
-      specify { expect(field.read_value_before_type_cast(nil)).to eq({}) }
-      specify { expect(field.read_value_before_type_cast({})).to eq({}) }
-      specify { expect(field.read_value_before_type_cast({a: 1})).to eq({'a' => 1}) }
-      specify { expect(field.read_value_before_type_cast({a: nil, b: nil})).to eq({'a' => :world, 'b' => :world}) }
-      specify { expect(field.read_value_before_type_cast({a: ''})).to eq({'a' => ''}) }
+      specify { expect(field.tap { |r| r.write(nil) }.read_before_type_cast).to eq({}) }
+      specify { expect(field.tap { |r| r.write({}) }.read_before_type_cast).to eq({}) }
+      specify { expect(field.tap { |r| r.write({a: 1}) }.read_before_type_cast).to eq({'a' => 1}) }
+      specify { expect(field.tap { |r| r.write({a: nil, b: nil}) }.read_before_type_cast).to eq({'a' => :world, 'b' => :world}) }
+      specify { expect(field.tap { |r| r.write({a: ''}) }.read_before_type_cast).to eq({'a' => ''}) }
     end
 
     context 'with :keys' do
       let(:field) { attribute(type: String, keys: ['a', :b]) }
 
-      specify { expect(field.read_value_before_type_cast(nil)).to eq({}) }
-      specify { expect(field.read_value_before_type_cast({})).to eq({}) }
-      specify { expect(field.read_value_before_type_cast({a: 1, 'b' => 2, c: 3, 'd' => 4}))
+      specify { expect(field.tap { |r| r.write(nil) }.read_before_type_cast).to eq({}) }
+      specify { expect(field.tap { |r| r.write({}) }.read_before_type_cast).to eq({}) }
+      specify { expect(field.tap { |r| r.write({a: 1, 'b' => 2, c: 3, 'd' => 4}) }.read_before_type_cast)
         .to eq({'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4}) }
     end
   end

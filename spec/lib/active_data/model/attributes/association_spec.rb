@@ -7,23 +7,23 @@ describe ActiveData::Model::Attributes::Association do
     described_class.new(args.first || Object.new, reflection)
   end
 
-  describe '#read_value' do
+  describe '#read' do
     let(:field) { attribute(type: String, normalizer: ->(v){ v ? v.strip : v }, default: :world, enum: ['hello', '42', 'world']) }
     let(:object) { Object.new }
 
-    specify { expect(field.read_value(nil)).to eq(nil) }
-    specify { expect(field.read_value('')).to eq('') }
-    specify { expect(field.read_value(:world)).to eq(:world) }
-    specify { expect(field.read_value(object)).to eq(object) }
+    specify { expect(field.tap { |r| r.write(nil) }.read).to eq(nil) }
+    specify { expect(field.tap { |r| r.write('') }.read).to eq('') }
+    specify { expect(field.tap { |r| r.write(:world) }.read).to eq(:world) }
+    specify { expect(field.tap { |r| r.write(object) }.read).to eq(object) }
   end
 
-  describe '#read_value_before_type_cast' do
+  describe '#read_before_type_cast' do
     let(:field) { attribute(type: String, normalizer: ->(v){ v.strip }, default: :world, enum: ['hello', '42', 'world']) }
     let(:object) { Object.new }
 
-    specify { expect(field.read_value_before_type_cast(nil)).to eq(nil) }
-    specify { expect(field.read_value_before_type_cast('')).to eq('') }
-    specify { expect(field.read_value_before_type_cast(:world)).to eq(:world) }
-    specify { expect(field.read_value_before_type_cast(object)).to eq(object) }
+    specify { expect(field.tap { |r| r.write(nil) }.read_before_type_cast).to eq(nil) }
+    specify { expect(field.tap { |r| r.write('') }.read_before_type_cast).to eq('') }
+    specify { expect(field.tap { |r| r.write(:world) }.read_before_type_cast).to eq(:world) }
+    specify { expect(field.tap { |r| r.write(object) }.read_before_type_cast).to eq(object) }
   end
 end

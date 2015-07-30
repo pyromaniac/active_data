@@ -2,12 +2,12 @@ module ActiveData
   module Model
     module Attributes
       class Association < Base
-        def read_value value
-          value
+        def read
+          @raw_value
         end
 
-        def read_value_before_type_cast value
-          value
+        def read_before_type_cast
+          @raw_value
         end
       end
     end

@@ -8,7 +8,7 @@ module ActiveData
           data = data.stringify_keys
           instance = allocate
 
-          instance.instance_variable_set(:@attributes, data.slice(*attribute_names))
+          instance.instance_variable_set(:@initial_attributes, data.slice(*attribute_names))
           instance.send(:mark_persisted!)
 
           instance

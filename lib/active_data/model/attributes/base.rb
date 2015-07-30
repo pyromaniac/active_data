@@ -9,6 +9,20 @@ module ActiveData
           @owner, @reflection = owner, reflection
         end
 
+        def read
+          @value ||= normalize(enumerize(typecast(read_before_type_cast)))
+        end
+
+        def read_before_type_cast
+          @value_before_type_cast ||= defaultize(@raw_value)
+        end
+
+        def write value
+          @value = nil
+          @value_before_type_cast = nil
+          @raw_value = value
+        end
+
         def default
           defaultizer.is_a?(Proc) ? evaluate(&defaultizer) : defaultizer
         end
@@ -60,14 +74,6 @@ module ActiveData
               end
             end
           end
-        end
-
-        def read_value value
-          normalize(enumerize(typecast(defaultize(value))))
-        end
-
-        def read_value_before_type_cast value
-          defaultize(value)
         end
 
       private

@@ -84,7 +84,7 @@ module ActiveData
       end
 
       def initialize attrs = {}
-        @attributes = {}
+        @initial_attributes = {}
         assign_attributes attrs
       end
 
@@ -94,31 +94,26 @@ module ActiveData
       alias_method :eql?, :==
 
       def attribute(name)
-        (@_attributes ||= {})[name.to_s] ||= self.class.reflect_on_attribute(name).build_attribute(self)
+        (@_attributes ||= {})[name.to_s] ||= self.class.reflect_on_attribute(name)
+          .build_attribute(self, @initial_attributes[name.to_s])
       end
 
       def write_attribute name, value
-        name = name.to_s
-        attributes_cache.delete name
-        @attributes[name] = value
+        attribute(name).write(value)
       end
       alias_method :[]=, :write_attribute
 
       def read_attribute name
-        name = name.to_s
-        attributes_cache.fetch(name) do
-          attributes_cache[name] = attribute(name).read_value(@attributes[name])
-        end
+        attribute(name).read
       end
       alias_method :[], :read_attribute
 
       def read_attribute_before_type_cast name
-        name = name.to_s
-        attribute(name).read_value_before_type_cast(@attributes[name])
+        attribute(name).read_before_type_cast
       end
 
       def attribute_present? name
-        value = read_attribute name
+        value = read_attribute(name)
         !value.nil? && !(value.respond_to?(:empty?) && value.empty?)
       end
 
@@ -147,18 +142,11 @@ module ActiveData
       end
 
       def initialize_copy _
-        @attributes = attributes.clone
-        @attributes_cache = attributes_cache.clone
+        @initial_attributes = Hash[attribute_names.map do |name|
+          [name, read_attribute_before_type_cast(name)]
+        end]
+        @_attributes = nil
         super
-      end
-
-      def freeze
-        @attributes = @attributes.clone.freeze
-        self
-      end
-
-      def frozen?
-        @attributes.frozen?
       end
 
     private
@@ -175,10 +163,6 @@ module ActiveData
         attribute_names(false).map do |name|
           "#{name}: #{value_for_inspect(read_attribute(name))}"
         end.join(', ')
-      end
-
-      def attributes_cache
-        @attributes_cache ||= {}
       end
     end
   end

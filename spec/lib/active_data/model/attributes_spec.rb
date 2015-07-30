@@ -118,7 +118,7 @@ describe ActiveData::Model::Attributes do
         collection :array, enum: [1, 2, 3], default: 7
 
         def initialize name = nil
-          @attributes = {}
+          super()
           @name = name
         end
       end
@@ -159,24 +159,13 @@ describe ActiveData::Model::Attributes do
     end
 
     context 'attribute caching' do
-      context do
-        before do
-          subject.hello
-          expect(subject.send(:attributes_cache)).to receive(:fetch).with('hello').once
-        end
-
-        specify { subject.hello }
+      before do
+        subject.hello = 'blabla'
+        subject.hello
+        subject.hello = 'newnewnew'
       end
 
-      context 'attribute cache reset' do
-        before do
-          subject.hello = 'blabla'
-          subject.hello
-          subject.hello = 'newnewnew'
-        end
-
-        specify { expect(subject.hello).to eq('newnewnew') }
-      end
+      specify { expect(subject.hello).to eq('newnewnew') }
     end
   end
 
