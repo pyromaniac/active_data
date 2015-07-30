@@ -10,126 +10,21 @@ describe ActiveData::Model::Attributes::Base do
 
   describe '#read' do
     let(:field) { attribute(type: String, normalizer: ->(v){ v ? v.strip : v }, default: :world, enum: ['hello', '42', 'world']) }
+    let(:object) { Object.new }
 
-    specify { expect(field.tap { |r| r.write(nil) }.read).to eq('world') }
-    specify { expect(field.tap { |r| r.write(:world) }.read).to eq('world') }
-    specify { expect(field.tap { |r| r.write('hello') }.read).to eq('hello') }
-    specify { expect(field.tap { |r| r.write(' hello ') }.read).to eq(nil) }
-    specify { expect(field.tap { |r| r.write(42) }.read).to eq('42') }
-    specify { expect(field.tap { |r| r.write(43) }.read).to eq(nil) }
-    specify { expect(field.tap { |r| r.write('') }.read).to eq(nil) }
+    specify { expect(field.tap { |r| r.write(nil) }.read).to eq(nil) }
+    specify { expect(field.tap { |r| r.write('') }.read).to eq('') }
+    specify { expect(field.tap { |r| r.write(:world) }.read).to eq(:world) }
+    specify { expect(field.tap { |r| r.write(object) }.read).to eq(object) }
   end
 
   describe '#read_before_type_cast' do
     let(:field) { attribute(type: String, normalizer: ->(v){ v.strip }, default: :world, enum: ['hello', '42', 'world']) }
+    let(:object) { Object.new }
 
-    specify { expect(field.tap { |r| r.write(nil) }.read_before_type_cast).to eq(:world) }
-    specify { expect(field.tap { |r| r.write(:world) }.read_before_type_cast).to eq(:world) }
-    specify { expect(field.tap { |r| r.write('hello') }.read_before_type_cast).to eq('hello') }
-    specify { expect(field.tap { |r| r.write(42) }.read_before_type_cast).to eq(42) }
-    specify { expect(field.tap { |r| r.write(43) }.read_before_type_cast).to eq(43) }
+    specify { expect(field.tap { |r| r.write(nil) }.read_before_type_cast).to eq(nil) }
     specify { expect(field.tap { |r| r.write('') }.read_before_type_cast).to eq('') }
-  end
-
-  describe '#default' do
-    let(:owner) { double(value: 42) }
-
-    specify { expect(attribute.default).to eq(nil) }
-    specify { expect(attribute(default: 'hello').default).to eq('hello') }
-    specify { expect(attribute(owner, default: -> { value }).default).to eq(42) }
-    specify { expect(attribute(owner, default: ->(object) { object.value }).default).to eq(42) }
-    specify { expect(attribute(owner, default: ->(*args) { args.first.value }).default).to eq(42) }
-  end
-
-  describe '#defaultize' do
-    specify { expect(attribute.defaultize(nil)).to be_nil }
-    specify { expect(attribute(default: 'hello').defaultize(nil)).to eq('hello') }
-    specify { expect(attribute(default: 'hello').defaultize('world')).to eq('world') }
-  end
-
-  describe '#typecast' do
-    specify { expect(attribute.typecast(:hello)).to eq(:hello) }
-    specify { expect(attribute(type: Integer).typecast(42)).to eq(42) }
-    specify { expect(attribute(type: Integer).typecast('42')).to eq(42) }
-  end
-
-  describe '#enum' do
-    let(:owner) { double(value: 1..5) }
-
-    specify { expect(attribute.enum).to eq([].to_set) }
-    specify { expect(attribute(enum: []).enum).to eq([].to_set) }
-    specify { expect(attribute(enum: 'hello').enum).to eq(['hello'].to_set) }
-    specify { expect(attribute(enum: ['hello', 'world']).enum).to eq(['hello', 'world'].to_set) }
-    specify { expect(attribute(enum: [1..5]).enum).to eq([1..5].to_set) }
-    specify { expect(attribute(enum: 1..5).enum).to eq((1..5).to_a.to_set) }
-    specify { expect(attribute(enum: -> { 1..5 }).enum).to eq((1..5).to_a.to_set) }
-    specify { expect(attribute(enum: -> { 'hello' }).enum).to eq(['hello'].to_set) }
-    specify { expect(attribute(enum: -> { ['hello', 42] }).enum).to eq(['hello', 42].to_set) }
-    specify { expect(attribute(owner, enum: -> { value }).enum).to eq((1..5).to_a.to_set) }
-    specify { expect(attribute(owner, enum: ->(object) { object.value }).enum).to eq((1..5).to_a.to_set) }
-  end
-
-  describe '#enumerize' do
-    specify { expect(attribute.enumerize('anything')).to eq('anything') }
-    specify { expect(attribute(enum: ['hello', 42]).enumerize('hello')).to eq('hello') }
-    specify { expect(attribute(enum: ['hello', 42]).enumerize('world')).to eq(nil) }
-    specify { expect(attribute(enum: -> { 'hello' }).enumerize('hello')).to eq('hello') }
-    specify { expect(attribute(enum: -> { 1..5 }).enumerize(2)).to eq(2) }
-    specify { expect(attribute(enum: -> { 1..5 }).enumerize(42)).to eq(nil) }
-  end
-
-  describe '#normalize' do
-    specify { expect(attribute.normalize(' hello ')).to eq(' hello ') }
-    specify { expect(attribute(normalizer: ->(v) { v.strip }).normalize(' hello ')).to eq('hello') }
-    specify { expect(attribute(normalizer: [->(v) { v.strip }, ->(v) { v.first(4) }]).normalize(' hello ')).to eq('hell') }
-    specify { expect(attribute(normalizer: [->(v) { v.first(4) }, ->(v) { v.strip }]).normalize(' hello ')).to eq('hel') }
-
-    context do
-      let(:owner) { double(value: 'value') }
-      let(:other) { 'other' }
-
-      specify { expect(attribute(owner, normalizer: ->(v) { value }).normalize(' hello ')).to eq('value') }
-      specify { expect(attribute(owner, normalizer: ->(v, object) { object.value }).normalize(' hello ')).to eq('value') }
-      specify { expect(attribute(owner, normalizer: ->(v, object) { other }).normalize(' hello ')).to eq('other') }
-    end
-
-    context 'integration' do
-      before do
-        allow(ActiveData).to receive_messages(config: ActiveData::Config.send(:new))
-        ActiveData.normalizer(:strip) do |value|
-          value.strip
-        end
-        ActiveData.normalizer(:trim) do |value, options, attribute|
-          value.first(length || options[:length] || 2)
-        end
-        ActiveData.normalizer(:reset) do |value, options, attribute|
-          empty = value.respond_to?(:empty?) ? value.empty? : value.nil?
-          empty ? attribute.default : value
-        end
-      end
-
-      let(:length) { nil }
-
-      specify { expect(attribute(normalizer: :strip).normalize(' hello ')).to eq('hello') }
-      specify { expect(attribute(normalizer: [:strip, :trim]).normalize(' hello ')).to eq('he') }
-      specify { expect(attribute(normalizer: [:trim, :strip]).normalize(' hello ')).to eq('h') }
-      specify { expect(attribute(normalizer: [:strip, { trim: { length: 4 } }]).normalize(' hello ')).to eq('hell') }
-      specify { expect(attribute(normalizer: {strip: { }, trim: { length: 4 } }).normalize(' hello ')).to eq('hell') }
-      specify { expect(attribute(normalizer: [:strip, { trim: { length: 4 } }, ->(v) { v.last(2) }])
-        .normalize(' hello ')).to eq('ll') }
-      specify { expect(attribute(normalizer: :reset).normalize('')).to eq(nil) }
-      specify { expect(attribute(normalizer: [:strip, :reset]).normalize('   ')).to eq(nil) }
-      specify { expect(attribute(normalizer: :reset, default: '!!!').normalize(nil)).to eq('!!!') }
-      specify { expect(attribute(normalizer: :reset, default: '!!!').normalize('')).to eq('!!!') }
-
-      context do
-        let(:length) { 3 }
-
-        specify { expect(attribute(normalizer: [:strip, { trim: { length: 4 } }]).normalize(' hello ')).to eq('hel') }
-        specify { expect(attribute(normalizer: {strip: { }, trim: { length: 4 } }).normalize(' hello ')).to eq('hel') }
-        specify { expect(attribute(normalizer: [:strip, { trim: { length: 4 } }, ->(v) { v.last(2) }])
-          .normalize(' hello ')).to eq('el') }
-      end
-    end
+    specify { expect(field.tap { |r| r.write(:world) }.read_before_type_cast).to eq(:world) }
+    specify { expect(field.tap { |r| r.write(object) }.read_before_type_cast).to eq(object) }
   end
 end

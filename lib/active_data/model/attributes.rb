@@ -3,14 +3,12 @@ require 'active_data/model/attributes/reflections/attribute'
 require 'active_data/model/attributes/reflections/collection'
 require 'active_data/model/attributes/reflections/dictionary'
 require 'active_data/model/attributes/reflections/localized'
-require 'active_data/model/attributes/reflections/association'
 
 require 'active_data/model/attributes/base'
 require 'active_data/model/attributes/attribute'
 require 'active_data/model/attributes/collection'
 require 'active_data/model/attributes/dictionary'
 require 'active_data/model/attributes/localized'
-require 'active_data/model/attributes/association'
 
 module ActiveData
   module Model
@@ -52,7 +50,7 @@ module ActiveData
             _attributes.keys
           else
             _attributes.map do |name, attribute|
-              name unless attribute.is_a?(ActiveData::Model::Attributes::Reflections::Association)
+              name unless attribute.class == ActiveData::Model::Attributes::Reflections::Base
             end.compact
           end
         end

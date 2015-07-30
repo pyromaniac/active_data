@@ -1,7 +1,7 @@
 module ActiveData
   module Model
     module Attributes
-      class Dictionary < Base
+      class Dictionary < Attribute
         delegate :keys, to: :reflection
 
         def read

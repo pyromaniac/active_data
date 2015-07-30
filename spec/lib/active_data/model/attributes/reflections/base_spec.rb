@@ -6,11 +6,13 @@ describe ActiveData::Model::Attributes::Reflections::Base do
   end
 
   describe '.build' do
-    before { stub_class(:dummy, String) }
+    before { stub_class(:target) }
 
-    specify { expect(described_class.build(Dummy, :field).name).to eq('field') }
-    specify { expect(described_class.build(Dummy, :field, String).type).to eq(String) }
-    specify { expect(described_class.build(Dummy, :field) {}.defaultizer).to be_a(Proc) }
+    specify do
+      described_class.build(Target, :field)
+      expect(Target).not_to be_method_defined(:field)
+    end
+    specify { expect(described_class.build(Target, :field).name).to eq('field') }
   end
 
   describe '.attribute_class' do
@@ -27,6 +29,12 @@ describe ActiveData::Model::Attributes::Reflections::Base do
     specify { expect(reflection.name).to eq('field') }
   end
 
+  describe '#alias_attribute' do
+    before { stub_class(:target) }
+
+    specify { expect { described_class.build(Target, :field).alias_attribute(:field_alias, Target) }.to raise_error NotImplementedError }
+  end
+
   describe '#build_attribute' do
     before do
       stub_class('SomeScope::Borogoves', described_class)
@@ -40,48 +48,5 @@ describe ActiveData::Model::Attributes::Reflections::Base do
     specify { expect(reflection.build_attribute(owner, nil)).to be_a(ActiveData::Model::Attributes::Borogoves) }
     specify { expect(reflection.build_attribute(owner, nil).reflection).to eq(reflection) }
     specify { expect(reflection.build_attribute(owner, nil).owner).to eq(owner) }
-  end
-
-  describe '#type' do
-    before { stub_class(:dummy, String) }
-
-    specify { expect(reflection.type).to eq(Object) }
-    specify { expect(reflection(type: String).type).to eq(String) }
-    specify { expect(reflection(type: :string).type).to eq(String) }
-    specify { expect(reflection(type: Dummy).type).to eq(Dummy) }
-    specify { expect { reflection(type: :blabla).type }.to raise_error NameError }
-  end
-
-  describe '#defaultizer' do
-    specify { expect(reflection.defaultizer).to be_nil }
-    specify { expect(reflection(default: 42).defaultizer).to eq(42) }
-    specify { expect(reflection(default: ->{ }).defaultizer).to be_a Proc }
-  end
-
-  describe '#typecaster' do
-    before do
-      stub_class(:dummy, String)
-      stub_class(:dummy_dummy, Dummy)
-    end
-
-    specify { expect(reflection.typecaster).to eq(ActiveData.typecaster(Object)) }
-    specify { expect(reflection(type: String).typecaster).to eq(ActiveData.typecaster(String)) }
-    specify { expect(reflection(type: Dummy).typecaster).to eq(ActiveData.typecaster(String)) }
-    specify { expect(reflection(type: DummyDummy).typecaster).to eq(ActiveData.typecaster(String)) }
-  end
-
-  describe '#enumerizer' do
-    specify { expect(reflection.enumerizer).to be_nil }
-    specify { expect(reflection(enum: 42).enumerizer).to eq(42) }
-    specify { expect(reflection(enum: ->{ }).enumerizer).to be_a Proc }
-    specify { expect(reflection(in: 42).enumerizer).to eq(42) }
-    specify { expect(reflection(in: ->{ }).enumerizer).to be_a Proc }
-    specify { expect(reflection(enum: 42, in: ->{ }).enumerizer).to eq(42) }
-  end
-
-  describe '#normalizers' do
-    specify { expect(reflection.normalizers).to eq([]) }
-    specify { expect(reflection(normalizer: ->{}).normalizers).to be_a Array }
-    specify { expect(reflection(normalizer: ->{}).normalizers.first).to be_a Proc }
   end
 end

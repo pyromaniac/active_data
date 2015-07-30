@@ -1,7 +1,7 @@
 module ActiveData
   module Model
     module Attributes
-      class Collection < Base
+      class Collection < Attribute
         def read
           @value ||= normalize(read_before_type_cast.map do |value|
             enumerize(typecast(value))

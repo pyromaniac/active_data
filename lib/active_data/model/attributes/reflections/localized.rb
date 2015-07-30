@@ -2,9 +2,9 @@ module ActiveData
   module Model
     module Attributes
       module Reflections
-        class Localized < Base
+        class Localized < Attribute
           def self.build target, name, *args, &block
-            attribute = super
+            attribute = build_reflection(target, name, *args, &block)
             target.class_eval <<-RUBY, __FILE__, __LINE__ + 1
               def #{name}_translations
                 read_attribute('#{name}')

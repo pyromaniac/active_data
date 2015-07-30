@@ -6,7 +6,7 @@ module ActiveData
           def self.build target, generated_methods, name, options = {}, &block
             reflection = super
             if target < ActiveData::Model::Attributes
-              target.add_attribute(ActiveData::Model::Attributes::Reflections::Association, name)
+              target.add_attribute(ActiveData::Model::Attributes::Reflections::Base, name)
             end
             generated_methods.class_eval <<-EOS
               def #{name} force_reload = false
