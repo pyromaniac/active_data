@@ -2,6 +2,8 @@ module ActiveData
   module Model
     module Attributes
       class Attribute < Base
+        delegate :typecaster, :defaultizer, :enumerizer, :normalizers, to: :reflection
+
         def read
           @value ||= normalize(enumerize(typecast(read_before_type_cast)))
         end

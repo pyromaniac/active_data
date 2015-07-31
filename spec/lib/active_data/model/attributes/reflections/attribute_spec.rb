@@ -38,16 +38,6 @@ describe ActiveData::Model::Attributes::Reflections::Attribute do
     end
   end
 
-  describe '#type' do
-    before { stub_class(:dummy, String) }
-
-    specify { expect(reflection.type).to eq(Object) }
-    specify { expect(reflection(type: String).type).to eq(String) }
-    specify { expect(reflection(type: :string).type).to eq(String) }
-    specify { expect(reflection(type: Dummy).type).to eq(Dummy) }
-    specify { expect { reflection(type: :blabla).type }.to raise_error NameError }
-  end
-
   describe '#defaultizer' do
     specify { expect(reflection.defaultizer).to be_nil }
     specify { expect(reflection(default: 42).defaultizer).to eq(42) }

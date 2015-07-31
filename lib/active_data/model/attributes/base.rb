@@ -3,7 +3,7 @@ module ActiveData
     module Attributes
       class Base
         attr_reader :owner, :reflection
-        delegate :type, :typecaster, :defaultizer, :enumerizer, :normalizers, to: :reflection
+        delegate :name, :type, to: :reflection
 
         def initialize owner, reflection
           @owner, @reflection = owner, reflection
@@ -23,6 +23,16 @@ module ActiveData
 
         def value_present?
           !read.nil? && !(read.respond_to?(:empty?) && read.empty?)
+        end
+
+        def inspect_attribute
+          value = case type
+          when Date, Time, DateTime
+            %("#{read.to_s(:db)}")
+          else
+            read.inspect.truncate(50)
+          end
+          "#{name}: #{value}"
         end
 
       private

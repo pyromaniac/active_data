@@ -144,18 +144,8 @@ module ActiveData
 
     private
 
-      def value_for_inspect(value)
-        if value.is_a?(Date) || value.is_a?(Time)
-          %("#{value.to_s(:db)}")
-        else
-          value.inspect.truncate(50)
-        end
-      end
-
       def attributes_for_inspect
-        attribute_names(false).map do |name|
-          "#{name}: #{value_for_inspect(read_attribute(name))}"
-        end.join(', ')
+        attribute_names(false).map { |name| attribute(name).inspect_attribute }.join(', ')
       end
     end
   end

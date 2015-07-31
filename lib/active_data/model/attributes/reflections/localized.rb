@@ -4,7 +4,7 @@ module ActiveData
       module Reflections
         class Localized < Attribute
           def self.build target, name, *args, &block
-            attribute = build_reflection(target, name, *args, &block)
+            attribute = build_instance(target, name, *args, &block)
             target.class_eval <<-RUBY, __FILE__, __LINE__ + 1
               def #{name}_translations
                 attribute('#{name}').read

@@ -49,4 +49,14 @@ describe ActiveData::Model::Attributes::Reflections::Base do
     specify { expect(reflection.build_attribute(owner, nil).reflection).to eq(reflection) }
     specify { expect(reflection.build_attribute(owner, nil).owner).to eq(owner) }
   end
+
+  describe '#type' do
+    before { stub_class(:dummy, String) }
+
+    specify { expect(reflection.type).to eq(Object) }
+    specify { expect(reflection(type: String).type).to eq(String) }
+    specify { expect(reflection(type: :string).type).to eq(String) }
+    specify { expect(reflection(type: Dummy).type).to eq(Dummy) }
+    specify { expect { reflection(type: :blabla).type }.to raise_error NameError }
+  end
 end

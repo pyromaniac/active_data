@@ -5,13 +5,14 @@ module ActiveData
         class Base
           attr_reader :name, :options
           class << self
-            def build_reflection target, name, *args, &block
+            def build_instance target, name, *args, &block
               options = args.extract_options!
+              options.merge!(type: args.first) if args.first
               new(name, options)
             end
 
-            alias_method :build, :build_reflection
-            private :build_reflection
+            alias_method :build, :build_instance
+            private :build_instance
 
             def attribute_class
               @attribute_class ||= "ActiveData::Model::Attributes::#{name.demodulize}".constantize
@@ -29,6 +30,11 @@ module ActiveData
 
           def build_attribute owner, raw_value
             self.class.attribute_class.new(owner, self).tap { |a| a.write(raw_value) }
+          end
+
+          def type
+            @type ||= options[:type].is_a?(Class) ? options[:type] :
+              options[:type].present? ? options[:type].to_s.camelize.constantize : Object
           end
         end
       end

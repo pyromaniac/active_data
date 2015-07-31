@@ -4,7 +4,7 @@ module ActiveData
       module Reflections
         class Attribute < Base
           def self.build target, name, *args, &block
-            attribute = build_reflection(target, name, *args, &block)
+            attribute = build_instance(target, name, *args, &block)
             target.class_eval <<-RUBY, __FILE__, __LINE__ + 1
               def #{name}
                 attribute('#{name}').read
@@ -44,11 +44,6 @@ module ActiveData
             RUBY
           end
 
-          def type
-            @type ||= options[:type].is_a?(Class) ? options[:type] :
-              options[:type].present? ? options[:type].to_s.camelize.constantize : Object
-          end
-
           def defaultizer
             @defaultizer ||= options[:default]
           end
@@ -67,7 +62,7 @@ module ActiveData
 
         private
 
-          def self.build_reflection target, name, *args, &block
+          def self.build_instance target, name, *args, &block
             options = args.extract_options!
             options.merge!(type: args.first) if args.first
             options.merge!(default: block) if block
