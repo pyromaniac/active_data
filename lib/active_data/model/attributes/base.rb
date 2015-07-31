@@ -21,6 +21,10 @@ module ActiveData
           @raw_value = value
         end
 
+        def value_present?
+          !read.nil? && !(read.respond_to?(:empty?) && read.empty?)
+        end
+
       private
 
         def evaluate *args, &block

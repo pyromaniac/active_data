@@ -7,27 +7,27 @@ module ActiveData
             attribute = build_reflection(target, name, *args, &block)
             target.class_eval <<-RUBY, __FILE__, __LINE__ + 1
               def #{name}_translations
-                read_attribute('#{name}')
+                attribute('#{name}').read
               end
 
               def #{name}_translations= value
-                write_attribute('#{name}', value)
+                attribute('#{name}').write(value)
               end
 
               def #{name}
-                read_localized_attribute('#{name}')
+                attribute('#{name}').read_locale(self.class.locale)
               end
 
               def #{name}= value
-                write_localized_attribute('#{name}', value)
+                attribute('#{name}').write_locale(value, self.class.locale)
               end
 
               def #{name}?
-                read_localized_attribute('#{name}').present?
+                attribute('#{name}').locale_value_present?(self.class.locale)
               end
 
               def #{name}_before_type_cast
-                read_localized_attribute_before_type_cast('#{name}')
+                attribute('#{name}').read_locale_before_type_cast(self.class.locale)
               end
             RUBY
             attribute
