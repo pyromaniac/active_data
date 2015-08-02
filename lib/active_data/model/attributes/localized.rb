@@ -14,6 +14,10 @@ module ActiveData
           end]
         end
 
+        def write_locale value, locale
+          write(read.merge(locale.to_s => value))
+        end
+
         def read_locale locale
           read[owner.class.fallbacks(locale).detect do |fallback|
             read[fallback.to_s]
@@ -24,10 +28,6 @@ module ActiveData
           read_before_type_cast[owner.class.fallbacks(locale).detect do |fallback|
             read_before_type_cast[fallback.to_s]
           end.to_s]
-        end
-
-        def write_locale value, locale
-          write(read.merge(locale.to_s => value))
         end
 
         def locale_value_present? locale

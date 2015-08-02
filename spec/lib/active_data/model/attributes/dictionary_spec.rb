@@ -75,4 +75,17 @@ describe ActiveData::Model::Attributes::Dictionary do
         .to eq({'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4}) }
     end
   end
+
+  context 'integration' do
+    before do
+      stub_model(:post) do
+        dictionary :options, type: String
+      end
+    end
+
+    specify { expect(Post.new(options: {a: 'hello', b: 42}).options).to eq({'a' => 'hello', 'b' => '42'}) }
+    specify { expect(Post.new(options: {a: 'hello', b: 42}).options_before_type_cast).to eq({'a' => 'hello', 'b' => 42}) }
+    specify { expect(Post.new.options?).to eq(false) }
+    specify { expect(Post.new(options: {a: 'hello', b: 42}).options?).to eq(true) }
+  end
 end

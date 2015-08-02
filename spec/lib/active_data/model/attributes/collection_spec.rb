@@ -55,4 +55,17 @@ describe ActiveData::Model::Attributes::Collection do
       specify { expect(field.tap { |r| r.write(['']) }.read_before_type_cast).to eq(['']) }
     end
   end
+
+  context 'integration' do
+    before do
+      stub_model(:post) do
+        collection :tags, type: String
+      end
+    end
+
+    specify { expect(Post.new(tags: ['hello', 42]).tags).to eq(['hello', '42']) }
+    specify { expect(Post.new(tags: ['hello', 42]).tags_before_type_cast).to eq(['hello', 42]) }
+    specify { expect(Post.new.tags?).to eq(false) }
+    specify { expect(Post.new(tags: ['hello', 42]).tags?).to eq(true) }
+  end
 end

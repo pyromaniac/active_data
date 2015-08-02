@@ -13,7 +13,6 @@ describe ActiveData::Model::Attributes::Reflections::Attribute do
     specify do
       described_class.build(Target, :field)
 
-
       expect(Target).to be_method_defined(:field)
       expect(Target).to be_method_defined(:field=)
       expect(Target).to be_method_defined(:field?)

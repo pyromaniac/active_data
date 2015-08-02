@@ -3,12 +3,14 @@ require 'active_data/model/attributes/reflections/attribute'
 require 'active_data/model/attributes/reflections/collection'
 require 'active_data/model/attributes/reflections/dictionary'
 require 'active_data/model/attributes/reflections/localized'
+require 'active_data/model/attributes/reflections/represent'
 
 require 'active_data/model/attributes/base'
 require 'active_data/model/attributes/attribute'
 require 'active_data/model/attributes/collection'
 require 'active_data/model/attributes/dictionary'
 require 'active_data/model/attributes/localized'
+require 'active_data/model/attributes/represent'
 
 module ActiveData
   module Model
@@ -21,7 +23,7 @@ module ActiveData
 
         delegate :attribute_names, :has_attribute?, to: 'self.class'
 
-        %w[attribute collection dictionary].each do |kind|
+        %w[attribute collection dictionary represent].each do |kind|
           define_singleton_method kind do |*args, &block|
             add_attribute("ActiveData::Model::Attributes::Reflections::#{kind.camelize}".constantize, *args, &block)
           end
@@ -71,7 +73,7 @@ module ActiveData
 
         def attributes_for_inspect
           attribute_names(false).map do |name|
-            "#{name}: #{reflect_on_attribute(name).type}"
+            reflect_on_attribute(name).inspect_reflection
           end.join(', ')
         end
 
@@ -92,8 +94,10 @@ module ActiveData
       alias_method :eql?, :==
 
       def attribute(name)
-        (@_attributes ||= {})[name.to_s] ||= self.class.reflect_on_attribute(name)
-          .build_attribute(self, @initial_attributes[name.to_s])
+        (@_attributes ||= {})[name.to_s] ||= begin
+          reflection = self.class.reflect_on_attribute(name)
+          reflection.build_attribute(self, @initial_attributes[name.to_s])
+        end
       end
 
       def write_attribute name, value
@@ -145,7 +149,9 @@ module ActiveData
     private
 
       def attributes_for_inspect
-        attribute_names(false).map { |name| attribute(name).inspect_attribute }.join(', ')
+        attribute_names(false).map do |name|
+          attribute(name).inspect_attribute
+        end.join(', ')
       end
     end
   end

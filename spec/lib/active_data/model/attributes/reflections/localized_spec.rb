@@ -7,6 +7,7 @@ describe ActiveData::Model::Attributes::Reflections::Localized do
 
   describe '.build' do
     before { stub_class(:target) }
+
     specify do
       described_class.build(Target, :field)
 

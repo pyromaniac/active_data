@@ -59,15 +59,6 @@ module ActiveData
           def normalizers
             @normalizers ||= Array.wrap(options[:normalize] || options[:normalizer] || options[:normalizers])
           end
-
-        private
-
-          def self.build_instance target, name, *args, &block
-            options = args.extract_options!
-            options.merge!(type: args.first) if args.first
-            options.merge!(default: block) if block
-            new(name, options)
-          end
         end
       end
     end

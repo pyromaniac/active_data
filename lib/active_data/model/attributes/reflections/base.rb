@@ -8,6 +8,7 @@ module ActiveData
             def build_instance target, name, *args, &block
               options = args.extract_options!
               options.merge!(type: args.first) if args.first
+              options.merge!(default: block) if block
               new(name, options)
             end
 
@@ -28,13 +29,19 @@ module ActiveData
             raise NotImplementedError, 'Attribute aliasing is not supported'
           end
 
-          def build_attribute owner, raw_value
-            self.class.attribute_class.new(owner, self).tap { |a| a.write(raw_value) }
+          def build_attribute owner, raw_value = nil
+            attribute = self.class.attribute_class.new(owner, self)
+            attribute.write(raw_value) if raw_value
+            attribute
           end
 
           def type
             @type ||= options[:type].is_a?(Class) ? options[:type] :
               options[:type].present? ? options[:type].to_s.camelize.constantize : Object
+          end
+
+          def inspect_reflection
+            "#{name}: #{type}"
           end
         end
       end

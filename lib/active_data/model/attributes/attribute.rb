@@ -2,7 +2,13 @@ module ActiveData
   module Model
     module Attributes
       class Attribute < Base
-        delegate :typecaster, :defaultizer, :enumerizer, :normalizers, to: :reflection
+        delegate :defaultizer, :typecaster, :enumerizer, :normalizers, to: :reflection
+
+        def write value
+          @value = nil
+          @value_before_type_cast = nil
+          super
+        end
 
         def read
           @value ||= normalize(enumerize(typecast(read_before_type_cast)))
@@ -12,18 +18,12 @@ module ActiveData
           @value_before_type_cast ||= defaultize(@raw_value)
         end
 
-        def write value
-          @value = nil
-          @value_before_type_cast = nil
-          super
-        end
-
         def default
           defaultizer.is_a?(Proc) ? evaluate(&defaultizer) : defaultizer
         end
 
-        def defaultize value
-          defaultizer && value.nil? ? default : value
+        def defaultize value, default_value = nil
+          defaultizer && value.nil? ? default_value || default : value
         end
 
         def typecast value

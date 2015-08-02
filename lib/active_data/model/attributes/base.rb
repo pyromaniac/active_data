@@ -9,16 +9,16 @@ module ActiveData
           @owner, @reflection = owner, reflection
         end
 
+        def write value
+          @raw_value = value
+        end
+
         def read
           @raw_value
         end
 
         def read_before_type_cast
           @raw_value
-        end
-
-        def write value
-          @raw_value = value
         end
 
         def value_present?
