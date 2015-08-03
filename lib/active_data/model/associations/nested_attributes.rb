@@ -5,7 +5,6 @@ module ActiveData
         extend ActiveSupport::Concern
 
         DESTROY_ATTRIBUTE = '_destroy'
-        UNASSIGNABLE_KEYS = [ActiveData.primary_attribute.to_s, DESTROY_ATTRIBUTE]
 
         included do
           class_attribute :nested_attributes_options, instance_writer: false
@@ -44,15 +43,15 @@ module ActiveData
 
             association = object.association(association_name)
             existing_record = association.target
+            primary_attribute_name = association.reflection.klass._primary_name
+            primary_attribute_value = existing_record.attribute(primary_attribute_name).typecast(attributes[primary_attribute_name]) if existing_record
 
-            if existing_record && (options[:update_only] || existing_record.send(ActiveData.primary_attribute).to_s == attributes[ActiveData.primary_attribute.to_s].to_s)
+            if existing_record && (options[:update_only] || existing_record.primary_attribute == primary_attribute_value)
               assign_to_or_mark_for_destruction(existing_record, attributes, options[:allow_destroy]) unless call_reject_if(object, association_name, attributes)
-
-            elsif attributes[ActiveData.primary_attribute.to_s].present?
-              raise_nested_attributes_record_not_found!(object, association_name, attributes[ActiveData.primary_attribute.to_s])
-
+            elsif attributes[primary_attribute_name].present?
+              raise ActiveData::ObjectNotFound.new(object, association_name, attributes[primary_attribute_name])
             elsif !reject_new_object?(object, association_name, attributes)
-              assignable_attributes = attributes.except(*UNASSIGNABLE_KEYS)
+              assignable_attributes = attributes.except(*unassignable_keys(object))
 
               if existing_record && !existing_record.persisted?
                 existing_record.assign_attributes(assignable_attributes)
@@ -71,30 +70,37 @@ module ActiveData
 
             check_record_limit!(options[:limit], attributes_collection)
 
+            association = object.association(association_name)
+            primary_attribute_name = association.reflection.klass._primary_name
+
             if attributes_collection.is_a? Hash
               keys = attributes_collection.keys
-              attributes_collection = if keys.include?(ActiveData.primary_attribute.to_s) || keys.include?(ActiveData.primary_attribute.to_sym)
+              attributes_collection = if keys.include?(primary_attribute_name) || keys.include?(primary_attribute_name.to_sym)
                 [attributes_collection]
               else
                 attributes_collection.values
               end
             end
 
-            association = object.association(association_name)
-
             attributes_collection.each do |attributes|
               attributes = attributes.with_indifferent_access
 
-              if attributes[ActiveData.primary_attribute.to_s].blank?
+              if attributes[primary_attribute_name].blank?
                 unless reject_new_object?(object, association_name, attributes)
-                  association.build(attributes.except(*UNASSIGNABLE_KEYS))
-                end
-              elsif existing_record = association.target.detect { |record| record.send(ActiveData.primary_attribute).to_s == attributes[ActiveData.primary_attribute.to_s].to_s }
-                if !call_reject_if(object, association_name, attributes)
-                  assign_to_or_mark_for_destruction(existing_record, attributes, options[:allow_destroy])
+                  association.build(attributes.except(*unassignable_keys(object)))
                 end
               else
-                raise_nested_attributes_record_not_found!(object, association_name, attributes[ActiveData.primary_attribute.to_s])
+                existing_record = association.target.detect do |record|
+                  primary_attribute_value = record.attribute(primary_attribute_name).typecast(attributes[primary_attribute_name])
+                  record.primary_attribute == primary_attribute_value
+                end
+                if existing_record
+                  if !call_reject_if(object, association_name, attributes)
+                    assign_to_or_mark_for_destruction(existing_record, attributes, options[:allow_destroy])
+                  end
+                else
+                  raise ActiveData::ObjectNotFound.new(object, association_name, attributes[primary_attribute_name])
+                end
               end
             end
           end
@@ -111,14 +117,14 @@ module ActiveData
               end
 
               if limit && attributes_collection.size > limit
-                raise ActiveData::TooManyObjects, "Maximum #{limit} objects are allowed. Got #{attributes_collection.size} objects instead."
+                raise ActiveData::TooManyObjects.new(limit, attributes_collection.size)
               end
             end
           end
 
-          def self.assign_to_or_mark_for_destruction(record, attributes, allow_destroy)
-            record.assign_attributes(attributes.except(*UNASSIGNABLE_KEYS))
-            record.mark_for_destruction if has_destroy_flag?(attributes) && allow_destroy
+          def self.assign_to_or_mark_for_destruction(object, attributes, allow_destroy)
+            object.assign_attributes(attributes.except(*unassignable_keys(object)))
+            object.mark_for_destruction if has_destroy_flag?(attributes) && allow_destroy
           end
 
           def self.has_destroy_flag?(hash)
@@ -139,8 +145,9 @@ module ActiveData
             end
           end
 
-          def self.raise_nested_attributes_record_not_found!(object, association_name, record_id)
-            raise ActiveData::ObjectNotFound, "Couldn't find #{object.class.reflect_on_association(association_name).klass.name} with id = #{record_id} for #{object.inspect}"
+          def self.unassignable_keys(object)
+            [(object._primary_name if object.respond_to?(:_primary_name)),
+              DESTROY_ATTRIBUTE].compact
           end
         end
 

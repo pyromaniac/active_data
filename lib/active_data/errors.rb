@@ -16,9 +16,6 @@ module ActiveData
     end
   end
 
-  class ObjectNotFound < ActiveDataError
-  end
-
   class UnsavableObject < ActiveDataError
   end
 
@@ -43,7 +40,18 @@ module ActiveData
     end
   end
 
+  class ObjectNotFound < ActiveDataError
+    def initialize object, association_name, record_id
+      message = "Couldn't find #{object.class.reflect_on_association(association_name).klass.name}" \
+        "with #{object.respond_to?(:_primary_name) ? object._primary_name : 'id'} = #{record_id} for #{object.inspect}"
+      super message
+    end
+  end
+
   class TooManyObjects < ActiveDataError
+    def initialize limit, actual_size
+      super "Maximum #{limit} objects are allowed. Got #{actual_size} objects instead."
+    end
   end
 
   class NormalizerMissing < NoMethodError

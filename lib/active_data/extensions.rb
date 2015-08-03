@@ -25,5 +25,9 @@ else
         parse_raw value
       end
     end
+
+    def inspect
+      "#<ActiveData::UUID:#{to_s}>"
+    end
   end
 end

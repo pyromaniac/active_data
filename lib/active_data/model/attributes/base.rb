@@ -30,7 +30,8 @@ module ActiveData
           when Date, Time, DateTime
             %("#{read.to_s(:db)}")
           else
-            read.inspect.truncate(50)
+            inspection = read.inspect
+            inspection.size > 100 ? inspection.truncate(50) : inspection
           end
           "#{name}: #{value}"
         end

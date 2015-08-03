@@ -8,23 +8,26 @@ module ActiveData
       } }
 
       included do
+        class_attribute :_primary_name, instance_writer: false
+
         delegate :has_primary_attribute?, to: 'self.class'
         alias_method_chain :==, :primary
         alias_method :eql?, :==
       end
 
       module ClassMethods
-        def primary_attribute options = {}
-          attribute ActiveData.primary_attribute, options.presence || DEFAULT_PRIMARY_ATTRIBUTE_OPTIONS.call
+        def primary_attribute *args
+          options = args.extract_options!
+          self._primary_name = (args.first.presence || ActiveData.primary_attribute).to_s
+          unless has_attribute?(_primary_name)
+            attribute _primary_name, options.presence || DEFAULT_PRIMARY_ATTRIBUTE_OPTIONS.call
+          end
+          alias_attribute :primary_attribute, _primary_name
         end
 
         def has_primary_attribute?
-          has_attribute? ActiveData.primary_attribute
+          has_attribute? _primary_name
         end
-      end
-
-      def primary_attribute
-        send(ActiveData.primary_attribute)
       end
 
       define_method :'=_with_primary=' do |other|
