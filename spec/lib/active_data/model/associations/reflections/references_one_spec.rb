@@ -3,7 +3,9 @@ require 'spec_helper'
 
 describe ActiveData::Model::Associations::Reflections::ReferencesOne do
   before do
-    stub_class(:author, ActiveRecord::Base)
+    stub_class(:author, ActiveRecord::Base) do
+      scope :name_starts_with_a, -> { where('name LIKE "a%"') }
+    end
 
     stub_model(:book) do
       include ActiveData::Model::Associations
@@ -64,6 +66,38 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
       .to change { book.author }.from(nil).to(author) }
     specify { expect { book.author = author }
       .to change { book.identify }.from(nil).to(author.id) }
+  end
+
+  describe '#scope' do
+    before do
+      stub_model(:book) do
+        include ActiveData::Model::Associations
+        references_one :author, -> { name_starts_with_a }
+      end
+    end
+
+    let!(:author1) { Author.create!(name: 'Rick') }
+    let!(:author2) { Author.create!(name: 'Aaron') }
+
+    specify { expect { book.author_id = author1.id }
+      .not_to change { book.author } }
+    specify { expect { book.author_id = author2.id }
+      .to change { book.author }.from(nil).to(author2) }
+
+    specify { expect { book.author = author1 }
+      .to change { book.author_id }.from(nil).to(author1.id) }
+    specify { expect { book.author = author2 }
+      .to change { book.author_id }.from(nil).to(author2.id) }
+
+    specify { expect { book.author = author1 }
+      .to change { book.association(:author).reload; book.author_id }.from(nil).to(author1.id) }
+    specify { expect { book.author = author2 }
+      .to change { book.association(:author).reload; book.author_id }.from(nil).to(author2.id) }
+
+    specify { expect { book.author = author1 }
+      .not_to change { book.association(:author).reload; book.author } }
+    specify { expect { book.author = author2 }
+      .to change { book.association(:author).reload; book.author }.from(nil).to(author2) }
   end
 
   describe '#author=' do

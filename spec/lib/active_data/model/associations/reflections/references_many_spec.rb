@@ -73,6 +73,28 @@ describe ActiveData::Model::Associations::Reflections::ReferencesMany do
       .to change { book.identify }.from([]).to([author.id]) }
   end
 
+  describe '#scope' do
+    before do
+      stub_model(:book) do
+        include ActiveData::Model::Associations
+        references_many :authors, -> { name_starts_with_a }
+      end
+    end
+
+    let!(:author1) { Author.create!(name: 'Rick') }
+    let!(:author2) { Author.create!(name: 'Aaron') }
+
+    specify { expect { book.author_ids = [author1.id, author2.id] }
+      .to change { book.authors }.from([]).to([author2]) }
+    specify { expect { book.authors = [author1, author2] }
+      .to change { book.author_ids }.from([]).to([author1.id, author2.id]) }
+
+    specify { expect { book.authors = [author1, author2] }
+      .to change { book.authors.reload }.from([]).to([author2]) }
+    specify { expect { book.authors = [author1, author2] }
+      .to change { book.authors.reload; book.author_ids }.from([]).to([author1.id, author2.id]) }
+  end
+
   describe '#author' do
     it { expect(book.authors).not_to respond_to(:build) }
     it { expect(book.authors).not_to respond_to(:create) }

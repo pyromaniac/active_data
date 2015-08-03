@@ -57,7 +57,7 @@ module ActiveData
         alias_method :writer, :replace
 
         def scope source = read_source
-          reflection.klass.where(reflection.primary_key => source)
+          reflection.scope.where(reflection.primary_key => source)
         end
 
       private

@@ -3,7 +3,7 @@ module ActiveData
     module Associations
       module Reflections
         class ReferencesOne < ReferenceReflection
-          def self.build target, generated_methods, name, options = {}, &block
+          def self.build target, generated_methods, name, *args, &block
             reflection = super
             if target < ActiveData::Model::Attributes && !target.has_attribute?(reflection.reference_key)
               target.attribute(reflection.reference_key, Integer)
