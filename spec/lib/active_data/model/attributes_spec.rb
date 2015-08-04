@@ -35,8 +35,16 @@ describe ActiveData::Model::Attributes do
   describe '.inspect' do
     specify { expect(stub_model.inspect).to match(/#<Class:0x\w+>\(no attributes\)/) }
     specify { expect(stub_model(:user).inspect).to eq('User(no attributes)') }
-    specify { expect(stub_model { attribute :count, type: Integer; attribute :object }.inspect).to match(/#<Class:0x\w+>\(count: Integer, object: Object\)/) }
-    specify { expect(stub_model(:user) { attribute :count, type: Integer; attribute :object }.inspect).to match('User(count: Integer, object: Object)') }
+    specify { expect(stub_model {
+      include ActiveData::Model::Primary
+      primary :count, type: Integer
+      attribute :object
+    }.inspect).to match(/#<Class:0x\w+>\(\*count: Integer, object: Object\)/) }
+    specify { expect(stub_model(:user) {
+      include ActiveData::Model::Primary
+      primary :count, type: Integer
+      attribute :object
+    }.inspect).to match('User(*count: Integer, object: Object)') }
   end
 
   describe '#==' do
@@ -96,8 +104,16 @@ describe ActiveData::Model::Attributes do
   describe '#inspect' do
     specify { expect(stub_model.new.inspect).to match(/#<#<Class:0x\w+> \(no attributes\)>/) }
     specify { expect(stub_model(:user).new.inspect).to match(/#<User \(no attributes\)>/) }
-    specify { expect(stub_model { attribute :count, type: Integer; attribute :object }.new(object: 'String').inspect).to match(/#<#<Class:0x\w+> count: nil, object: "String">/) }
-    specify { expect(stub_model(:user) { attribute :count, type: Integer; attribute :object }.new.inspect).to match(/#<User count: nil, object: nil>/) }
+    specify { expect(stub_model {
+      include ActiveData::Model::Primary
+      primary :count, type: Integer
+      attribute :object
+    }.new(object: 'String').inspect).to match(/#<#<Class:0x\w+> \*count: nil, object: "String">/) }
+    specify { expect(stub_model(:user) {
+      include ActiveData::Model::Primary
+      primary :count, type: Integer
+      attribute :object
+    }.new.inspect).to match(/#<User \*count: nil, object: nil>/) }
   end
 
   context 'attributes integration' do

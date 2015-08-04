@@ -73,7 +73,8 @@ module ActiveData
 
         def attributes_for_inspect
           attribute_names(false).map do |name|
-            reflect_on_attribute(name).inspect_reflection
+            prefix = respond_to?(:_primary_name) && _primary_name == name ? ?* : ''
+            "#{prefix}#{reflect_on_attribute(name).inspect_reflection}"
           end.join(', ')
         end
 
@@ -150,7 +151,8 @@ module ActiveData
 
       def attributes_for_inspect
         attribute_names(false).map do |name|
-          attribute(name).inspect_attribute
+          prefix = respond_to?(:_primary_name) && _primary_name == name ? ?* : ''
+          "#{prefix}#{attribute(name).inspect_attribute}"
         end.join(', ')
       end
     end

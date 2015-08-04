@@ -33,7 +33,7 @@ module ActiveData
           end
 
           def inspect_reflection
-            "#{name}: (undefined)"
+            "#{name}: (represent)"
           end
 
         private
