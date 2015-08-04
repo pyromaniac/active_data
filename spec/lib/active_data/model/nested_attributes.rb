@@ -6,7 +6,7 @@ shared_examples 'nested attributes' do
       include ActiveData::Model::Primary
       include ActiveData::Model::Lifecycle
 
-      primary_attribute :slug, type: String
+      primary :slug, type: String
       attribute :title, type: String
     end
 
@@ -14,7 +14,7 @@ shared_examples 'nested attributes' do
       include ActiveData::Model::Primary
       include ActiveData::Model::Lifecycle
 
-      primary_attribute :identifier
+      primary :identifier
       attribute :first_name, type: String
     end
   end

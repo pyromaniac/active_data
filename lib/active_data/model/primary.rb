@@ -16,7 +16,7 @@ module ActiveData
       end
 
       module ClassMethods
-        def primary_attribute *args
+        def primary *args
           options = args.extract_options!
           self._primary_name = (args.first.presence || ActiveData.primary_attribute).to_s
           unless has_attribute?(_primary_name)
@@ -24,6 +24,7 @@ module ActiveData
           end
           alias_attribute :primary_attribute, _primary_name
         end
+        alias_method :primary_attribute, :primary
 
         def has_primary_attribute?
           has_attribute? _primary_name
