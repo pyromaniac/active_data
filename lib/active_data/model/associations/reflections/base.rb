@@ -16,6 +16,7 @@ module ActiveData
               klass = Class.new(superclass || Object) do
                 include ActiveData::Model
                 include ActiveData::Model::Lifecycle
+                include ActiveData::Model::Primary
               end
               target.const_set(name.to_s.classify, klass)
               klass.class_eval(&block)
