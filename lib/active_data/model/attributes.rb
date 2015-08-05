@@ -85,7 +85,6 @@ module ActiveData
       end
 
       def initialize attrs = {}
-        @initial_attributes = {}
         assign_attributes attrs
       end
 
@@ -97,7 +96,7 @@ module ActiveData
       def attribute(name)
         (@_attributes ||= {})[name.to_s] ||= begin
           reflection = self.class.reflect_on_attribute(name)
-          reflection.build_attribute(self, @initial_attributes[name.to_s])
+          reflection.build_attribute(self, @initial_attributes.try(:[], name.to_s))
         end
       end
 
