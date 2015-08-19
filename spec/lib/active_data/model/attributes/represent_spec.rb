@@ -103,16 +103,13 @@ describe ActiveData::Model::Attributes::Represent do
       context do
         let(:post) { Post.new(name: 33) }
 
-        specify { expect { post.update(author: author) }.to change { post.name }.to '33' }
-        specify { expect { post.update(author: author) }.not_to change { post.name_before_type_cast } }
-
-        specify { expect { post.update(author: author) }.to change { post.author.try(:name) }.to '33' }
+        specify { expect { post.update(author: author) }.to change { post.author.try(:name).try(:to_s) }.to '33' }
         specify { expect { post.update(author: author) }.to change { post.author.try(:name_before_type_cast) }.to 33 }
 
-        specify { expect { post.update(author: author) }.to change { author.name }.to '33' }
+        specify { expect { post.update(author: author) }.to change { author.name.to_s }.to '33' }
         specify { expect { post.update(author: author) }.to change { author.name_before_type_cast }.to 33 }
 
-        specify { expect { post.update(author_id: author.id) }.to change { post.author.try(:name) }.to '33' }
+        specify { expect { post.update(author_id: author.id) }.to change { post.author.try(:name).try(:to_s) }.to '33' }
         specify { expect { post.update(author_id: author.id) }.to change { post.author.try(:name_before_type_cast) }.to 33 }
       end
     end
