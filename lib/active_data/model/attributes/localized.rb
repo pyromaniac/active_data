@@ -9,7 +9,7 @@ module ActiveData
         end
 
         def read_before_type_cast
-          @value_before_type_cast ||= Hash[(@raw_value.presence || {}).map do |locale, value|
+          @value_before_type_cast ||= Hash[(@value_cache.presence || {}).map do |locale, value|
             [locale.to_s, defaultize(value)]
           end]
         end

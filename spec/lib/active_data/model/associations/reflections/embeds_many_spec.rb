@@ -119,7 +119,7 @@ describe ActiveData::Model::Associations::Reflections::EmbedsMany do
 
       specify { expect(User.reflect_on_association(:projects).klass).to eq(User::Project) }
       specify { expect(User.new.projects).to eq([]) }
-      specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.projects).to be_a(ActiveData::Model::Associations::EmbeddedCollectionProxy) }
+      specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.projects).to be_a(ActiveData::Model::Associations::Collection::Embedded) }
       specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.read_attribute(:projects)).to eq([{'title' => 'Project'}]) }
     end
 
@@ -137,7 +137,7 @@ describe ActiveData::Model::Associations::Reflections::EmbedsMany do
 
       specify { expect(User.reflect_on_association(:projects).klass).to eq(User::Project) }
       specify { expect(User.new.projects).to eq([]) }
-      specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.projects).to be_a(ActiveData::Model::Associations::EmbeddedCollectionProxy) }
+      specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.projects).to be_a(ActiveData::Model::Associations::Collection::Embedded) }
       specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.read_attribute(:projects)).to eq([{'title' => 'Project', 'value' => nil}]) }
     end
   end

@@ -15,7 +15,7 @@ module ActiveData
         end
 
         def read_before_type_cast
-          @value_before_type_cast ||= defaultize(@raw_value)
+          @value_before_type_cast ||= defaultize(@value_cache)
         end
 
         def default

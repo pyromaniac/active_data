@@ -19,10 +19,17 @@ describe ActiveData::Model::Attributes do
     end
   end
 
+  describe '.reflect_on_attribute' do
+    specify { expect(model.reflect_on_attribute(:full_name).name).to eq('full_name') }
+    specify { expect(model.reflect_on_attribute('full_name').name).to eq('full_name') }
+    specify { expect(model.reflect_on_attribute(:name).name).to eq('full_name') }
+    specify { expect(model.reflect_on_attribute(:foobar)).to be_nil }
+  end
+
   describe '.has_attribute?' do
     specify { expect(model.has_attribute?(:full_name)).to eq(true) }
     specify { expect(model.has_attribute?('full_name')).to eq(true) }
-    specify { expect(model.has_attribute?(:name)).to eq(false) }
+    specify { expect(model.has_attribute?(:name)).to eq(true) }
     specify { expect(model.has_attribute?(:foobar)).to eq(false) }
   end
 
@@ -73,9 +80,20 @@ describe ActiveData::Model::Attributes do
     it { is_expected.to eql(model.new(name: 'hello', count: 42)) }
   end
 
+  describe '#attribute' do
+    let(:instance) { model.new }
+    specify { expect(instance.attribute(:full_name).reflection.name).to eq('full_name') }
+    specify { expect(instance.attribute('full_name').reflection.name).to eq('full_name') }
+    specify { expect(instance.attribute(:name).reflection.name).to eq('full_name') }
+    specify { expect(instance.attribute(:foobar)).to be_nil }
+
+    specify { expect(instance.attribute('full_name')).to equal(instance.attribute(:name)) }
+  end
+
   describe '#has_attribute?' do
     specify { expect(model.new.has_attribute?(:full_name)).to eq(true) }
     specify { expect(model.new.has_attribute?('full_name')).to eq(true) }
+    specify { expect(model.new.has_attribute?(:name)).to eq(true) }
     specify { expect(model.new.has_attribute?(:foobar)).to eq(false) }
   end
 

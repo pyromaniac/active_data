@@ -56,7 +56,7 @@ module ActiveData
 
         def reader force_reload = false
           reload if force_reload
-          @proxy ||= EmbeddedCollectionProxy.new self
+          @proxy ||= Collection::Embedded.new self
         end
 
         def writer objects

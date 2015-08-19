@@ -10,15 +10,17 @@ module ActiveData
         end
 
         def write value
-          @raw_value = value
+          @value_cache = value
+          flush_represents! unless value.nil?
+          @value_cache
         end
 
         def read
-          @raw_value
+          @value_cache
         end
 
         def read_before_type_cast
-          @raw_value
+          @value_cache
         end
 
         def value_present?
@@ -37,6 +39,10 @@ module ActiveData
         end
 
       private
+
+        def flush_represents!
+          owner.flush!(reflection.options[:flush_represents_of]) if reflection.options[:flush_represents_of]
+        end
 
         def evaluate *args, &block
           if block.arity >= 0 && block.arity <= args.length

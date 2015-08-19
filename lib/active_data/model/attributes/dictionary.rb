@@ -16,7 +16,7 @@ module ActiveData
         end
 
         def read_before_type_cast
-          @value_before_type_cast ||= Hash[(@raw_value.presence || {}).map do |key, value|
+          @value_before_type_cast ||= Hash[(@value_cache.presence || {}).map do |key, value|
             [key, defaultize(value)]
           end].with_indifferent_access
         end

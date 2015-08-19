@@ -32,6 +32,16 @@ module ActiveData
             reflection
           end
 
+          def alias_association alias_name, target
+            target.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+              alias_method :#{alias_name}, :#{name}
+              alias_method :#{alias_name}=, :#{name}=
+              alias_method :build_#{alias_name}, :build_#{name}
+              alias_method :create_#{alias_name}, :create_#{name}
+              alias_method :create_#{alias_name}!, :create_#{name}!
+            RUBY
+          end
+
           def collection?
             false
           end

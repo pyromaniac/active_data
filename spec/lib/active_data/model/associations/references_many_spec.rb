@@ -78,7 +78,7 @@ describe ActiveData::Model::Associations::ReferencesMany do
 
   describe '#reader' do
     specify { expect(association.reader).to eq([]) }
-    specify { expect(association.reader).to be_a ActiveData::Model::Associations::ReferencedCollectionProxy }
+    specify { expect(association.reader).to be_a ActiveData::Model::Associations::Collection::Referenced }
 
     specify { expect(existing_association.reader.first).to be_a Author }
     specify { expect(existing_association.reader.first).to be_persisted }

@@ -62,12 +62,59 @@ describe ActiveData::Model::Attributes::Represent do
     end
     let(:author) { Author.new(rate: '42') }
 
-    specify { expect { Post.new.rate }.to raise_error NoMethodError }
-    specify { expect { Post.new(rate: '33') }.to raise_error NoMethodError }
     specify { expect(Post.new(author: author).rate).to eq(42) }
     specify { expect(Post.new(author: author).rate_before_type_cast).to eq('42') }
     specify { expect(Post.new(author: author, rate: '33').rate).to eq(33) }
+    specify { expect(Post.new(author: author, rate: '33').author.rate).to eq(33) }
     specify { expect(Post.new(author: author).rate?).to eq(true) }
     specify { expect(Post.new(author: author, rate: nil).rate?).to eq(false) }
+
+    specify { expect(Post.new.rate).to be_nil }
+    specify { expect(Post.new.rate_before_type_cast).to be_nil }
+    specify { expect(Post.new(rate: '33').rate).to eq('33') }
+    specify { expect(Post.new(rate: '33').rate_before_type_cast).to eq('33') }
+
+    context do
+      let(:post) { Post.new(rate: '33') }
+
+      specify { expect { post.update(author: author) }.to change { post.rate }.to 33 }
+      specify { expect { post.update(author: author) }.not_to change { post.rate_before_type_cast } }
+
+      specify { expect { post.update(author: author) }.to change { post.author.try(:rate) }.to 33 }
+      specify { expect { post.update(author: author) }.to change { post.author.try(:rate_before_type_cast) }.to '33' }
+
+      specify { expect { post.update(author: author) }.to change { author.rate }.to 33 }
+      specify { expect { post.update(author: author) }.to change { author.rate_before_type_cast }.to '33' }
+    end
+
+    context do
+      before do
+        stub_class(:author, ActiveRecord::Base)
+
+        stub_model(:post) do
+          include ActiveData::Model::Associations
+
+          references_one :author
+          represent :name, of: :author
+        end
+      end
+      let!(:author) { Author.create!(name: 42) }
+
+      context do
+        let(:post) { Post.new(name: 33) }
+
+        specify { expect { post.update(author: author) }.to change { post.name }.to '33' }
+        specify { expect { post.update(author: author) }.not_to change { post.name_before_type_cast } }
+
+        specify { expect { post.update(author: author) }.to change { post.author.try(:name) }.to '33' }
+        specify { expect { post.update(author: author) }.to change { post.author.try(:name_before_type_cast) }.to 33 }
+
+        specify { expect { post.update(author: author) }.to change { author.name }.to '33' }
+        specify { expect { post.update(author: author) }.to change { author.name_before_type_cast }.to 33 }
+
+        specify { expect { post.update(author_id: author.id) }.to change { post.author.try(:name) }.to '33' }
+        specify { expect { post.update(author_id: author.id) }.to change { post.author.try(:name_before_type_cast) }.to 33 }
+      end
+    end
   end
 end

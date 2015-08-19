@@ -9,10 +9,10 @@ describe ActiveData::Model::Attributes::Reflections::Base do
     before { stub_class(:target) }
 
     specify do
-      described_class.build(Target, :field)
+      described_class.build(Class.new, Target, :field)
       expect(Target).not_to be_method_defined(:field)
     end
-    specify { expect(described_class.build(Target, :field).name).to eq('field') }
+    specify { expect(described_class.build(Class.new, Target, :field).name).to eq('field') }
   end
 
   describe '.attribute_class' do
@@ -32,7 +32,7 @@ describe ActiveData::Model::Attributes::Reflections::Base do
   describe '#alias_attribute' do
     before { stub_class(:target) }
 
-    specify { expect { described_class.build(Target, :field).alias_attribute(:field_alias, Target) }.to raise_error NotImplementedError }
+    specify { expect { described_class.build(Class.new, Target, :field).alias_attribute(:field_alias, Target) }.to raise_error NotImplementedError }
   end
 
   describe '#build_attribute' do

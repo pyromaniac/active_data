@@ -18,8 +18,9 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
-        class_attribute :_attributes, instance_reader: false, instance_writer: false
+        class_attribute :_attributes, :_attribute_aliases, instance_reader: false, instance_writer: false
         self._attributes = {}
+        self._attribute_aliases = {}
 
         delegate :attribute_names, :has_attribute?, to: 'self.class'
 
@@ -32,19 +33,27 @@ module ActiveData
 
       module ClassMethods
         def add_attribute(reflection_class, *args, &block)
-          attribute = reflection_class.build(generated_attributes_methods, *args, &block)
-          self._attributes = _attributes.merge(attribute.name => attribute)
-          attribute
-        end
-
-        def reflect_on_attribute(name)
-          _attributes[name.to_s]
+          reflection = reflection_class.build(self, generated_attributes_methods, *args, &block)
+          self._attributes = _attributes.merge(reflection.name => reflection)
+          reflection
         end
 
         def alias_attribute(alias_name, attribute_name)
-          attribute = reflect_on_attribute(attribute_name)
-          raise ArgumentError.new("Can't alias undefined attribute `#{attribute_name}` on #{self}") unless attribute
-          attribute.alias_attribute alias_name, generated_attributes_methods
+          reflection = reflect_on_attribute(attribute_name)
+          raise ArgumentError.new("Can't alias undefined attribute `#{attribute_name}` on #{self}") unless reflection
+          reflection.alias_attribute alias_name, generated_attributes_methods
+          self._attribute_aliases = _attribute_aliases.merge(alias_name.to_s => reflection.name)
+          reflection
+        end
+
+        def reflect_on_attribute(name)
+          name = name.to_s
+          _attributes[_attribute_aliases[name] || name]
+        end
+
+        def has_attribute? name
+          name = name.to_s
+          _attributes.key?(_attribute_aliases[name] || name)
         end
 
         def attribute_names(include_associations = true)
@@ -57,12 +66,20 @@ module ActiveData
           end
         end
 
-        def has_attribute? name
-          _attributes.key? name.to_s
-        end
-
         def inspect
           "#{original_inspect}(#{attributes_for_inspect.presence || 'no attributes'})"
+        end
+
+        def represent_attributes
+          @represent_attributes ||= _attributes.values.select do |attribute|
+            attribute.is_a? ActiveData::Model::Attributes::Reflections::Represent
+          end.group_by(&:reference)
+        end
+
+        def represent_attribute_names
+          @represent_attribute_names ||= Hash[represent_attributes.map do |reference, attributes|
+            [reference, attributes.map(&:name)]
+          end]
         end
 
       private
@@ -74,7 +91,7 @@ module ActiveData
         def attributes_for_inspect
           attribute_names(false).map do |name|
             prefix = respond_to?(:_primary_name) && _primary_name == name ? ?* : ''
-            "#{prefix}#{reflect_on_attribute(name).inspect_reflection}"
+            "#{prefix}#{_attributes[name].inspect_reflection}"
           end.join(', ')
         end
 
@@ -94,9 +111,9 @@ module ActiveData
       alias_method :eql?, :==
 
       def attribute(name)
-        (@_attributes ||= {})[name.to_s] ||= begin
-          reflection = self.class.reflect_on_attribute(name)
-          reflection.build_attribute(self, @initial_attributes.try(:[], name.to_s))
+        if reflection = self.class.reflect_on_attribute(name)
+          (@_attributes ||= {})[reflection.name] ||= reflection
+            .build_attribute(self, @initial_attributes.try(:[], reflection.name))
         end
       end
 
@@ -144,6 +161,12 @@ module ActiveData
         end]
         @_attributes = nil
         super
+      end
+
+      def flush! reference
+        if names = self.class.represent_attribute_names[reference.to_s]
+          names.each { |name| attribute(name).flush! }
+        end
       end
 
     private

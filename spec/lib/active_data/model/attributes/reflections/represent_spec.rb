@@ -9,7 +9,7 @@ describe ActiveData::Model::Attributes::Reflections::Represent do
     before { stub_class(:target) }
 
     specify do
-      described_class.build(Target, :field, of: :subject)
+      described_class.build(Class.new, Target, :field, of: :subject)
 
       expect(Target).to be_method_defined(:field)
       expect(Target).to be_method_defined(:field=)
@@ -24,7 +24,7 @@ describe ActiveData::Model::Attributes::Reflections::Represent do
     before { stub_class(:target) }
 
     specify do
-      described_class.build(Target, :field, of: :subject).alias_attribute(:field_alias, Target)
+      described_class.build(Class.new, Target, :field, of: :subject).alias_attribute(:field_alias, Target)
 
       expect(Target).to be_method_defined(:field_alias)
       expect(Target).to be_method_defined(:field_alias=)

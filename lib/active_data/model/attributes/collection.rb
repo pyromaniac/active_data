@@ -9,7 +9,7 @@ module ActiveData
         end
 
         def read_before_type_cast
-          @value_before_type_cast ||= Array.wrap(@raw_value).map { |value| defaultize(value) }
+          @value_before_type_cast ||= Array.wrap(@value_cache).map { |value| defaultize(value) }
         end
       end
     end

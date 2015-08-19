@@ -21,6 +21,8 @@ describe ActiveData::Model::Associations do
       stub_model(:admin, User) do
         include ActiveData::Model::Associations
         embeds_many :admin_projects, class_name: 'Project'
+
+        alias_association :own_projects, :admin_projects
       end
     end
 
@@ -34,6 +36,7 @@ describe ActiveData::Model::Associations do
     describe '#reflect_on_association' do
       specify { expect(Nobody.reflect_on_association(:blabla)).to be_nil }
       specify { expect(Admin.reflect_on_association('projects')).to be_a ActiveData::Model::Associations::Reflections::EmbedsMany }
+      specify { expect(Admin.reflect_on_association('own_projects').name).to eq(:admin_projects) }
       specify { expect(Manager.reflect_on_association(:managed_project)).to be_a ActiveData::Model::Associations::Reflections::EmbedsOne }
     end
   end
@@ -93,6 +96,8 @@ describe ActiveData::Model::Associations do
 
         embeds_one :profile
         embeds_many :projects
+
+        alias_association :my_profile, :profile
       end
     end
 
@@ -103,6 +108,10 @@ describe ActiveData::Model::Associations do
 
     describe '.inspect' do
       specify { expect(User.inspect).to eq('User(profile: EmbedsOne(Profile), projects: EmbedsMany(Project), login: Object)') }
+    end
+
+    describe '.association_names' do
+      specify { expect(User.association_names).to eq([:profile, :projects]) }
     end
 
     describe '#inspect' do
@@ -139,6 +148,9 @@ describe ActiveData::Model::Associations do
     describe '#association' do
       specify { expect(user.association(:projects)).to be_a(ActiveData::Model::Associations::EmbedsMany) }
       specify { expect(user.association(:profile)).to be_a(ActiveData::Model::Associations::EmbedsOne) }
+      specify { expect(user.association(:blabla)).to be_nil }
+      specify { expect(user.association('my_profile').reflection.name).to eq(:profile) }
+      specify { expect(user.association('my_profile')).to equal(user.association(:profile)) }
     end
 
     describe '#association_names' do

@@ -36,7 +36,7 @@ module ActiveData
 
         def reader force_reload = false
           reload if force_reload || source_changed?
-          @proxy ||= ReferencedCollectionProxy.new self
+          @proxy ||= Collection::Referenced.new self
         end
 
         def replace objects

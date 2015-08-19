@@ -33,6 +33,13 @@ module ActiveData
             @name, @options = name.to_sym, options
           end
 
+          def alias_association alias_name, target
+            target.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+              alias_method :#{alias_name}, :#{name}
+              alias_method :#{alias_name}=, :#{name}=
+            RUBY
+          end
+
           def macro
             self.class.name.demodulize.underscore.to_sym
           end
