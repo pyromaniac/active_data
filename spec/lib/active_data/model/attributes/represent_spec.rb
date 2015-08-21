@@ -57,10 +57,13 @@ describe ActiveData::Model::Attributes::Represent do
 
       stub_model(:post) do
         attribute :author
-        represent :rate, of: :author
+        alias_attribute :a, :author
+        represent :rate, of: :a
       end
     end
     let(:author) { Author.new(rate: '42') }
+
+    specify { expect(Post.reflect_on_attribute(:rate).reference).to eq('author') }
 
     specify { expect(Post.new(author: author).rate).to eq(42) }
     specify { expect(Post.new(author: author).rate_before_type_cast).to eq('42') }
@@ -95,10 +98,13 @@ describe ActiveData::Model::Attributes::Represent do
           include ActiveData::Model::Associations
 
           references_one :author
-          represent :name, of: :author
+          alias_association :a, :author
+          represent :name, of: :a
         end
       end
       let!(:author) { Author.create!(name: 42) }
+
+      specify { expect(Post.reflect_on_attribute(:name).reference).to eq('author') }
 
       context do
         let(:post) { Post.new(name: 33) }
