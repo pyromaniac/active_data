@@ -8,10 +8,10 @@ module ActiveData
             reference = target.reflect_on_association(attribute.reference) if target.respond_to?(:reflect_on_association)
             reference ||= target.reflect_on_attribute(attribute.reference) if target.respond_to?(:reflect_on_attribute)
             if reference
-              reference.options[:flush_represents_of] = attribute.reference
+              reference.options[:flush_represents_of] = reference.name
               if reference.respond_to?(:reference_key)
                 reference_key = target.reflect_on_attribute(reference.reference_key)
-                reference_key.options[:flush_represents_of] = attribute.reference
+                reference_key.options[:flush_represents_of] = reference.name
               end
             end
             attribute
