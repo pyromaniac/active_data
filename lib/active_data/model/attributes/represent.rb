@@ -5,6 +5,7 @@ module ActiveData
         delegate :reader, :reader_before_type_cast, :writer, to: :reflection
 
         def write value
+          return if readonly?
           @value = nil
           @value_before_type_cast = nil
           ref = reference

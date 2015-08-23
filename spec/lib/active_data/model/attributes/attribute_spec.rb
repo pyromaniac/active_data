@@ -17,6 +17,10 @@ describe ActiveData::Model::Attributes::Attribute do
     specify { expect(field.tap { |r| r.write(42) }.read).to eq('42') }
     specify { expect(field.tap { |r| r.write(43) }.read).to eq(nil) }
     specify { expect(field.tap { |r| r.write('') }.read).to eq(nil) }
+
+    context ':readonly' do
+      specify { expect(attribute(readonly: true, default: :world).tap { |r| r.write('string') }.read).to eq(:world) }
+    end
   end
 
   describe '#read_before_type_cast' do
@@ -28,6 +32,10 @@ describe ActiveData::Model::Attributes::Attribute do
     specify { expect(field.tap { |r| r.write(42) }.read_before_type_cast).to eq(42) }
     specify { expect(field.tap { |r| r.write(43) }.read_before_type_cast).to eq(43) }
     specify { expect(field.tap { |r| r.write('') }.read_before_type_cast).to eq('') }
+
+    context ':readonly' do
+      specify { expect(attribute(readonly: true, default: :world).tap { |r| r.write('string') }.read_before_type_cast).to eq(:world) }
+    end
   end
 
   describe '#default' do

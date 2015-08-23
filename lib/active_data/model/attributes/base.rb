@@ -3,16 +3,17 @@ module ActiveData
     module Attributes
       class Base
         attr_reader :owner, :reflection
-        delegate :name, :type, to: :reflection
+        delegate :name, :type, :readonly, to: :reflection
 
         def initialize owner, reflection
           @owner, @reflection = owner, reflection
         end
 
         def write value
+          return if readonly?
           @value_cache = value
           flush_represents! unless value.nil?
-          @value_cache
+          value
         end
 
         def read
@@ -25,6 +26,10 @@ module ActiveData
 
         def value_present?
           !read.nil? && !(read.respond_to?(:empty?) && read.empty?)
+        end
+
+        def readonly?
+          !!(readonly.is_a?(Proc) ? evaluate(&readonly) : readonly)
         end
 
         def inspect_attribute

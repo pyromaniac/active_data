@@ -40,6 +40,10 @@ module ActiveData
               options[:type].present? ? options[:type].to_s.camelize.constantize : Object
           end
 
+          def readonly
+            @readonly ||= options[:readonly]
+          end
+
           def inspect_reflection
             "#{name}: #{type}"
           end
