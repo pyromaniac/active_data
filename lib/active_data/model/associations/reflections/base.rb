@@ -12,15 +12,18 @@ module ActiveData
 
           def self.build target, generated_methods, name, options = {}, &block
             if block
-              superclass = options[:class_name].to_s.presence.try(:constantize)
-              klass = Class.new(superclass || Object) do
-                include ActiveData::Model
-                include ActiveData::Model::Lifecycle
-                include ActiveData::Model::Primary
+              options[:class] = proc do |reflection|
+                superclass = reflection.options[:class_name].to_s.presence.try(:constantize)
+                klass = Class.new(superclass || Object) do
+                  include ActiveData::Model
+                  include ActiveData::Model::Associations
+                  include ActiveData::Model::Lifecycle
+                  include ActiveData::Model::Primary
+                end
+                target.const_set(name.to_s.classify, klass)
+                klass.class_eval(&block)
+                klass
               end
-              target.const_set(name.to_s.classify, klass)
-              klass.class_eval(&block)
-              options[:class] = klass
             end
             new(name, options)
           end
@@ -45,7 +48,9 @@ module ActiveData
           end
 
           def klass
-            @klass ||= options[:class] || (options[:class_name].presence || name.to_s.classify).to_s.constantize
+            @klass ||= options[:class] ?
+              options[:class].call(self) :
+              (options[:class_name].presence || name.to_s.classify).to_s.constantize
           end
 
           def validate?
