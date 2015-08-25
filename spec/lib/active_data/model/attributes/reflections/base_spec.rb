@@ -29,12 +29,6 @@ describe ActiveData::Model::Attributes::Reflections::Base do
     specify { expect(reflection.name).to eq('field') }
   end
 
-  describe '#alias_attribute' do
-    before { stub_class(:target) }
-
-    specify { expect { described_class.build(Class.new, Target, :field).alias_attribute(:field_alias, Target) }.to raise_error NotImplementedError }
-  end
-
   describe '#build_attribute' do
     before do
       stub_class('SomeScope::Borogoves', described_class)

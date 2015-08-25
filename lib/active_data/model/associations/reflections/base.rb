@@ -28,19 +28,24 @@ module ActiveData
             new(name, options)
           end
 
+          def self.generate_methods name, target
+            target.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+              def #{name} force_reload = false
+                association(:#{name}).reader(force_reload)
+              end
+
+              def #{name}= value
+                association(:#{name}).writer(value)
+              end
+            RUBY
+          end
+
           def self.association_class
             @association_class ||= "ActiveData::Model::Associations::#{name.demodulize}".constantize
           end
 
           def initialize name, options = {}
             @name, @options = name.to_sym, options
-          end
-
-          def alias_association alias_name, target
-            target.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-              alias_method :#{alias_name}, :#{name}
-              alias_method :#{alias_name}=, :#{name}=
-            RUBY
           end
 
           def macro

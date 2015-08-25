@@ -105,9 +105,9 @@ describe ActiveData::Model::Attributes do
 
   describe '#attributes' do
     specify { expect(stub_model.new.attributes).to eq({})  }
-    specify { expect(model.new(full_name: 'Name').attributes)
+    specify { expect(model.new(name: 'Name').attributes)
       .to match({'id' => nil, 'full_name' => 'Name', 't' => {}, 'author' => nil, 'projects' => nil})  }
-    specify { expect(model.new(full_name: 'Name').attributes(false))
+    specify { expect(model.new(name: 'Name').attributes(false))
       .to match({'id' => nil, 'full_name' => 'Name', 't' => {}})  }
   end
 

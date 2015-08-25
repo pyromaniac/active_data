@@ -20,11 +20,11 @@ describe ActiveData::Model::Attributes::Reflections::Collection do
     end
   end
 
-  describe '#alias_attribute' do
+  describe '#generate_methods' do
     before { stub_class(:target) }
 
     specify do
-      described_class.build(Class.new, Target, :field).alias_attribute(:field_alias, Target)
+      described_class.generate_methods(:field_alias, Target)
 
       expect(Target).to be_method_defined(:field_alias)
       expect(Target).to be_method_defined(:field_alias=)

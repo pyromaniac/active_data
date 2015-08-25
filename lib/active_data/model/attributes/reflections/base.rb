@@ -15,6 +15,9 @@ module ActiveData
             alias_method :build, :build_instance
             private :build_instance
 
+            def generate_methods name, target
+            end
+
             def attribute_class
               @attribute_class ||= "ActiveData::Model::Attributes::#{name.demodulize}".constantize
             end
@@ -23,10 +26,6 @@ module ActiveData
           def initialize name, options = {}
             @name = name.to_s
             @options = options
-          end
-
-          def alias_attribute alias_name, target
-            raise NotImplementedError, 'Attribute aliasing is not supported'
           end
 
           def build_attribute owner, raw_value = nil

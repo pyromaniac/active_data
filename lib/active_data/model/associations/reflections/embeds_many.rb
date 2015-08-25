@@ -8,15 +8,7 @@ module ActiveData
             if target < ActiveData::Model::Attributes
               target.add_attribute(ActiveData::Model::Attributes::Reflections::Base, name)
             end
-            generated_methods.class_eval <<-EOS
-              def #{name} force_reload = false
-                association(:#{name}).reader(force_reload)
-              end
-
-              def #{name}= value
-                association(:#{name}).writer(value)
-              end
-            EOS
+            generate_methods name, generated_methods
             reflection
           end
 

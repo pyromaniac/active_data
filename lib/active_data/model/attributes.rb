@@ -41,7 +41,7 @@ module ActiveData
         def alias_attribute(alias_name, attribute_name)
           reflection = reflect_on_attribute(attribute_name)
           raise ArgumentError.new("Can't alias undefined attribute `#{attribute_name}` on #{self}") unless reflection
-          reflection.alias_attribute alias_name, generated_attributes_methods
+          reflection.class.generate_methods alias_name, generated_attributes_methods
           self._attribute_aliases = _attribute_aliases.merge(alias_name.to_s => reflection.name)
           reflection
         end
@@ -96,7 +96,7 @@ module ActiveData
         end
 
         def generated_attributes_methods
-          @generated_attributes_methods ||= const_set(:GeneratedAttirbutesMethods, Module.new)
+          @generated_attributes_methods ||= const_set(:GeneratedAttributesMethods, Module.new)
             .tap { |proxy| include proxy }
         end
       end
