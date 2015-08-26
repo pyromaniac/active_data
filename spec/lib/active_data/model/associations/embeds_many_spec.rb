@@ -186,6 +186,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
     let(:existing_user) { User.instantiate name: 'Rick' }
 
     specify { expect(association.target.map(&:title)).to eq(['Default']) }
+    specify { expect(association.target.map(&:new_record?)).to eq([true]) }
     specify { expect { association.replace([new_project]) }.to change { association.target.map(&:title) }.to eq(['Project']) }
     specify { expect { association.replace([]) }.to change { association.target }.to([]) }
 

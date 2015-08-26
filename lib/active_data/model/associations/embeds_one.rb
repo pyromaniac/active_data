@@ -39,7 +39,7 @@ module ActiveData
             if default.is_a?(reflection.klass)
               default
             else
-              reflection.klass.instantiate(default)
+              reflection.klass.new(default)
             end if default
           end
         end

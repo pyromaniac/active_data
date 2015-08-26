@@ -39,7 +39,7 @@ module ActiveData
             if default.all? { |object| object.is_a?(reflection.klass) }
               default
             else
-              reflection.klass.instantiate_collection(default)
+              default.map { |attributes| reflection.klass.new(attributes) }
             end if default.present?
           end || []
         end

@@ -104,6 +104,7 @@ describe ActiveData::Model::Associations::EmbedsOne do
     let(:existing_book) { Book.instantiate title: 'My Life' }
 
     specify { expect(association.target.name).to eq('Default') }
+    specify { expect(association.target.new_record?).to eq(true) }
     specify { expect { association.replace(new_author) }.to change { association.target.name }.to eq('Morty') }
     specify { expect { association.replace(nil) }.to change { association.target }.to be_nil }
 
