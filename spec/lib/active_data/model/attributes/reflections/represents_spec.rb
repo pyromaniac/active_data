@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ActiveData::Model::Attributes::Reflections::Represent do
+describe ActiveData::Model::Attributes::Reflections::Represents do
   def reflection(options = {})
     described_class.new(:field, options.reverse_merge(of: :subject))
   end

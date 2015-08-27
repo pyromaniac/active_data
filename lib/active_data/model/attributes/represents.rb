@@ -1,7 +1,7 @@
 module ActiveData
   module Model
     module Attributes
-      class Represent < Attribute
+      class Represents < Attribute
         delegate :reader, :reader_before_type_cast, :writer, to: :reflection
 
         def write value

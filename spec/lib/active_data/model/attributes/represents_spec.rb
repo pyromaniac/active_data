@@ -1,10 +1,10 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-describe ActiveData::Model::Attributes::Represent do
+describe ActiveData::Model::Attributes::Represents do
   def attribute(*args)
     options = args.extract_options!
-    reflection = ActiveData::Model::Attributes::Reflections::Represent.new(:full_name, options.reverse_merge(of: :subject))
+    reflection = ActiveData::Model::Attributes::Reflections::Represents.new(:full_name, options.reverse_merge(of: :subject))
     described_class.new(args.first || Object.new, reflection)
   end
 
@@ -66,7 +66,7 @@ describe ActiveData::Model::Attributes::Represent do
       stub_model(:post) do
         attribute :author
         alias_attribute :a, :author
-        represent :rate, of: :a
+        represents :rate, of: :a
       end
     end
     let(:author) { Author.new(rate: '42') }
@@ -107,7 +107,7 @@ describe ActiveData::Model::Attributes::Represent do
 
           references_one :author
           alias_association :a, :author
-          represent :name, of: :a
+          represents :name, of: :a
         end
       end
       let!(:author) { Author.create!(name: 42) }

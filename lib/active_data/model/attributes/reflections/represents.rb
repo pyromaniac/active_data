@@ -2,7 +2,7 @@ module ActiveData
   module Model
     module Attributes
       module Reflections
-        class Represent < Attribute
+        class Represents < Attribute
           def self.build target, generated_methods, name, *args, &block
             options = args.extract_options!
             reference = target.reflect_on_association(options[:of]) if target.respond_to?(:reflect_on_association)
@@ -48,7 +48,7 @@ module ActiveData
           end
 
           def inspect_reflection
-            "#{name}: (represent)"
+            "#{name}: (represents)"
           end
 
         private

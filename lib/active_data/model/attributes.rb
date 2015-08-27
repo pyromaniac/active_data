@@ -3,14 +3,14 @@ require 'active_data/model/attributes/reflections/attribute'
 require 'active_data/model/attributes/reflections/collection'
 require 'active_data/model/attributes/reflections/dictionary'
 require 'active_data/model/attributes/reflections/localized'
-require 'active_data/model/attributes/reflections/represent'
+require 'active_data/model/attributes/reflections/represents'
 
 require 'active_data/model/attributes/base'
 require 'active_data/model/attributes/attribute'
 require 'active_data/model/attributes/collection'
 require 'active_data/model/attributes/dictionary'
 require 'active_data/model/attributes/localized'
-require 'active_data/model/attributes/represent'
+require 'active_data/model/attributes/represents'
 
 module ActiveData
   module Model
@@ -24,7 +24,7 @@ module ActiveData
 
         delegate :attribute_names, :has_attribute?, to: 'self.class'
 
-        %w[attribute collection dictionary represent].each do |kind|
+        %w[attribute collection dictionary represents].each do |kind|
           define_singleton_method kind do |*args, &block|
             add_attribute("ActiveData::Model::Attributes::Reflections::#{kind.camelize}".constantize, *args, &block)
           end
@@ -70,14 +70,14 @@ module ActiveData
           "#{original_inspect}(#{attributes_for_inspect.presence || 'no attributes'})"
         end
 
-        def represent_attributes
-          @represent_attributes ||= _attributes.values.select do |attribute|
-            attribute.is_a? ActiveData::Model::Attributes::Reflections::Represent
+        def represents_attributes
+          @represents_attributes ||= _attributes.values.select do |attribute|
+            attribute.is_a? ActiveData::Model::Attributes::Reflections::Represents
           end.group_by(&:reference)
         end
 
-        def represent_attribute_names
-          @represent_attribute_names ||= Hash[represent_attributes.map do |reference, attributes|
+        def represents_attribute_names
+          @represents_attribute_names ||= Hash[represents_attributes.map do |reference, attributes|
             [reference, attributes.map(&:name)]
           end]
         end
@@ -164,7 +164,7 @@ module ActiveData
       end
 
       def flush! reference
-        if names = self.class.represent_attribute_names[reference.to_s]
+        if names = self.class.represents_attribute_names[reference.to_s]
           names.each { |name| attribute(name).flush! }
         end
       end
