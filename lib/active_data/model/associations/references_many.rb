@@ -3,14 +3,13 @@ module ActiveData
     module Associations
       class ReferencesMany < Base
         def save
-          return false unless target.all?(&:persisted?)
           present_keys = target.reject { |t| t.marked_for_destruction? }.map(&reflection.primary_key)
           write_source(present_keys)
           true
         end
 
         def save!
-          save or raise AssociationObjectNotPersisted
+          save
         end
 
         def target= object

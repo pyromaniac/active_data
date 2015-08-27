@@ -107,13 +107,10 @@ describe ActiveData::Model::Associations::ReferencesMany do
   describe '#writer' do
     let(:new_author1) { Author.create!(name: 'John') }
     let(:new_author2) { Author.create!(name: 'Adam') }
+    let(:new_author3) { Author.new(name: 'Jane') }
 
     specify { expect { association.writer([Dummy.new]) }
       .to raise_error ActiveData::AssociationTypeMismatch }
-    specify { expect { association.writer([Author.new]) }
-      .to raise_error ActiveData::AssociationObjectNotPersisted }
-    specify { expect { existing_association.writer([Author.new]) rescue nil }
-      .not_to change { existing_association.target } }
 
     specify { expect { association.writer(nil) }.to raise_error NoMethodError }
     specify { expect { association.writer(new_author1) }.to raise_error NoMethodError }
@@ -152,6 +149,12 @@ describe ActiveData::Model::Associations::ReferencesMany do
     specify { expect { existing_association.writer([new_author1, new_author2]) }
       .to change { existing_book.read_attribute(:author_ids) }
       .from([author.id]).to([new_author1.id, new_author2.id]) }
+
+    specify { expect { existing_association.writer([new_author3]) }
+      .to change { existing_association.target }.from([author]).to([new_author3]) }
+    specify { expect { existing_association.writer([new_author3]) }
+      .to change { existing_book.read_attribute(:author_ids) }
+      .from([author.id]).to([nil]) }
   end
 
   describe '#concat' do

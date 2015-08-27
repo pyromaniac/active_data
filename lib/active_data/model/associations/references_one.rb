@@ -3,7 +3,6 @@ module ActiveData
     module Associations
       class ReferencesOne < Base
         def save
-          return false if target && !target.persisted?
           if target.present? && !target.marked_for_destruction?
             write_source identifier
           else
@@ -13,7 +12,7 @@ module ActiveData
         end
 
         def save!
-          save or raise AssociationObjectNotPersisted
+          save
         end
 
         def target= object
