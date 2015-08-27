@@ -145,7 +145,7 @@ describe ActiveData::Model::Associations::Reflections::ReferencesMany do
 
     context 'model not persisted' do
       let(:author) { Author.new }
-      specify { expect { book.authors = [author] }.to raise_error ActiveData::AssociationObjectNotPersisted }
+      specify { expect { book.authors = [author] }.to change { book.authors }.from([]).to([author]) }
     end
   end
 

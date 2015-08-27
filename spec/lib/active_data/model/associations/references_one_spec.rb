@@ -79,9 +79,9 @@ describe ActiveData::Model::Associations::ReferencesOne do
 
 
   describe '#writer' do
-    let(:new_author) { Author.create(name: 'Morty') }
-
     context 'new owner' do
+      let(:new_author) { Author.new(name: 'Morty') }
+
       let(:book) do
         Book.new.tap do |book|
           book.send(:mark_persisted!)
@@ -93,17 +93,15 @@ describe ActiveData::Model::Associations::ReferencesOne do
       specify { expect { association.writer(new_author) }
         .to change { association.reader.name rescue nil }.from(nil).to('Morty') }
       specify { expect { association.writer(new_author) }
-        .to change { book.author_id }.from(nil).to(new_author.id) }
+        .not_to change { book.author_id }.from(nil) }
 
     end
 
     context 'persisted owner' do
+      let(:new_author) { Author.create(name: 'Morty') }
+
       specify { expect { association.writer(stub_model(:dummy).new) }
         .to raise_error ActiveData::AssociationTypeMismatch }
-      specify { expect { association.writer(Author.new) }
-        .to raise_error ActiveData::AssociationObjectNotPersisted }
-      specify { expect { association.writer(Author.new) rescue nil }
-        .not_to change { association.target } }
 
       specify { expect(association.writer(nil)).to be_nil }
       specify { expect(association.writer(new_author)).to eq(new_author) }
