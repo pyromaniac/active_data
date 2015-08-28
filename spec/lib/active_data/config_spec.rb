@@ -16,6 +16,10 @@ describe ActiveData::Config do
       .to change { subject.i18n_scope }.from(:active_data).to(:data_model) }
   end
 
+  describe '#logger' do
+    its(:logger) { should be_a Logger }
+  end
+
   describe '#primary_attribute' do
     its(:primary_attribute) { should == :id }
     specify { expect { subject.primary_attribute = :identified }

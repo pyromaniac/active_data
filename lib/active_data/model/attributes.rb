@@ -144,8 +144,12 @@ module ActiveData
         (attrs.presence || {}).each do |(name, value)|
           name = name.to_s
           sanitize = respond_to?(:_primary_name) && name == _primary_name
+          logger.info("Ignoring primary `#{name}` attribute value for #{self} during mass-assignment") if sanitize
+
           if (has_attribute?(name) || respond_to?("#{name}=")) && !sanitize
             public_send("#{name}=", value)
+          else
+            logger.info("Ignoring undefined `#{name}` attribute value for #{self} during mass-assignment")
           end
         end
       end

@@ -4,6 +4,7 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
+        delegate :logger, to: ActiveData
         self.include_root_in_json = ActiveData.include_root_in_json
       end
 

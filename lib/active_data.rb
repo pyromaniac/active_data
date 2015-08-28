@@ -11,6 +11,7 @@ require 'active_data/version'
 require 'active_data/errors'
 require 'active_data/extensions'
 require 'active_data/config'
+require 'active_data/railtie' if defined? Rails
 
 module ActiveData
   BOOLEAN_MAPPING = {

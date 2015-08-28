@@ -2,7 +2,7 @@ module ActiveData
   class Config
     include Singleton
 
-    attr_accessor :include_root_in_json, :i18n_scope, :primary_attribute,
+    attr_accessor :include_root_in_json, :i18n_scope, :logger, :primary_attribute,
       :_normalizers, :_typecasters
 
     def self.delegated
@@ -12,6 +12,7 @@ module ActiveData
     def initialize
       @include_root_in_json = false
       @i18n_scope = :active_data
+      @logger = Logger.new(STDERR)
       @primary_attribute = :id
       @_normalizers = {}
       @_typecasters = {}
