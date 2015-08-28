@@ -24,6 +24,7 @@ module ActiveData
               if reflection = klass.reflect_on_association(association_name)
                 klass.nested_attributes_options = klass.nested_attributes_options.merge(association_name.to_sym => options)
 
+                reflection.options[:validate] = true
                 type = (reflection.collection? ? :collection : :one_to_one)
                 klass.class_eval <<-METHOD, __FILE__, __LINE__ + 1
                   def #{association_name}_attributes=(attributes)

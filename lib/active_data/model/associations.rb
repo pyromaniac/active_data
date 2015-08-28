@@ -14,7 +14,9 @@ require 'active_data/model/associations/embeds_one'
 require 'active_data/model/associations/embeds_many'
 require 'active_data/model/associations/references_one'
 require 'active_data/model/associations/references_many'
+
 require 'active_data/model/associations/nested_attributes'
+require 'active_data/model/associations/validations'
 
 module ActiveData
   module Model
@@ -23,6 +25,7 @@ module ActiveData
 
       included do
         include NestedAttributes
+        include Validations
 
         class_attribute :_associations, :_association_aliases, instance_reader: false, instance_writer: false
         self._associations = {}
@@ -100,44 +103,6 @@ module ActiveData
           association.reload
           result
         end
-      end
-
-      def valid_ancestry?
-        errors.clear
-        association_names.each do |name|
-          association = association(name)
-          if association.collection?
-            association.target.each.with_index do |object, i|
-              object.respond_to?(:valid_ancestry?) ?
-                object.valid_ancestry? :
-                object.valid?
-
-              if object.errors.present?
-                (errors.messages[name] ||= [])[i] = object.errors.messages
-              end
-            end
-          else
-            if association.target
-              association.target.respond_to?(:valid_ancestry?) ?
-                association.target.valid_ancestry? :
-                association.target.valid?
-
-              if association.target.errors.present?
-                errors.messages[name] = association.target.errors.messages
-              end
-            end
-          end
-        end
-        run_validations!
-      end
-      alias_method :validate_ancestry, :valid_ancestry?
-
-      def invalid_ancestry?
-        !valid_ancestry?
-      end
-
-      def validate_ancestry!
-        valid_ancestry? || raise_validation_error
       end
 
     private

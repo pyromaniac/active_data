@@ -9,6 +9,7 @@ module ActiveData
             reference ||= target.reflect_on_attribute(options[:of]) if target.respond_to?(:reflect_on_attribute)
             if reference
               options[:of] = reference.name
+              reference.options[:validate] = true
               reference.options[:flush_represents_of] = reference.name
               if reference.respond_to?(:reference_key)
                 reference_key = target.reflect_on_attribute(reference.reference_key)

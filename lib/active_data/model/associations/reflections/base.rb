@@ -59,7 +59,7 @@ module ActiveData
           end
 
           def validate?
-            false
+            !!options[:validate]
           end
 
           def belongs_to?

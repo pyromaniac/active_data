@@ -28,33 +28,4 @@ describe ActiveData::Model::Validations do
     specify { expect(model.new(name: 'Name').validate!).to eq(true) }
     specify { expect { model.new(name: 'Name').validate! }.not_to raise_error }
   end
-
-  context 'represent attributes' do
-    before do
-      stub_class(:author, ActiveRecord::Base) do
-        validates :name, presence: true
-
-        # Emulate Active Record association auto save error.
-        def errors
-          super.tap do |errors|
-            errors.add(:'user.email', 'is invalid') if errors[:'user.email'].empty?
-          end
-        end
-      end
-
-      stub_model(:post) do
-        include ActiveData::Model::Associations
-
-        references_one :author
-        represents :name, of: :author
-        represents :email, of: :author
-      end
-    end
-
-    let(:post) { Post.new(author: Author.new) }
-
-    before { post.validate_ancestry }
-
-    specify { expect(post.errors.messages).to eq(email: ['is invalid'], name: ["can't be blank"]) }
-  end
 end

@@ -185,58 +185,5 @@ describe ActiveData::Model::Associations do
       specify { expect(User.instantiate(JSON.parse(user.to_json))
         .tap { |u| u.projects.first.author.name = 'Other' }).not_to eq(user) }
     end
-
-    context '#validate_ancestry, #valid_ancestry?, #invalid_ancestry?' do
-      before { User.send(:include, ActiveData::Model::Persistence) }
-      let(:profile) { Profile.new first_name: 'Name' }
-      let(:project) { Project.new title: 'Project' }
-      let(:projects) { [project] }
-      let(:user) { User.new(login: 'Login', profile: profile, projects: projects) }
-      let(:author_attributes) { { name: 'Author' } }
-      before { project.build_author(author_attributes) }
-
-      specify { expect(user.validate_ancestry).to eq(true) }
-      specify { expect(user.validate_ancestry!).to eq(true) }
-      specify { expect { user.validate_ancestry! }.not_to raise_error }
-      specify { expect(user.valid_ancestry?).to eq(true) }
-      specify { expect(user.invalid_ancestry?).to eq(false) }
-      specify { expect{ user.validate_ancestry }.not_to change { user.errors.messages } }
-
-      context do
-        let(:author_attributes) { {} }
-        specify { expect(user.validate_ancestry).to eq(false) }
-        specify { expect { user.validate_ancestry! }.to raise_error ActiveData::ValidationError }
-        specify { expect(user.valid_ancestry?).to eq(false) }
-        specify { expect(user.invalid_ancestry?).to eq(true) }
-        specify { expect{ user.validate_ancestry }.to change { user.errors.messages }
-          .to(projects: [author: { name: ["can't be blank"] }]) }
-      end
-
-      context do
-        let(:profile) { Profile.new }
-        specify { expect(user.validate_ancestry).to eq(false) }
-        specify { expect { user.validate_ancestry! }.to raise_error ActiveData::ValidationError }
-        specify { expect(user.valid_ancestry?).to eq(false) }
-        specify { expect(user.invalid_ancestry?).to eq(true) }
-        specify { expect{ user.validate_ancestry }.to change { user.errors.messages }
-          .to(profile: { first_name: ["can't be blank"] }) }
-      end
-
-      context do
-        let(:projects) { [project, Project.new] }
-        specify { expect(user.validate_ancestry).to eq(false) }
-        specify { expect { user.validate_ancestry! }.to raise_error ActiveData::ValidationError }
-        specify { expect(user.valid_ancestry?).to eq(false) }
-        specify { expect(user.invalid_ancestry?).to eq(true) }
-        specify { expect{ user.validate_ancestry }.to change { user.errors.messages }
-          .to(projects: [nil, { title: ["can't be blank"] }]) }
-
-        context do
-          before { user.update(login: '') }
-          specify { expect{ user.validate_ancestry }.to change { user.errors.messages }
-            .to(projects: [nil, { title: ["can't be blank"] }], login: ["can't be blank"]) }
-        end
-      end
-    end
   end
 end

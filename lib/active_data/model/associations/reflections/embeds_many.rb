@@ -12,6 +12,11 @@ module ActiveData
             reflection
           end
 
+          def initialize name, options = {}
+            super
+            options[:validate] = true unless options.key?(:validate)
+          end
+
           def collection?
             true
           end

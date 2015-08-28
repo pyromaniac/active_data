@@ -36,6 +36,11 @@ module ActiveData
             RUBY
           end
 
+          def initialize name, options = {}
+            super
+            options[:validate] = true unless options.key?(:validate)
+          end
+
           def collection?
             false
           end
