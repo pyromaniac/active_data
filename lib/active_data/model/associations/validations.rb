@@ -29,7 +29,7 @@ module ActiveData
         def run_validations!(deep = false) #:nodoc:
           validate_associations!(deep)
           super()
-          emerge_represents_attributes_errors!
+          emerge_represented_attributes_errors!
           errors.empty?
         end
 
@@ -60,8 +60,8 @@ module ActiveData
           end
         end
 
-        def emerge_represents_attributes_errors!
-          self.class.represents_attributes.each do |reference, attributes|
+        def emerge_represented_attributes_errors!
+          self.class.represented_attributes.each do |reference, attributes|
             reference_errors = errors.messages[reference.to_sym]
             next unless reference_errors
 

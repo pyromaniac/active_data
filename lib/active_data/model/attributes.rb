@@ -70,14 +70,14 @@ module ActiveData
           "#{original_inspect}(#{attributes_for_inspect.presence || 'no attributes'})"
         end
 
-        def represents_attributes
-          @represents_attributes ||= _attributes.values.select do |attribute|
+        def represented_attributes
+          @represented_attributes ||= _attributes.values.select do |attribute|
             attribute.is_a? ActiveData::Model::Attributes::Reflections::Represents
           end.group_by(&:reference)
         end
 
-        def represents_attribute_names
-          @represents_attribute_names ||= Hash[represents_attributes.map do |reference, attributes|
+        def represented_attribute_names
+          @represented_attribute_names ||= Hash[represented_attributes.map do |reference, attributes|
             [reference, attributes.map(&:name)]
           end]
         end
@@ -168,7 +168,7 @@ module ActiveData
       end
 
       def flush! reference
-        if names = self.class.represents_attribute_names[reference.to_s]
+        if names = self.class.represented_attribute_names[reference.to_s]
           names.each { |name| attribute(name).flush! }
         end
       end
