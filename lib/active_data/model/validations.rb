@@ -7,6 +7,8 @@ module ActiveData
       included do
         extend HelperMethods
         include HelperMethods
+
+        alias_method :validate, :valid?
       end
 
       def validate! context = nil
