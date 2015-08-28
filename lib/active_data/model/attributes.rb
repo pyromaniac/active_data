@@ -24,7 +24,7 @@ module ActiveData
 
         delegate :attribute_names, :has_attribute?, to: 'self.class'
 
-        %w[attribute collection dictionary represents].each do |kind|
+        %w[attribute collection dictionary].each do |kind|
           define_singleton_method kind do |*args, &block|
             add_attribute("ActiveData::Model::Attributes::Reflections::#{kind.camelize}".constantize, *args, &block)
           end
@@ -32,6 +32,13 @@ module ActiveData
       end
 
       module ClassMethods
+        def represents(*names, &block)
+          options = names.extract_options!
+          names.each do |name|
+            add_attribute(Reflections::Represents, name, options, &block)
+          end
+        end
+
         def add_attribute(reflection_class, *args, &block)
           reflection = reflection_class.build(self, generated_attributes_methods, *args, &block)
           self._attributes = _attributes.merge(reflection.name => reflection)
