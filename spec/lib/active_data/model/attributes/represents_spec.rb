@@ -126,6 +126,30 @@ describe ActiveData::Model::Attributes::Represents do
         specify { expect { post.update(author_id: author.id) }.to change { post.author.try(:name).try(:to_s) }.to '33' }
         specify { expect { post.update(author_id: author.id) }.to change { post.author.try(:name_before_type_cast) }.to 33 }
       end
+
+    end
+
+    context 'multiple attributes in a single represents definition' do
+      before do
+        stub_model(:author) do
+          attribute :first_name
+          attribute :last_name
+        end
+
+        stub_model(:post) do
+          attribute :author
+          represents :first_name, :last_name, of: :author
+        end
+      end
+
+      let(:author) { Author.new(first_name: 'John', last_name: 'Doe') }
+      let(:post) { Post.new }
+
+      specify do
+        expect { post.update(author: author) }
+          .to change { post.first_name }.to('John')
+          .and change { post.last_name }.to('Doe')
+      end
     end
   end
 end

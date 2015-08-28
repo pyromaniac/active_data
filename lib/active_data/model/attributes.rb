@@ -24,7 +24,7 @@ module ActiveData
 
         delegate :attribute_names, :has_attribute?, to: 'self.class'
 
-        %w[attribute collection dictionary represents].each do |kind|
+        %w[attribute collection dictionary].each do |kind|
           define_singleton_method kind do |*args, &block|
             add_attribute("ActiveData::Model::Attributes::Reflections::#{kind.camelize}".constantize, *args, &block)
           end
@@ -32,6 +32,13 @@ module ActiveData
       end
 
       module ClassMethods
+        def represents(*names, &block)
+          options = names.extract_options!
+          names.each do |name|
+            add_attribute(Reflections::Represents, name, options, &block)
+          end
+        end
+
         def add_attribute(reflection_class, *args, &block)
           reflection = reflection_class.build(self, generated_attributes_methods, *args, &block)
           self._attributes = _attributes.merge(reflection.name => reflection)
@@ -70,14 +77,14 @@ module ActiveData
           "#{original_inspect}(#{attributes_for_inspect.presence || 'no attributes'})"
         end
 
-        def represents_attributes
-          @represents_attributes ||= _attributes.values.select do |attribute|
+        def represented_attributes
+          @represented_attributes ||= _attributes.values.select do |attribute|
             attribute.is_a? ActiveData::Model::Attributes::Reflections::Represents
           end.group_by(&:reference)
         end
 
-        def represents_attribute_names
-          @represents_attribute_names ||= Hash[represents_attributes.map do |reference, attributes|
+        def represented_attribute_names
+          @represented_attribute_names ||= Hash[represented_attributes.map do |reference, attributes|
             [reference, attributes.map(&:name)]
           end]
         end
@@ -168,7 +175,7 @@ module ActiveData
       end
 
       def flush! reference
-        if names = self.class.represents_attribute_names[reference.to_s]
+        if names = self.class.represented_attribute_names[reference.to_s]
           names.each { |name| attribute(name).flush! }
         end
       end
