@@ -100,7 +100,7 @@ module ActiveData
         association_names.all? do |name|
           association = association(name)
           result = association.save!
-          association.reload
+          association.reload if association.reflection.embedded?
           result
         end
       end
