@@ -147,10 +147,10 @@ module ActiveData
       end
       alias_method :update_attributes, :update
 
-      def assign_attributes attrs
+      def assign_attributes attrs, sanitize = true
         (attrs.presence || {}).each do |(name, value)|
           name = name.to_s
-          sanitize = respond_to?(:_primary_name) && name == _primary_name
+          sanitize &&= name == self.class.primary_name
 
           if (has_attribute?(name) || respond_to?("#{name}=")) && !sanitize
             public_send("#{name}=", value)
@@ -183,7 +183,7 @@ module ActiveData
 
       def attributes_for_inspect
         attribute_names(false).map do |name|
-          prefix = respond_to?(:_primary_name) && _primary_name == name ? ?* : ''
+          prefix = self.class.primary_name == name ? ?* : ''
           "#{prefix}#{attribute(name).inspect_attribute}"
         end.join(', ')
       end

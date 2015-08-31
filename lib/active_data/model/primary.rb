@@ -30,6 +30,10 @@ module ActiveData
         def has_primary_attribute?
           has_attribute? _primary_name
         end
+
+        def primary_name
+          _primary_name
+        end
       end
 
       define_method :'=_with_primary=' do |other|

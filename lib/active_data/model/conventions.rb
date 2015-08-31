@@ -25,6 +25,10 @@ module ActiveData
         def to_ary
           nil
         end
+
+        def primary_name
+          nil
+        end
       end
     end
   end

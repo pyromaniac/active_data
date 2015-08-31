@@ -39,7 +39,7 @@ module ActiveData
             if default.is_a?(reflection.klass)
               default
             else
-              reflection.klass.new(default)
+              reflection.klass.new.tap { |i| i.assign_attributes(default, false) }
             end if default
           end
         end
