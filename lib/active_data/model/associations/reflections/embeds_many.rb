@@ -20,6 +20,10 @@ module ActiveData
           def collection?
             true
           end
+
+          def embedded?
+            true
+          end
         end
       end
     end

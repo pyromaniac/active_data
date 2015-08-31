@@ -76,7 +76,7 @@ shared_examples 'nested attributes' do
     specify { expect { user.projects_attributes = {1 => {title: 'Project 1'}, 2 => {title: 'Project 2'}} }
       .to change { user.projects.map(&:title) }.to(['Project 1', 'Project 2']) }
     specify { expect { user.projects_attributes = [{slug: 42, title: 'Project 1'}, {title: 'Project 2'}] }
-      .to raise_error ActiveData::ObjectNotFound }
+      .to change { user.projects.map(&:title) }.to(['Project 1', 'Project 2']) }
     specify { expect { user.projects_attributes = [{title: ''}, {title: 'Project 2'}] }
       .to change { user.projects.map(&:title) }.to(['', 'Project 2']) }
 
@@ -118,6 +118,11 @@ shared_examples 'nested attributes' do
           {title: 'Project 4'}
         ] }
         .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2', 'Project 4']) }
+      specify { expect { user.projects_attributes = [
+          {slug: projects.first.slug.to_i, title: 'Project 3'},
+          {slug: 33, title: 'Project 4'}
+        ] }
+        .to change { user.projects.map(&:slug) }.to(['42', '43', '33']) }
       specify { expect { user.projects_attributes = {
           1 => {slug: projects.first.slug.to_i, title: 'Project 3'},
           2 => {title: 'Project 4'}

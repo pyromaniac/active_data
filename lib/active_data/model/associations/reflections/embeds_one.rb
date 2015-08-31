@@ -44,6 +44,10 @@ module ActiveData
           def collection?
             false
           end
+
+          def embedded?
+            true
+          end
         end
       end
     end

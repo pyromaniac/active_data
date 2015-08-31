@@ -34,6 +34,10 @@ module ActiveData
               scope
             end
           end
+
+          def embedded?
+            false
+          end
         end
       end
     end

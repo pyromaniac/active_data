@@ -15,7 +15,7 @@ module ActiveData
           REJECT_ALL_BLANK_PROC = proc { |attributes| attributes.all? { |key, value| key == DESTROY_ATTRIBUTE || value.blank? } }
 
           def self.accepts_nested_attributes_for(klass, *attr_names)
-            options = { :allow_destroy => false, :update_only => false }
+            options = { allow_destroy: false, update_only: false }
             options.update(attr_names.extract_options!)
             options.assert_valid_keys(:allow_destroy, :reject_if, :limit, :update_only)
             options[:reject_if] = REJECT_ALL_BLANK_PROC if options[:reject_if] == :all_blank
@@ -44,8 +44,9 @@ module ActiveData
 
             association = object.association(association_name)
             existing_record = association.target
-            primary_attribute_name = association.reflection.klass._primary_name
-            primary_attribute_value = existing_record.attribute(primary_attribute_name).typecast(attributes[primary_attribute_name]) if existing_record
+            primary_attribute_name = primary_name_for(association.reflection.klass)
+            primary_attribute_value = existing_record.attribute(primary_attribute_name)
+              .typecast(attributes[primary_attribute_name]) if existing_record
 
             if existing_record && (options[:update_only] || existing_record.primary_attribute == primary_attribute_value)
               assign_to_or_mark_for_destruction(existing_record, attributes, options[:allow_destroy]) unless call_reject_if(object, association_name, attributes)
@@ -72,7 +73,7 @@ module ActiveData
             check_record_limit!(options[:limit], attributes_collection)
 
             association = object.association(association_name)
-            primary_attribute_name = association.reflection.klass._primary_name
+            primary_attribute_name = primary_name_for(association.reflection.klass)
 
             if attributes_collection.is_a? Hash
               keys = attributes_collection.keys
@@ -92,7 +93,8 @@ module ActiveData
                 end
               else
                 existing_record = association.target.detect do |record|
-                  primary_attribute_value = record.attribute(primary_attribute_name).typecast(attributes[primary_attribute_name])
+                  primary_attribute_value = record.attribute(primary_attribute_name)
+                    .typecast(attributes[primary_attribute_name])
                   record.primary_attribute == primary_attribute_value
                 end
                 if existing_record
@@ -100,7 +102,13 @@ module ActiveData
                     assign_to_or_mark_for_destruction(existing_record, attributes, options[:allow_destroy])
                   end
                 else
-                  raise ActiveData::ObjectNotFound.new(object, association_name, attributes[primary_attribute_name])
+                  if association.reflection.embedded?
+                    association.build.tap do |i|
+                      i.assign_attributes(attributes.except(DESTROY_ATTRIBUTE), false)
+                    end
+                  else
+                    raise ActiveData::ObjectNotFound.new(object, association_name, attributes[primary_attribute_name])
+                  end
                 end
               end
             end
@@ -147,8 +155,11 @@ module ActiveData
           end
 
           def self.unassignable_keys(object)
-            [(object._primary_name if object.respond_to?(:_primary_name)),
-              DESTROY_ATTRIBUTE].compact
+            [primary_name_for(object.class), DESTROY_ATTRIBUTE].compact
+          end
+
+          def self.primary_name_for(klass)
+            klass < ActiveData::Model ? klass.primary_name : 'id'
           end
         end
 
