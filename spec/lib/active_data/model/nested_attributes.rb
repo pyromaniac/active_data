@@ -123,6 +123,11 @@ shared_examples 'nested attributes' do
           {slug: 33, title: 'Project 4'}
         ] }
         .to change { user.projects.map(&:slug) }.to(['42', '43', '33']) }
+      specify { expect { user.projects_attributes = [
+          {slug: projects.first.slug.to_i, title: 'Project 3'},
+          {slug: 33, title: 'Project 4', _destroy: 1}
+        ] }
+        .not_to change { user.projects.map(&:slug) } }
       specify { expect { user.projects_attributes = {
           1 => {slug: projects.first.slug.to_i, title: 'Project 3'},
           2 => {title: 'Project 4'}

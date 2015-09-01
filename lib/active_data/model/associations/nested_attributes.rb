@@ -103,8 +103,10 @@ module ActiveData
                   end
                 else
                   if association.reflection.embedded?
-                    association.build.tap do |i|
-                      i.assign_attributes(attributes.except(DESTROY_ATTRIBUTE), false)
+                    unless reject_new_object?(object, association_name, attributes)
+                      association.build.tap do |i|
+                        i.assign_attributes(attributes.except(DESTROY_ATTRIBUTE), false)
+                      end
                     end
                   else
                     raise ActiveData::ObjectNotFound.new(object, association_name, attributes[primary_attribute_name])
