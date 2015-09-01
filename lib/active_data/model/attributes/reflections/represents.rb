@@ -32,12 +32,12 @@ module ActiveData
             @reference ||= options[:of].to_s
           end
 
-          def attribute
-            @attribute ||= options[:attribute].presence.try(:to_s) || name
+          def column
+            @column ||= options[:column].presence.try(:to_s) || name
           end
 
           def reader
-            @reader ||= options[:reader].presence.try(:to_s) || attribute
+            @reader ||= options[:reader].presence.try(:to_s) || column
           end
 
           def reader_before_type_cast
@@ -45,7 +45,7 @@ module ActiveData
           end
 
           def writer
-            @writer ||= "#{options[:writer].presence || attribute}="
+            @writer ||= "#{options[:writer].presence || column}="
           end
 
           def inspect_reflection

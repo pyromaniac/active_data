@@ -17,15 +17,6 @@ module ActiveData
         end
 
       private
-
-        # Move represent attribute errors to the top level:
-        #
-        #   {role: {:'user.email' => ['Some error']}}
-        #
-        # to:
-        #
-        #   {email: ['Some error']}
-        #
         def run_validations!(deep = false) #:nodoc:
           validate_associations!(deep)
           super()
@@ -39,12 +30,20 @@ module ActiveData
             if association.collection?
               association.target.each.with_index do |object, i|
                 if object_invalid?(object, deep)
-                  (errors.messages[name] ||= [])[i] = object.errors.messages
+                  object.errors.each do |key, message|
+                    key = "#{name}.#{i}.#{key}"
+                    errors[key] << message
+                    errors[key].uniq!
+                  end
                 end
               end
             else
               if association.target && object_invalid?(association.target, deep)
-                errors.messages[name] = association.target.errors.messages
+                association.target.errors.each do |key, message|
+                  key = "#{name}.#{key}"
+                  errors[key] << message
+                  errors[key].uniq!
+                end
               end
             end if deep || association.validate?
           end
@@ -60,22 +59,25 @@ module ActiveData
           end
         end
 
+
+        # Move represent attribute errors to the top level:
+        #
+        #   {:'role.email' => ['Some error']}
+        #
+        # to:
+        #
+        #   {email: ['Some error']}
+        #
         def emerge_represented_attributes_errors!
           self.class.represented_attributes.each do |reference, attributes|
-            reference_errors = errors.messages[reference.to_sym]
-            next unless reference_errors
-
-            attributes_hash = attributes.index_by(&:attribute)
-            reference_errors.each do |key, messages|
-              name = key.to_s.split(?.).last
-              if attributes_hash.key?(name)
-                reference_errors.delete(key)
-                errors.messages[name.to_sym] ||= []
-                errors.messages[name.to_sym].concat(messages)
+            attributes.each do |attribute|
+              key = :"#{reference}.#{attribute.column}"
+              messages = errors.messages[key]
+              if messages.present?
+                errors[attribute.column].concat(messages)
+                errors.delete(key)
               end
             end
-
-            errors.messages.delete(reference.to_sym) if reference_errors.empty?
           end
         end
       end

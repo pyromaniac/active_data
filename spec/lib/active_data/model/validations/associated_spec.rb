@@ -65,7 +65,7 @@ describe ActiveData::Model::Validations::AssociatedValidator do
     subject(:instance) { main.instantiate name: 'hello', validated_many: [{ }] }
     it { is_expected.not_to be_valid }
     specify { expect { instance.validate }.to change { instance.errors.messages }
-      .to(validated_many: [{name: ["can't be blank"]}, 'is invalid']) }
+      .to(:'validated_many.0.name' => ["can't be blank"], validated_many: ['is invalid']) }
   end
 
   context do
@@ -89,6 +89,6 @@ describe ActiveData::Model::Validations::AssociatedValidator do
     subject(:instance) { main.instantiate name: 'hello', validated_many: [{ }], validated_one: { name: 'name' } }
     it { is_expected.not_to be_valid }
     specify { expect { instance.validate }.to change { instance.errors.messages }
-      .to(validated_many: [{name: ["can't be blank"]}, 'is invalid']) }
+      .to(:'validated_many.0.name' => ["can't be blank"], validated_many: ['is invalid']) }
   end
 end

@@ -45,26 +45,26 @@ describe ActiveData::Model::Attributes::Reflections::Represents do
     specify { expect(reflection(of: :subject).reference).to eq('subject') }
   end
 
-  describe '#attribute' do
-    specify { expect(reflection.attribute).to eq('field') }
-    specify { expect(reflection(attribute: 'hello').attribute).to eq('hello') }
+  describe '#column' do
+    specify { expect(reflection.column).to eq('field') }
+    specify { expect(reflection(column: 'hello').column).to eq('hello') }
   end
 
   describe '#reader' do
     specify { expect(reflection.reader).to eq('field') }
-    specify { expect(reflection(attribute: 'hello').reader).to eq('hello') }
+    specify { expect(reflection(column: 'hello').reader).to eq('hello') }
     specify { expect(reflection(reader: 'world').reader).to eq('world') }
   end
 
   describe '#reader_before_type_cast' do
     specify { expect(reflection.reader_before_type_cast).to eq('field_before_type_cast') }
-    specify { expect(reflection(attribute: 'hello').reader_before_type_cast).to eq('hello_before_type_cast') }
+    specify { expect(reflection(column: 'hello').reader_before_type_cast).to eq('hello_before_type_cast') }
     specify { expect(reflection(reader: 'world').reader_before_type_cast).to eq('world_before_type_cast') }
   end
 
   describe '#writer' do
     specify { expect(reflection.writer).to eq('field=') }
-    specify { expect(reflection(attribute: 'hello').writer).to eq('hello=') }
+    specify { expect(reflection(column: 'hello').writer).to eq('hello=') }
     specify { expect(reflection(writer: 'world').writer).to eq('world=') }
   end
 end
