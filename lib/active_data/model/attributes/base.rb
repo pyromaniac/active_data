@@ -12,7 +12,6 @@ module ActiveData
         def write value
           return if readonly?
           @value_cache = value
-          flush_represents! unless value.nil?
           value
         end
 
@@ -44,10 +43,6 @@ module ActiveData
         end
 
       private
-
-        def flush_represents!
-          owner.flush!(reflection.options[:flush_represents_of]) if reflection.options[:flush_represents_of]
-        end
 
         def evaluate *args, &block
           if block.arity >= 0 && block.arity <= args.length

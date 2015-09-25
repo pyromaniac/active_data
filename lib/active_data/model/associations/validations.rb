@@ -69,14 +69,12 @@ module ActiveData
         #   {email: ['Some error']}
         #
         def emerge_represented_attributes_errors!
-          self.class.represented_attributes.each do |reference, attributes|
-            attributes.each do |attribute|
-              key = :"#{reference}.#{attribute.column}"
-              messages = errors.messages[key]
-              if messages.present?
-                errors[attribute.column].concat(messages)
-                errors.delete(key)
-              end
+          self.class.represented_attributes.each do |attribute|
+            key = :"#{attribute.reference}.#{attribute.column}"
+            messages = errors.messages[key]
+            if messages.present?
+              errors[attribute.column].concat(messages)
+              errors.delete(key)
             end
           end
         end

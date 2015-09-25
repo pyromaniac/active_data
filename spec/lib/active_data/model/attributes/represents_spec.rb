@@ -67,6 +67,7 @@ describe ActiveData::Model::Attributes::Represents do
         attribute :author
         alias_attribute :a, :author
         represents :rate, of: :a
+        alias_attribute :r, :rate
       end
     end
     let(:author) { Author.new(rate: '42') }
@@ -75,28 +76,16 @@ describe ActiveData::Model::Attributes::Represents do
 
     specify { expect(Post.new(author: author).rate).to eq(42) }
     specify { expect(Post.new(author: author).rate_before_type_cast).to eq('42') }
-    specify { expect(Post.new(author: author, rate: '33').rate).to eq(33) }
-    specify { expect(Post.new(author: author, rate: '33').author.rate).to eq(33) }
+    specify { expect(Post.new(rate: '33', author: author).rate).to eq(33) }
+    specify { expect(Post.new(rate: '33', author: author).author.rate).to eq(33) }
+    specify { expect(Post.new(r: '33', author: author).rate).to eq(33) }
+    specify { expect(Post.new(r: '33', author: author).author.rate).to eq(33) }
     specify { expect(Post.new(author: author).rate?).to eq(true) }
-    specify { expect(Post.new(author: author, rate: nil).rate?).to eq(false) }
+    specify { expect(Post.new(rate: nil, author: author).rate?).to eq(false) }
 
     specify { expect(Post.new.rate).to be_nil }
     specify { expect(Post.new.rate_before_type_cast).to be_nil }
-    specify { expect(Post.new(rate: '33').rate).to eq('33') }
-    specify { expect(Post.new(rate: '33').rate_before_type_cast).to eq('33') }
-
-    context do
-      let(:post) { Post.new(rate: '33') }
-
-      specify { expect { post.update(author: author) }.to change { post.rate }.to 33 }
-      specify { expect { post.update(author: author) }.not_to change { post.rate_before_type_cast } }
-
-      specify { expect { post.update(author: author) }.to change { post.author.try(:rate) }.to 33 }
-      specify { expect { post.update(author: author) }.to change { post.author.try(:rate_before_type_cast) }.to '33' }
-
-      specify { expect { post.update(author: author) }.to change { author.rate }.to 33 }
-      specify { expect { post.update(author: author) }.to change { author.rate_before_type_cast }.to '33' }
-    end
+    specify { expect { Post.new(rate: '33') }.to raise_error(NoMethodError) }
 
     context do
       before do
@@ -114,19 +103,8 @@ describe ActiveData::Model::Attributes::Represents do
 
       specify { expect(Post.reflect_on_attribute(:name).reference).to eq('author') }
 
-      context do
-        let(:post) { Post.new(name: 33) }
-
-        specify { expect { post.update(author: author) }.to change { post.author.try(:name).try(:to_s) }.to '33' }
-        specify { expect { post.update(author: author) }.to change { post.author.try(:name_before_type_cast) }.to 33 }
-
-        specify { expect { post.update(author: author) }.to change { author.name.to_s }.to '33' }
-        specify { expect { post.update(author: author) }.to change { author.name_before_type_cast }.to 33 }
-
-        specify { expect { post.update(author_id: author.id) }.to change { post.author.try(:name).try(:to_s) }.to '33' }
-        specify { expect { post.update(author_id: author.id) }.to change { post.author.try(:name_before_type_cast) }.to 33 }
-      end
-
+      specify { expect(Post.new(name: 33, author: author).name).to eq('33') }
+      specify { expect(Post.new(name: 33, author: author).author.name).to eq('33') }
     end
 
     context 'multiple attributes in a single represents definition' do

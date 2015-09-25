@@ -8,12 +8,7 @@ module ActiveData
           return if readonly?
           @value = nil
           @value_before_type_cast = nil
-          ref = reference
-          if ref
-            ref.send(writer, value)
-          else
-            @value_cache = value
-          end
+          reference.send(writer, value)
         end
 
         def read
@@ -24,23 +19,7 @@ module ActiveData
           @value_before_type_cast ||= defaultize(read_value_before_type_cast)
         end
 
-        def flush!
-          if value_cache? && reference
-            value_cache = @value_cache
-            flush_value_cache
-            write(value_cache)
-          end
-        end
-
       private
-
-        def value_cache?
-          instance_variable_defined?(:@value_cache)
-        end
-
-        def flush_value_cache
-          remove_instance_variable(:@value_cache)
-        end
 
         def reference
           owner.send(reflection.reference)
@@ -48,11 +27,7 @@ module ActiveData
 
         def read_value
           ref = reference
-          if ref
-            ref.public_send(reader)
-          else
-            @value_cache
-          end
+          ref.public_send(reader) if ref
         end
 
         def read_value_before_type_cast
@@ -61,8 +36,6 @@ module ActiveData
             ref.respond_to?(reader_before_type_cast) ?
               ref.public_send(reader_before_type_cast) :
               ref.public_send(reader)
-          else
-            @value_cache
           end
         end
       end

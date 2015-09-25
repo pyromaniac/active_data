@@ -5,17 +5,14 @@ module ActiveData
         class Represents < Attribute
           def self.build target, generated_methods, name, *args, &block
             options = args.extract_options!
+
             reference = target.reflect_on_association(options[:of]) if target.respond_to?(:reflect_on_association)
             reference ||= target.reflect_on_attribute(options[:of]) if target.respond_to?(:reflect_on_attribute)
             if reference
               options[:of] = reference.name
               reference.options[:validate] = true
-              reference.options[:flush_represents_of] = reference.name
-              if reference.respond_to?(:reference_key)
-                reference_key = target.reflect_on_attribute(reference.reference_key)
-                reference_key.options[:flush_represents_of] = reference.name
-              end
             end
+
             super target, generated_methods, name, *args, options, &block
           end
 

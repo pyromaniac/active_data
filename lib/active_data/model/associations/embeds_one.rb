@@ -66,8 +66,6 @@ module ActiveData
             clear
           end
 
-          flush_represents! if target
-
           target
         end
         alias_method :writer, :replace

@@ -80,13 +80,13 @@ module ActiveData
         def represented_attributes
           @represented_attributes ||= _attributes.values.select do |attribute|
             attribute.is_a? ActiveData::Model::Attributes::Reflections::Represents
-          end.group_by(&:reference)
+          end
         end
 
-        def represented_attribute_names
-          @represented_attribute_names ||= Hash[represented_attributes.map do |reference, attributes|
-            [reference, attributes.map(&:name)]
-          end]
+        def represented_names_and_aliases
+          @represented_names_and_aliases ||= represented_attributes.flat_map do |attribute|
+            [attribute.name, *inverted_attribute_aliases[attribute.name]]
+          end
         end
 
       private
@@ -103,8 +103,16 @@ module ActiveData
         end
 
         def generated_attributes_methods
-          @generated_attributes_methods ||= const_set(:GeneratedAttributesMethods, Module.new)
+          @generated_attributes_methods ||=
+            const_set(:GeneratedAttributesMethods, Module.new)
             .tap { |proxy| include proxy }
+        end
+
+        def inverted_attribute_aliases
+          @inverted_attribute_aliases ||=
+            _attribute_aliases.each.with_object({}) do |(alias_name, attribute_name), result|
+              (result[attribute_name] ||= []).push(alias_name)
+            end
         end
       end
 
@@ -148,15 +156,14 @@ module ActiveData
       alias_method :update_attributes, :update
 
       def assign_attributes attrs, sanitize = true
-        (attrs.presence || {}).each do |(name, value)|
-          name = name.to_s
-          sanitize &&= name == self.class.primary_name
+        if self.class.represented_attributes.present?
+          represented_attrs = attrs.stringify_keys!
+            .extract!(*self.class.represented_names_and_aliases)
 
-          if (has_attribute?(name) || respond_to?("#{name}=")) && !sanitize
-            public_send("#{name}=", value)
-          else
-            logger.info("Ignoring #{sanitize ? 'primary' : 'undefined'} `#{name}` attribute value for #{self} during mass-assignment")
-          end
+          _assign_attributes(attrs, sanitize)
+          _assign_attributes(represented_attrs, sanitize)
+        else
+          _assign_attributes(attrs, sanitize)
         end
       end
       alias_method :attributes=, :assign_attributes
@@ -173,13 +180,20 @@ module ActiveData
         super
       end
 
-      def flush! reference
-        if names = self.class.represented_attribute_names[reference.to_s]
-          names.each { |name| attribute(name).flush! }
+    private
+
+      def _assign_attributes attrs, sanitize
+        attrs.each do |name, value|
+          name = name.to_s
+          sanitize_value = sanitize && name == self.class.primary_name
+
+          if respond_to?("#{name}=") && !sanitize_value
+            public_send("#{name}=", value)
+          else
+            logger.info("Ignoring #{sanitize_value ? 'primary' : 'undefined'} `#{name}` attribute value for #{self} during mass-assignment")
+          end
         end
       end
-
-    private
 
       def attributes_for_inspect
         attribute_names(false).map do |name|

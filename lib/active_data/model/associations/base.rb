@@ -54,10 +54,6 @@ module ActiveData
 
       private
 
-        def flush_represents!
-          owner.flush!(reflection.options[:flush_represents_of]) if reflection.options[:flush_represents_of]
-        end
-
         def read_source
           reflection.read_source owner
         end
