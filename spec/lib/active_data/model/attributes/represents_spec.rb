@@ -103,8 +103,8 @@ describe ActiveData::Model::Attributes::Represents do
 
       specify { expect(Post.reflect_on_attribute(:name).reference).to eq('author') }
 
-      specify { expect(Post.new(name: 33, author: author).name).to eq('33') }
-      specify { expect(Post.new(name: 33, author: author).author.name).to eq('33') }
+      specify { expect(Post.new(name: '33', author: author).name).to eq('33') }
+      specify { expect(Post.new(name: '33', author: author).author.name).to eq('33') }
     end
 
     context 'multiple attributes in a single represents definition' do
