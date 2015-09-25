@@ -157,8 +157,11 @@ module ActiveData
 
       def assign_attributes attrs, sanitize = true
         if self.class.represented_attributes.present?
-          represented_attrs = attrs.stringify_keys!
-            .extract!(*self.class.represented_names_and_aliases)
+          attrs.stringify_keys!
+          represented_attrs = self.class
+            .represented_names_and_aliases.each_with_object({}) do |name, hash|
+              hash[name] = attrs.delete(name) if attrs.has_key?(name)
+            end
 
           _assign_attributes(attrs, sanitize)
           _assign_attributes(represented_attrs, sanitize)
