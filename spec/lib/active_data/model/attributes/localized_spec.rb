@@ -2,10 +2,12 @@
 require 'spec_helper'
 
 describe ActiveData::Model::Attributes::Localized do
+  before { stub_model(:dummy) }
+
   def attribute(*args)
     options = args.extract_options!
-    reflection = ActiveData::Model::Attributes::Reflections::Localized.new(:field, options)
-    described_class.new(args.first || Object.new, reflection)
+    reflection = Dummy.add_attribute(ActiveData::Model::Attributes::Reflections::Localized, :field, options)
+    described_class.new('field', Dummy.new)
   end
 
   describe '#read' do

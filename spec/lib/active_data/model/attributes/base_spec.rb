@@ -2,10 +2,12 @@
 require 'spec_helper'
 
 describe ActiveData::Model::Attributes::Base do
+  before { stub_model(:dummy) }
+
   def attribute(*args)
     options = args.extract_options!
-    reflection = ActiveData::Model::Attributes::Reflections::Base.new(:field, options)
-    described_class.new(args.first || Object.new, reflection)
+    reflection = Dummy.add_attribute(ActiveData::Model::Attributes::Reflections::Base, :field, options)
+    Dummy.new.attribute(:field)
   end
 
   describe '#read' do

@@ -40,7 +40,7 @@ describe ActiveData::Model::Attributes::Reflections::Base do
     let(:owner) { Owner.new }
 
     specify { expect(reflection.build_attribute(owner, nil)).to be_a(ActiveData::Model::Attributes::Borogoves) }
-    specify { expect(reflection.build_attribute(owner, nil).reflection).to eq(reflection) }
+    specify { expect(reflection.build_attribute(owner, nil).name).to eq('field') }
     specify { expect(reflection.build_attribute(owner, nil).owner).to eq(owner) }
   end
 

@@ -2,10 +2,12 @@
 require 'spec_helper'
 
 describe ActiveData::Model::Attributes::Represents do
+  before { stub_model(:dummy) }
+
   def attribute(*args)
     options = args.extract_options!
-    reflection = ActiveData::Model::Attributes::Reflections::Represents.new(:full_name, options.reverse_merge(of: :subject))
-    described_class.new(args.first || Object.new, reflection)
+    reflection = Dummy.add_attribute(ActiveData::Model::Attributes::Reflections::Represents, :full_name, options.reverse_merge(of: :subject))
+    Dummy.new.attribute(:full_name)
   end
 
   before do
@@ -16,15 +18,15 @@ describe ActiveData::Model::Attributes::Represents do
 
   describe '#write' do
     subject { Subject.new }
-    let(:owner) { double(value: 42, subject: subject) }
-    let(:field) { attribute(owner) }
+    before { allow_any_instance_of(Dummy).to receive_messages(value: 42, subject: subject) }
+    let(:field) { attribute }
 
     specify { expect { field.write('hello') }.to change { subject.full_name }.to('hello') }
   end
 
   describe '#read' do
-    let(:owner) { double(value: 42, subject: Subject.new(full_name: :hello)) }
-    let(:field) { attribute(owner, normalizer: ->(v){ v && v.is_a?(String) ? v.strip : v }, default: :world, enum: ['hello', '42', 'world', :world]) }
+    before { allow_any_instance_of(Dummy).to receive_messages(value: 42, subject: Subject.new(full_name: :hello)) }
+    let(:field) { attribute(normalizer: ->(v){ v && v.is_a?(String) ? v.strip : v }, default: :world, enum: ['hello', '42', 'world', :world]) }
 
     specify { expect(field.read).to eq('hello') }
     specify { expect(field.tap { |r| r.write(nil) }.read).to eq(:world) }
@@ -36,13 +38,13 @@ describe ActiveData::Model::Attributes::Represents do
     specify { expect(field.tap { |r| r.write('') }.read).to eq(nil) }
 
     context ':readonly' do
-      specify { expect(attribute(owner, readonly: true).tap { |r| r.write('string') }.read).to eq('hello') }
+      specify { expect(attribute(readonly: true).tap { |r| r.write('string') }.read).to eq('hello') }
     end
   end
 
   describe '#read_before_type_cast' do
-    let(:owner) { double(value: 42, subject: Subject.new(full_name: :hello)) }
-    let(:field) { attribute(owner, normalizer: ->(v){ v.strip }, default: :world, enum: ['hello', '42', 'world']) }
+    before { allow_any_instance_of(Dummy).to receive_messages(value: 42, subject: Subject.new(full_name: :hello)) }
+    let(:field) { attribute(normalizer: ->(v){ v.strip }, default: :world, enum: ['hello', '42', 'world']) }
 
     specify { expect(field.read_before_type_cast).to eq(:hello) }
     specify { expect(field.tap { |r| r.write(nil) }.read_before_type_cast).to eq(:world) }
@@ -53,7 +55,7 @@ describe ActiveData::Model::Attributes::Represents do
     specify { expect(field.tap { |r| r.write('') }.read_before_type_cast).to eq('') }
 
     context ':readonly' do
-      specify { expect(attribute(owner, readonly: true).tap { |r| r.write('string') }.read_before_type_cast).to eq(:hello) }
+      specify { expect(attribute(readonly: true).tap { |r| r.write('string') }.read_before_type_cast).to eq(:hello) }
     end
   end
 

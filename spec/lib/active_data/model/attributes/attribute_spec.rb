@@ -1,10 +1,12 @@
 require 'spec_helper'
 
 describe ActiveData::Model::Attributes::Attribute do
+  before { stub_model(:dummy) }
+
   def attribute(*args)
     options = args.extract_options!
-    reflection = ActiveData::Model::Attributes::Reflections::Attribute.new(:field, options)
-    described_class.new(args.first || Object.new, reflection)
+    reflection = Dummy.add_attribute(ActiveData::Model::Attributes::Reflections::Attribute, :field, options)
+    Dummy.new.attribute(:field)
   end
 
   describe '#read' do
@@ -39,13 +41,13 @@ describe ActiveData::Model::Attributes::Attribute do
   end
 
   describe '#default' do
-    let(:owner) { double(value: 42) }
+    before { allow_any_instance_of(Dummy).to receive_messages(value: 42) }
 
     specify { expect(attribute.default).to eq(nil) }
     specify { expect(attribute(default: 'hello').default).to eq('hello') }
-    specify { expect(attribute(owner, default: -> { value }).default).to eq(42) }
-    specify { expect(attribute(owner, default: ->(object) { object.value }).default).to eq(42) }
-    specify { expect(attribute(owner, default: ->(*args) { args.first.value }).default).to eq(42) }
+    specify { expect(attribute(default: -> { value }).default).to eq(42) }
+    specify { expect(attribute(default: ->(object) { object.value }).default).to eq(42) }
+    specify { expect(attribute(default: ->(*args) { args.first.value }).default).to eq(42) }
   end
 
   describe '#defaultize' do
@@ -61,7 +63,7 @@ describe ActiveData::Model::Attributes::Attribute do
   end
 
   describe '#enum' do
-    let(:owner) { double(value: 1..5) }
+    before { allow_any_instance_of(Dummy).to receive_messages(value: 1..5) }
 
     specify { expect(attribute.enum).to eq([].to_set) }
     specify { expect(attribute(enum: []).enum).to eq([].to_set) }
@@ -72,8 +74,8 @@ describe ActiveData::Model::Attributes::Attribute do
     specify { expect(attribute(enum: -> { 1..5 }).enum).to eq((1..5).to_a.to_set) }
     specify { expect(attribute(enum: -> { 'hello' }).enum).to eq(['hello'].to_set) }
     specify { expect(attribute(enum: -> { ['hello', 42] }).enum).to eq(['hello', 42].to_set) }
-    specify { expect(attribute(owner, enum: -> { value }).enum).to eq((1..5).to_a.to_set) }
-    specify { expect(attribute(owner, enum: ->(object) { object.value }).enum).to eq((1..5).to_a.to_set) }
+    specify { expect(attribute(enum: -> { value }).enum).to eq((1..5).to_a.to_set) }
+    specify { expect(attribute(enum: ->(object) { object.value }).enum).to eq((1..5).to_a.to_set) }
   end
 
   describe '#enumerize' do
@@ -92,12 +94,12 @@ describe ActiveData::Model::Attributes::Attribute do
     specify { expect(attribute(normalizer: [->(v) { v.first(4) }, ->(v) { v.strip }]).normalize(' hello ')).to eq('hel') }
 
     context do
-      let(:owner) { double(value: 'value') }
+      before { allow_any_instance_of(Dummy).to receive_messages(value: 'value') }
       let(:other) { 'other' }
 
-      specify { expect(attribute(owner, normalizer: ->(v) { value }).normalize(' hello ')).to eq('value') }
-      specify { expect(attribute(owner, normalizer: ->(v, object) { object.value }).normalize(' hello ')).to eq('value') }
-      specify { expect(attribute(owner, normalizer: ->(v, object) { other }).normalize(' hello ')).to eq('other') }
+      specify { expect(attribute(normalizer: ->(v) { value }).normalize(' hello ')).to eq('value') }
+      specify { expect(attribute(normalizer: ->(v, object) { object.value }).normalize(' hello ')).to eq('value') }
+      specify { expect(attribute(normalizer: ->(v, object) { other }).normalize(' hello ')).to eq('other') }
     end
 
     context 'integration' do
