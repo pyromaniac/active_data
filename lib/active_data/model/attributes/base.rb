@@ -2,11 +2,12 @@ module ActiveData
   module Model
     module Attributes
       class Base
-        attr_reader :owner, :reflection
+        attr_reader :owner
         delegate :name, :type, :readonly, to: :reflection
 
         def initialize owner, reflection
-          @owner, @reflection = owner, reflection
+          @owner = owner
+          singleton_class.send(:define_method, :reflection) { reflection }
         end
 
         def write value

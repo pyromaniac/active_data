@@ -2,7 +2,7 @@ module ActiveData
   module Model
     module Associations
       class Base
-        attr_accessor :reflection, :owner
+        attr_accessor :owner, :reflection
         delegate :macro, :collection?, :validate?, to: :reflection
 
         def initialize owner, reflection
