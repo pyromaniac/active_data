@@ -93,7 +93,7 @@ class Quiz < ActiveRecord::Base
   validates :answers, associated: true
 end
 
-q = Quis.new
+q = Quiz.new
 q.answers.build(question_id: 42, content: 'blabla')
 q.save
 ```
