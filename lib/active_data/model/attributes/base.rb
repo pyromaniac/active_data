@@ -13,10 +13,18 @@ module ActiveData
           @owner.class._attributes[name]
         end
 
+        def write_initial value
+          @value_cache = value
+        end
+
         def write value
           return if readonly?
           @value_cache = value
-          value
+        end
+
+        def reset
+          @value = nil
+          @value_before_type_cast = nil
         end
 
         def read

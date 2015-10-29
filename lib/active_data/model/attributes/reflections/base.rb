@@ -30,7 +30,7 @@ module ActiveData
 
           def build_attribute owner, raw_value = nil
             attribute = self.class.attribute_class.new(name, owner)
-            attribute.write(raw_value) if raw_value
+            attribute.write_initial(raw_value) if raw_value
             attribute
           end
 

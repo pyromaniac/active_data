@@ -5,10 +5,8 @@ module ActiveData
         delegate :defaultizer, :typecaster, :enumerizer, :normalizers, to: :reflection
 
         def write value
+          reset
           super
-          @value = nil
-          @value_before_type_cast = nil
-          value
         end
 
         def read
