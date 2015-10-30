@@ -8,6 +8,7 @@ require 'active_data/model/callbacks'
 require 'active_data/model/associations'
 require 'active_data/model/validations'
 require 'active_data/model/localization'
+require 'active_data/model/dirty'
 
 module ActiveData
   module Model

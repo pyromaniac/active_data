@@ -6,8 +6,10 @@ module ActiveData
 
         def write value
           return if readonly?
-          reset
-          reference.send(writer, value)
+          pollute do
+            reset
+            reference.send(writer, value)
+          end
         end
 
         def read

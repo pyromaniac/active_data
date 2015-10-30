@@ -5,8 +5,10 @@ module ActiveData
         delegate :defaultizer, :typecaster, :enumerizer, :normalizers, to: :reflection
 
         def write value
-          reset
-          super
+          pollute do
+            reset
+            super
+          end
         end
 
         def read
@@ -67,6 +69,22 @@ module ActiveData
                 ActiveData.normalizer(normalizer).call(value, {}, self)
               end
             end
+          end
+        end
+
+      private
+
+        def pollute
+          pollute = owner.respond_to?(:attribute_will_change!, true) &&
+            !owner.send(:attribute_changed?, name)
+
+          if pollute
+            previous_value = read
+            result = yield
+            owner.send(:set_attribute_was, name, previous_value) if previous_value != read
+            result
+          else
+            yield
           end
         end
       end

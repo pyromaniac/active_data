@@ -15,7 +15,9 @@ module ActiveData
         end
 
         def write_locale value, locale
-          write(read.merge(locale.to_s => value))
+          pollute do
+            write(read.merge(locale.to_s => value))
+          end
         end
 
         def read_locale locale
