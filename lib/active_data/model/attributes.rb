@@ -42,14 +42,21 @@ module ActiveData
         def add_attribute(reflection_class, *args, &block)
           reflection = reflection_class.build(self, generated_attributes_methods, *args, &block)
           self._attributes = _attributes.merge(reflection.name => reflection)
+          if dirty? && reflection_class != ActiveData::Model::Attributes::Reflections::Base
+            define_dirty reflection.name, generated_attributes_methods
+          end
           reflection
         end
 
         def alias_attribute(alias_name, attribute_name)
           reflection = reflect_on_attribute(attribute_name)
-          raise ArgumentError.new("Can't alias undefined attribute `#{attribute_name}` on #{self}") unless reflection
+          raise ArgumentError.new("Unable to alias undefined attribute `#{attribute_name}` on #{self}") unless reflection
+          raise ArgumentError.new("Unable to alias base attribute `#{attribute_name}`") if reflection.class == ActiveData::Model::Attributes::Reflections::Base
           reflection.class.generate_methods alias_name, generated_attributes_methods
           self._attribute_aliases = _attribute_aliases.merge(alias_name.to_s => reflection.name)
+          if dirty?
+            define_dirty alias_name, generated_attributes_methods
+          end
           reflection
         end
 
@@ -87,6 +94,10 @@ module ActiveData
           @represented_names_and_aliases ||= represented_attributes.flat_map do |attribute|
             [attribute.name, *inverted_attribute_aliases[attribute.name]]
           end
+        end
+
+        def dirty?
+          false
         end
 
       private

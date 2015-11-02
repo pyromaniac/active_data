@@ -4,19 +4,23 @@ require 'spec_helper'
 describe ActiveData::Model::Dirty do
   before do
     stub_class(:author, ActiveRecord::Base) { }
-    stub_model :model do
+    stub_model :premodel do
       include ActiveData::Model::Persistence
       include ActiveData::Model::Localization
       include ActiveData::Model::Associations
+
+      attribute :age, Integer
+      alias_attribute :a, :age
+    end
+    stub_model :model, Premodel do
       include ActiveData::Model::Dirty
 
       references_one :author
       embeds_one :something do
         attribute :value
       end
-
       represents :name, of: :author
-      attribute :age, Integer
+      alias_attribute :n, :name
       collection :numbers, Integer
       localized :title
     end
@@ -28,14 +32,22 @@ describe ActiveData::Model::Dirty do
   specify { expect(Model.new.tap { |m| m.create_something(value: 'Value') }.changes).to eq({}) }
   specify { expect(Model.new(author: author).changes).to eq('author_id' => [nil, author.id]) }
   specify { expect(Model.new(author: author, name: 'Name2').changes).to eq('author_id' => [nil, author.id], 'name' => ['Name', 'Name2']) }
-  specify { expect(Model.new(age: 'blabla').changes).to eq({}) }
-  specify { expect(Model.new(age: '42').changes).to eq('age' => [nil, 42]) }
+  specify { expect(Model.new(a: 'blabla').changes).to eq({}) }
+  specify { expect(Model.new(a: '42').changes).to eq('age' => [nil, 42]) }
   specify { expect(Model.instantiate(age: '42').changes).to eq({}) }
-  specify { expect(Model.instantiate(age: '42').tap { |m| m.update(age: '43') }.changes).to eq('age' => [42, 43]) }
-  specify { expect(Model.new(age: '42').tap { |m| m.update(age: '43') }.changes).to eq('age' => [nil, 43]) }
+  specify { expect(Model.instantiate(age: '42').tap { |m| m.update(a: '43') }.changes).to eq('age' => [42, 43]) }
+  specify { expect(Model.new(a: '42').tap { |m| m.update(a: '43') }.changes).to eq('age' => [nil, 43]) }
   specify { expect(Model.new(numbers: '42').changes).to eq('numbers' => [[], [42]]) }
 
   # Have no idea how should it work right now
   specify { expect(Model.new(title: 'Hello').changes).to eq('title' => [{}, 'Hello']) }
   specify { expect(Model.new(title_translations: {en: 'Hello'}).changes).to eq('title' => [{}, 'Hello']) }
+
+  specify { expect(Model.new).not_to respond_to :something_changed? }
+  specify { expect(Model.new).to respond_to :n_changed? }
+
+  specify { expect(Model.new(a: '42')).to be_age_changed }
+  specify { expect(Model.new(a: '42')).to be_a_changed }
+  specify { expect(Model.new(a: '42').age_change).to eq([nil, 42]) }
+  specify { expect(Model.new(a: '42').a_change).to eq([nil, 42]) }
 end
