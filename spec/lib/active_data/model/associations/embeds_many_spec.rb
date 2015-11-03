@@ -193,6 +193,11 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { expect(existing_association.target).to eq([]) }
     specify { expect { existing_association.replace([new_project]) }.to change { existing_association.target.map(&:title) }.to(['Project']) }
     specify { expect { existing_association.replace([]) }.not_to change { existing_association.target } }
+
+    context do
+      before { Project.send(:include, ActiveData::Model::Dirty) }
+      specify { expect(association.target.any?(&:changed?)).to eq(false) }
+    end
   end
 
   describe '#loaded?' do

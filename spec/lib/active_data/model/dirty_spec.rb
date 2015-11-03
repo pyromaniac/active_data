@@ -9,7 +9,7 @@ describe ActiveData::Model::Dirty do
       include ActiveData::Model::Localization
       include ActiveData::Model::Associations
 
-      attribute :age, Integer
+      attribute :age, Integer, default: 33
       alias_attribute :a, :age
     end
     stub_model :model, Premodel do
@@ -32,11 +32,11 @@ describe ActiveData::Model::Dirty do
   specify { expect(Model.new.tap { |m| m.create_something(value: 'Value') }.changes).to eq({}) }
   specify { expect(Model.new(author: author).changes).to eq('author_id' => [nil, author.id]) }
   specify { expect(Model.new(author: author, name: 'Name2').changes).to eq('author_id' => [nil, author.id], 'name' => ['Name', 'Name2']) }
-  specify { expect(Model.new(a: 'blabla').changes).to eq({}) }
-  specify { expect(Model.new(a: '42').changes).to eq('age' => [nil, 42]) }
+  specify { expect(Model.new(a: 'blabla').changes).to eq('age' => [33, nil]) }
+  specify { expect(Model.new(a: '42').changes).to eq('age' => [33, 42]) }
   specify { expect(Model.instantiate(age: '42').changes).to eq({}) }
   specify { expect(Model.instantiate(age: '42').tap { |m| m.update(a: '43') }.changes).to eq('age' => [42, 43]) }
-  specify { expect(Model.new(a: '42').tap { |m| m.update(a: '43') }.changes).to eq('age' => [nil, 43]) }
+  specify { expect(Model.new(a: '42').tap { |m| m.update(a: '43') }.changes).to eq('age' => [33, 43]) }
   specify { expect(Model.new(numbers: '42').changes).to eq('numbers' => [[], [42]]) }
 
   # Have no idea how should it work right now
@@ -48,6 +48,6 @@ describe ActiveData::Model::Dirty do
 
   specify { expect(Model.new(a: '42')).to be_age_changed }
   specify { expect(Model.new(a: '42')).to be_a_changed }
-  specify { expect(Model.new(a: '42').age_change).to eq([nil, 42]) }
-  specify { expect(Model.new(a: '42').a_change).to eq([nil, 42]) }
+  specify { expect(Model.new(a: '42').age_change).to eq([33, 42]) }
+  specify { expect(Model.new(a: '42').a_change).to eq([33, 42]) }
 end

@@ -36,13 +36,19 @@ module ActiveData
         def default
           unless evar_loaded?
             default = Array.wrap(reflection.default(owner))
-            if default.all? { |object| object.is_a?(reflection.klass) }
-              default
-            else
-              default.map do |attributes|
-                reflection.klass.new.tap { |i| i.assign_attributes(attributes, false) }
+            if default.present?
+              collection = if default.all? { |object| object.is_a?(reflection.klass) }
+                default
+              else
+                default.map do |attributes|
+                  reflection.klass.new.tap do |object|
+                    object.assign_attributes(attributes, false)
+                  end
+                end
               end
-            end if default.present?
+              collection.map { |object| object.send(:clear_changes_information) } if reflection.klass.dirty?
+              collection
+            end
           end || []
         end
 

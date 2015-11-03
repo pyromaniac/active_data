@@ -111,6 +111,11 @@ describe ActiveData::Model::Associations::EmbedsOne do
     specify { expect(existing_association.target).to be_nil }
     specify { expect { existing_association.replace(new_author) }.to change { existing_association.target }.to(an_instance_of(Author)) }
     specify { expect { existing_association.replace(nil) }.not_to change { existing_association.target } }
+
+    context do
+      before { Author.send(:include, ActiveData::Model::Dirty) }
+      specify { expect(association.target).not_to be_changed }
+    end
   end
 
   describe '#loaded?' do

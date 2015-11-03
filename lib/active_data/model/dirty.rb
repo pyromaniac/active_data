@@ -26,6 +26,19 @@ module ActiveData
           private :set_attribute_was
         end
 
+        unless method_defined?(:clear_changes_information)
+          if method_defined?(:reset_changes)
+            def clear_changes_information
+              reset_changes
+            end
+          else
+            def clear_changes_information
+              @previously_changed = nil
+              @changed_attributes = nil
+            end
+          end
+        end
+
         attribute_names(false).each do |name|
           define_dirty name, generated_attributes_methods
         end

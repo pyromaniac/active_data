@@ -36,11 +36,17 @@ module ActiveData
         def default
           unless evar_loaded?
             default = reflection.default(owner)
-            if default.is_a?(reflection.klass)
-              default
-            else
-              reflection.klass.new.tap { |i| i.assign_attributes(default, false) }
-            end if default
+            if default
+              object = if default.is_a?(reflection.klass)
+                default
+              else
+                reflection.klass.new.tap do |object|
+                  object.assign_attributes(default, false)
+                end
+              end
+              object.send(:clear_changes_information) if reflection.klass.dirty?
+              object
+            end
           end
         end
 
