@@ -11,10 +11,6 @@ module ActiveData
           true
         end
 
-        def apply_changes!
-          apply_changes
-        end
-
         def target= object
           loaded!
           @target = object

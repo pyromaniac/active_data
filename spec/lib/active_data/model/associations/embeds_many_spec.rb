@@ -157,6 +157,11 @@ describe ActiveData::Model::Associations::EmbedsMany do
       existing_association.build(title: 'Swordfish');
       existing_association.apply_changes
     }.not_to change { existing_association.target.map(&:persisted?) } }
+    specify { expect {
+      existing_association.target.first.destroy!
+      existing_association.build(title: 'Swordfish');
+      existing_association.apply_changes
+    }.to change { existing_association.target.map(&:title) }.to(['Swordfish']) }
   end
 
   describe '#apply_changes!' do
@@ -172,6 +177,11 @@ describe ActiveData::Model::Associations::EmbedsMany do
       existing_association.build(title: 'Swordfish');
       existing_association.apply_changes!
     }.not_to change { existing_association.target.map(&:persisted?) } }
+    specify { expect {
+      existing_association.target.first.destroy!
+      existing_association.build(title: 'Swordfish');
+      existing_association.apply_changes!
+    }.to change { existing_association.target.map(&:title) }.to(['Swordfish']) }
   end
 
   describe '#target' do

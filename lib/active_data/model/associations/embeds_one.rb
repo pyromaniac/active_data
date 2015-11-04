@@ -15,11 +15,11 @@ module ActiveData
         end
 
         def apply_changes
-          target ? (target.marked_for_destruction? ? clear : target.save) : true
-        end
-
-        def apply_changes!
-          apply_changes or raise ActiveData::AssociationChangesNotApplied
+          if target
+            target.marked_for_destruction? || target.destroyed? ? clear : target.save
+          else
+            true
+          end
         end
 
         def target= object

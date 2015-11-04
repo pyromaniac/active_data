@@ -16,14 +16,16 @@ module ActiveData
 
         def apply_changes
           result = target.map do |object|
-            object.marked_for_destruction? ? object.destroy : object.save
+            if object.marked_for_destruction?
+              object.destroy
+            elsif object.destroyed?
+              true
+            else
+              object.save
+            end
           end.all?
           target.reject!(&:destroyed?)
           result
-        end
-
-        def apply_changes!
-          apply_changes or raise ActiveData::AssociationChangesNotApplied
         end
 
         def target= objects

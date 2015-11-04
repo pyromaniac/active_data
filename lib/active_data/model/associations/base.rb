@@ -39,6 +39,10 @@ module ActiveData
           target
         end
 
+        def apply_changes!
+          apply_changes or raise ActiveData::AssociationChangesNotApplied
+        end
+
         def transaction &block
           data = Marshal.load(Marshal.dump(read_source))
           block.call
