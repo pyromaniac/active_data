@@ -25,7 +25,8 @@ describe ActiveData::Model::Attributes::Represents do
   end
 
   describe '#read' do
-    before { allow_any_instance_of(Dummy).to receive_messages(value: 42, subject: Subject.new(full_name: :hello)) }
+    subject { Subject.new(full_name: :hello) }
+    before { allow_any_instance_of(Dummy).to receive_messages(value: 42, subject: subject) }
     let(:field) { attribute(normalizer: ->(v){ v && v.is_a?(String) ? v.strip : v }, default: :world, enum: ['hello', '42', 'world', :world]) }
 
     specify { expect(field.read).to eq('hello') }
@@ -37,13 +38,22 @@ describe ActiveData::Model::Attributes::Represents do
     specify { expect(field.tap { |r| r.write(43) }.read).to eq(nil) }
     specify { expect(field.tap { |r| r.write('') }.read).to eq(nil) }
 
+    specify { expect { subject.full_name = 42 }.to change { field.read }.to('42') }
+
     context ':readonly' do
       specify { expect(attribute(readonly: true).tap { |r| r.write('string') }.read).to eq('hello') }
+    end
+
+    context do
+      subject { Subject.new }
+      let(:field) { attribute(default: -> { Time.now.to_f }) }
+      specify { expect { sleep(0.01) }.not_to change { field.read } }
     end
   end
 
   describe '#read_before_type_cast' do
-    before { allow_any_instance_of(Dummy).to receive_messages(value: 42, subject: Subject.new(full_name: :hello)) }
+    subject { Subject.new(full_name: :hello) }
+    before { allow_any_instance_of(Dummy).to receive_messages(value: 42, subject: subject) }
     let(:field) { attribute(normalizer: ->(v){ v.strip }, default: :world, enum: ['hello', '42', 'world']) }
 
     specify { expect(field.read_before_type_cast).to eq(:hello) }
@@ -54,8 +64,16 @@ describe ActiveData::Model::Attributes::Represents do
     specify { expect(field.tap { |r| r.write(43) }.read_before_type_cast).to eq(43) }
     specify { expect(field.tap { |r| r.write('') }.read_before_type_cast).to eq('') }
 
+    specify { expect { subject.full_name = 42 }.to change { field.read_before_type_cast }.to(42) }
+
     context ':readonly' do
       specify { expect(attribute(readonly: true).tap { |r| r.write('string') }.read_before_type_cast).to eq(:hello) }
+    end
+
+    context do
+      subject { Subject.new }
+      let(:field) { attribute(default: -> { Time.now.to_f }) }
+      specify { expect { sleep(0.01) }.not_to change { field.read_before_type_cast } }
     end
   end
 

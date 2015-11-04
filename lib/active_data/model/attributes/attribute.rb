@@ -12,11 +12,15 @@ module ActiveData
         end
 
         def read
-          @value ||= normalize(enumerize(typecast(read_before_type_cast)))
+          variable_cache(:value) do
+            normalize(enumerize(typecast(read_before_type_cast)))
+          end
         end
 
         def read_before_type_cast
-          @value_before_type_cast ||= defaultize(@value_cache)
+          variable_cache(:value_before_type_cast) do
+            defaultize(@value_cache)
+          end
         end
 
         def default

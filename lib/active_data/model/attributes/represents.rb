@@ -12,12 +12,23 @@ module ActiveData
           end
         end
 
+        def reset
+          super
+          remove_variable(:cached_value, :cached_value_before_type_cast)
+        end
+
         def read
-          @value ||= normalize(enumerize(defaultize(read_value, read_before_type_cast)))
+          reset if cached_value != read_value
+          variable_cache(:value) do
+            normalize(enumerize(defaultize(cached_value, read_before_type_cast)))
+          end
         end
 
         def read_before_type_cast
-          @value_before_type_cast ||= defaultize(read_value_before_type_cast)
+          reset if cached_value_before_type_cast != read_value_before_type_cast
+          variable_cache(:value_before_type_cast) do
+            defaultize(cached_value_before_type_cast)
+          end
         end
 
       private
@@ -31,6 +42,10 @@ module ActiveData
           ref.public_send(reader) if ref
         end
 
+        def cached_value
+          variable_cache(:cached_value) { read_value }
+        end
+
         def read_value_before_type_cast
           ref = reference
           if ref
@@ -38,6 +53,10 @@ module ActiveData
               ref.public_send(reader_before_type_cast) :
               ref.public_send(reader)
           end
+        end
+
+        def cached_value_before_type_cast
+          variable_cache(:cached_value_before_type_cast) { read_value_before_type_cast }
         end
       end
     end

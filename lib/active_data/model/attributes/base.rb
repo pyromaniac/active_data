@@ -23,8 +23,7 @@ module ActiveData
         end
 
         def reset
-          @value = nil
-          @value_before_type_cast = nil
+          remove_variable(:value, :value_before_type_cast)
         end
 
         def read
@@ -62,6 +61,22 @@ module ActiveData
           else
             args = block.arity < 0 ? args : args.first(block.arity)
             block.call(*args, owner)
+          end
+        end
+
+        def remove_variable(*names)
+          names.flatten.each do |name|
+            name = :"@#{name}"
+            remove_instance_variable(name) if instance_variable_defined?(name)
+          end
+        end
+
+        def variable_cache(name)
+          name = :"@#{name}"
+          if instance_variable_defined?(name)
+            instance_variable_get(name)
+          else
+            instance_variable_set(name, yield)
           end
         end
       end
