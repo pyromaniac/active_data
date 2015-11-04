@@ -2,14 +2,14 @@ module ActiveData
   module Model
     module Associations
       class ReferencesMany < Base
-        def save
+        def apply_changes
           present_keys = target.reject { |t| t.marked_for_destruction? }.map(&reflection.primary_key)
           write_source(present_keys)
           true
         end
 
-        def save!
-          save
+        def apply_changes!
+          apply_changes
         end
 
         def target= object
@@ -67,7 +67,7 @@ module ActiveData
             next if target.include?(object)
             raise AssociationTypeMismatch.new(reflection.klass, object.class) unless object.is_a?(reflection.klass)
             target[target.size] = object
-            save!
+            apply_changes!
           end
           target
         end

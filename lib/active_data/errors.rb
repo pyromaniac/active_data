@@ -28,7 +28,7 @@ module ActiveData
   class ObjectNotDestroyed < ActiveDataError
   end
 
-  class AssociationNotSaved < ActiveDataError
+  class AssociationChangesNotApplied < ActiveDataError
   end
 
   class AssociationTypeMismatch < ActiveDataError

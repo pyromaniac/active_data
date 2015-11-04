@@ -96,10 +96,10 @@ module ActiveData
         end
       end
 
-      def save_associations!
+      def apply_association_changes!
         association_names.all? do |name|
           association = association(name)
-          result = association.save!
+          result = association.apply_changes!
           association.reload if association.reflection.embedded?
           result
         end

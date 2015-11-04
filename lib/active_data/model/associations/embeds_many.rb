@@ -14,12 +14,12 @@ module ActiveData
           build(attributes).tap(&:save!)
         end
 
-        def save
+        def apply_changes
           target.map { |object| object.marked_for_destruction? ? object.destroy : object.save }.all?
         end
 
-        def save!
-          save or raise ActiveData::AssociationNotSaved
+        def apply_changes!
+          apply_changes or raise ActiveData::AssociationChangesNotApplied
         end
 
         def target= objects
@@ -74,7 +74,7 @@ module ActiveData
         def replace objects
           transaction do
             clear
-            append(objects) or raise ActiveData::AssociationNotSaved
+            append(objects) or raise ActiveData::AssociationChangesNotApplied
           end
         end
 
@@ -93,7 +93,7 @@ module ActiveData
             raise AssociationTypeMismatch.new(reflection.klass, object.class) unless object && object.is_a?(reflection.klass)
             push_object object
           end
-          result = owner.persisted? ? save : true
+          result = owner.persisted? ? apply_changes : true
           result && target
         end
 

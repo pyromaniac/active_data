@@ -144,33 +144,33 @@ describe ActiveData::Model::Associations::EmbedsMany do
       .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Swordfish'}]) }
   end
 
-  describe '#save' do
-    specify { expect { association.build; association.save }.to change { association.target.map(&:persisted?) }.to([false]) }
-    specify { expect { association.build(title: 'Genesis'); association.save }.to change { association.target.map(&:persisted?) }.to([true]) }
+  describe '#apply_changes' do
+    specify { expect { association.build; association.apply_changes }.to change { association.target.map(&:persisted?) }.to([false]) }
+    specify { expect { association.build(title: 'Genesis'); association.apply_changes }.to change { association.target.map(&:persisted?) }.to([true]) }
     specify { expect {
       existing_association.target.first.mark_for_destruction
       existing_association.build(title: 'Swordfish');
-      existing_association.save
+      existing_association.apply_changes
     }.to change { existing_association.target.map(&:destroyed?) }.to([true, false]) }
     specify { expect {
       existing_association.target.first.mark_for_destruction
       existing_association.build(title: 'Swordfish');
-      existing_association.save
+      existing_association.apply_changes
     }.to change { existing_association.target.map(&:persisted?) }.to([false, true]) }
   end
 
-  describe '#save!' do
-    specify { expect { association.build; association.save! }.to raise_error ActiveData::AssociationNotSaved }
-    specify { expect { association.build(title: 'Genesis'); association.save! }.to change { association.target.map(&:persisted?) }.to([true]) }
+  describe '#apply_changes!' do
+    specify { expect { association.build; association.apply_changes! }.to raise_error ActiveData::AssociationChangesNotApplied }
+    specify { expect { association.build(title: 'Genesis'); association.apply_changes! }.to change { association.target.map(&:persisted?) }.to([true]) }
     specify { expect {
       existing_association.target.first.mark_for_destruction
       existing_association.build(title: 'Swordfish');
-      existing_association.save!
+      existing_association.apply_changes!
     }.to change { existing_association.target.map(&:destroyed?) }.to([true, false]) }
     specify { expect {
       existing_association.target.first.mark_for_destruction
       existing_association.build(title: 'Swordfish');
-      existing_association.save!
+      existing_association.apply_changes!
     }.to change { existing_association.target.map(&:persisted?) }.to([false, true]) }
   end
 
@@ -292,7 +292,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
       .not_to change { user.read_attribute(:projects) } }
 
     specify { expect { existing_association.writer([new_project1, invalid_project]) }
-      .to raise_error ActiveData::AssociationNotSaved }
+      .to raise_error ActiveData::AssociationChangesNotApplied }
     specify { expect { existing_association.writer([new_project1, invalid_project]) rescue nil }
       .not_to change { existing_user.read_attribute(:projects) } }
     specify { expect { existing_association.writer([new_project1, invalid_project]) rescue nil }

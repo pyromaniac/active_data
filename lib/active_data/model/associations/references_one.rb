@@ -2,7 +2,7 @@ module ActiveData
   module Model
     module Associations
       class ReferencesOne < Base
-        def save
+        def apply_changes
           if target.present? && !target.marked_for_destruction?
             write_source identifier
           else
@@ -11,8 +11,8 @@ module ActiveData
           true
         end
 
-        def save!
-          save
+        def apply_changes!
+          apply_changes
         end
 
         def target= object
@@ -48,7 +48,7 @@ module ActiveData
 
           transaction do
             self.target = object
-            save!
+            apply_changes!
           end
 
           target

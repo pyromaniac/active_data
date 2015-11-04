@@ -14,12 +14,12 @@ module ActiveData
           build(attributes).tap(&:save!)
         end
 
-        def save
+        def apply_changes
           target ? (target.marked_for_destruction? ? target.destroy : target.save) : true
         end
 
-        def save!
-          save or raise ActiveData::AssociationNotSaved
+        def apply_changes!
+          apply_changes or raise ActiveData::AssociationChangesNotApplied
         end
 
         def target= object
@@ -66,7 +66,7 @@ module ActiveData
             transaction do
               clear
               self.target = object
-              save! if owner.persisted?
+              apply_changes! if owner.persisted?
             end
           else
             clear

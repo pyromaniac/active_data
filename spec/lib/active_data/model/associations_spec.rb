@@ -157,20 +157,20 @@ describe ActiveData::Model::Associations do
       specify { expect(user.association_names).to eq([:profile, :projects]) }
     end
 
-    describe '#save_associations!' do
+    describe '#apply_association_changes!' do
       let(:profile) { Profile.new first_name: 'Name' }
       let(:project) { Project.new title: 'Project' }
       let(:user) { User.new(profile: profile, projects: [project]) }
       before { project.build_author(name: 'Author') }
 
-      specify { expect { user.save_associations! }.to change { user.attributes['profile'] }
+      specify { expect { user.apply_association_changes! }.to change { user.attributes['profile'] }
         .from(nil).to('first_name' => 'Name', 'last_name' => nil) }
-      specify { expect { user.save_associations! }.to change { user.attributes['projects'] }
+      specify { expect { user.apply_association_changes! }.to change { user.attributes['projects'] }
         .from(nil).to([{ 'title' => 'Project', 'author' => { 'name' => 'Author' } }]) }
 
       context do
         let(:project) { Project.new }
-        specify { expect { user.save_associations! }.to raise_error ActiveData::AssociationNotSaved }
+        specify { expect { user.apply_association_changes! }.to raise_error ActiveData::AssociationChangesNotApplied }
       end
     end
 

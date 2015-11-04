@@ -80,16 +80,16 @@ describe ActiveData::Model::Associations::EmbedsOne do
       .to change { existing_book.read_attribute(:author) }.from('name' => 'Johny').to('name' => 'Fred') }
   end
 
-  describe '#save' do
-    specify { expect { association.build; association.save }.to change { association.target.try(:persisted?) }.to(false) }
-    specify { expect { association.build(name: 'Fred'); association.save }.to change { association.target.try(:persisted?) }.to(true) }
-    specify { expect { existing_association.target.mark_for_destruction; existing_association.save }.to change { existing_association.target.destroyed? }.to(true) }
+  describe '#apply_changes' do
+    specify { expect { association.build; association.apply_changes }.to change { association.target.try(:persisted?) }.to(false) }
+    specify { expect { association.build(name: 'Fred'); association.apply_changes }.to change { association.target.try(:persisted?) }.to(true) }
+    specify { expect { existing_association.target.mark_for_destruction; existing_association.apply_changes }.to change { existing_association.target.destroyed? }.to(true) }
   end
 
-  describe '#save!' do
-    specify { expect { association.build; association.save! }.to raise_error ActiveData::AssociationNotSaved }
-    specify { expect { association.build(name: 'Fred'); association.save! }.to change { association.target.try(:persisted?) }.to(true) }
-    specify { expect { existing_association.target.mark_for_destruction; existing_association.save! }.to change { existing_association.target.destroyed? }.to(true) }
+  describe '#apply_changes!' do
+    specify { expect { association.build; association.apply_changes! }.to raise_error ActiveData::AssociationChangesNotApplied }
+    specify { expect { association.build(name: 'Fred'); association.apply_changes! }.to change { association.target.try(:persisted?) }.to(true) }
+    specify { expect { existing_association.target.mark_for_destruction; existing_association.apply_changes! }.to change { existing_association.target.destroyed? }.to(true) }
   end
 
   describe '#target' do
@@ -210,7 +210,7 @@ describe ActiveData::Model::Associations::EmbedsOne do
         .to change { book.read_attribute(:author) }.from(nil).to('name' => 'Morty') }
 
       specify { expect { association.writer(invalid_author) }
-        .to raise_error ActiveData::AssociationNotSaved }
+        .to raise_error ActiveData::AssociationChangesNotApplied }
       specify { expect { association.writer(invalid_author) rescue nil }
         .not_to change { association.reader } }
       specify { expect { association.writer(invalid_author) rescue nil }
@@ -252,7 +252,7 @@ describe ActiveData::Model::Associations::EmbedsOne do
         .from('name' => 'Johny').to('name' => 'Morty') }
 
       specify { expect { existing_association.writer(invalid_author) }
-        .to raise_error ActiveData::AssociationNotSaved }
+        .to raise_error ActiveData::AssociationChangesNotApplied }
       specify { expect { existing_association.writer(invalid_author) rescue nil }
         .not_to change { existing_association.reader } }
       specify { expect { existing_association.writer(invalid_author) rescue nil }

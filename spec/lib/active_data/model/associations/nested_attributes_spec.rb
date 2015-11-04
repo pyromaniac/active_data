@@ -14,7 +14,7 @@ describe ActiveData::Model::Associations::NestedAttributes do
       accepts_nested_attributes_for :profile, :projects
 
       def save
-        save_associations!
+        apply_association_changes!
       end
     end
   end

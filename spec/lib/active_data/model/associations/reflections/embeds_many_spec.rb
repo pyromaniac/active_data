@@ -74,7 +74,7 @@ describe ActiveData::Model::Associations::Reflections::EmbedsMany do
       let(:project) { Project.new title: 'Project' }
       before do
         user.update(projects: [project])
-        user.save_associations!
+        user.apply_association_changes!
       end
       before { user.projects.build }
 
