@@ -151,12 +151,12 @@ describe ActiveData::Model::Associations::EmbedsMany do
       existing_association.target.first.mark_for_destruction
       existing_association.build(title: 'Swordfish');
       existing_association.apply_changes
-    }.to change { existing_association.target.map(&:destroyed?) }.to([true, false]) }
+    }.to change { existing_association.target.map(&:title) }.to(['Swordfish']) }
     specify { expect {
       existing_association.target.first.mark_for_destruction
       existing_association.build(title: 'Swordfish');
       existing_association.apply_changes
-    }.to change { existing_association.target.map(&:persisted?) }.to([false, true]) }
+    }.not_to change { existing_association.target.map(&:persisted?) } }
   end
 
   describe '#apply_changes!' do
@@ -166,12 +166,12 @@ describe ActiveData::Model::Associations::EmbedsMany do
       existing_association.target.first.mark_for_destruction
       existing_association.build(title: 'Swordfish');
       existing_association.apply_changes!
-    }.to change { existing_association.target.map(&:destroyed?) }.to([true, false]) }
+    }.to change { existing_association.target.map(&:title) }.to(['Swordfish']) }
     specify { expect {
       existing_association.target.first.mark_for_destruction
       existing_association.build(title: 'Swordfish');
       existing_association.apply_changes!
-    }.to change { existing_association.target.map(&:persisted?) }.to([false, true]) }
+    }.not_to change { existing_association.target.map(&:persisted?) } }
   end
 
   describe '#target' do

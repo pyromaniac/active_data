@@ -15,7 +15,11 @@ module ActiveData
         end
 
         def apply_changes
-          target.map { |object| object.marked_for_destruction? ? object.destroy : object.save }.all?
+          result = target.map do |object|
+            object.marked_for_destruction? ? object.destroy : object.save
+          end.all?
+          target.reject!(&:destroyed?)
+          result
         end
 
         def apply_changes!

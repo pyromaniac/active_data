@@ -15,7 +15,7 @@ module ActiveData
         end
 
         def apply_changes
-          target ? (target.marked_for_destruction? ? target.destroy : target.save) : true
+          target ? (target.marked_for_destruction? ? clear : target.save) : true
         end
 
         def apply_changes!
