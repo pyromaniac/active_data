@@ -85,6 +85,8 @@ describe ActiveData::Model::Associations::EmbedsOne do
     specify { expect { association.build(name: 'Fred'); association.apply_changes }.to change { association.target.try(:persisted?) }.to(true) }
     specify { expect { existing_association.target.mark_for_destruction; existing_association.apply_changes }.to change { existing_association.target }.to(nil) }
     specify { expect { existing_association.target.destroy!; existing_association.apply_changes }.to change { existing_association.target }.to(nil) }
+    specify { expect { existing_association.target.mark_for_destruction; existing_association.apply_changes }.to change { existing_association.destroyed.try(:name) }.from(nil).to('Johny') }
+    specify { expect { existing_association.target.destroy!; existing_association.apply_changes }.to change { existing_association.destroyed.try(:name) }.from(nil).to('Johny') }
   end
 
   describe '#apply_changes!' do

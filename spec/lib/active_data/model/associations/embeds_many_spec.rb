@@ -158,10 +158,20 @@ describe ActiveData::Model::Associations::EmbedsMany do
       existing_association.apply_changes
     }.not_to change { existing_association.target.map(&:persisted?) } }
     specify { expect {
+      existing_association.target.first.mark_for_destruction
+      existing_association.build(title: 'Swordfish');
+      existing_association.apply_changes
+    }.to change { existing_association.destroyed.map(&:title) }.from([]).to(['Genesis']) }
+    specify { expect {
       existing_association.target.first.destroy!
       existing_association.build(title: 'Swordfish');
       existing_association.apply_changes
     }.to change { existing_association.target.map(&:title) }.to(['Swordfish']) }
+    specify { expect {
+      existing_association.target.first.destroy!
+      existing_association.build(title: 'Swordfish');
+      existing_association.apply_changes
+    }.to change { existing_association.destroyed.map(&:title) }.from([]).to(['Genesis']) }
   end
 
   describe '#apply_changes!' do

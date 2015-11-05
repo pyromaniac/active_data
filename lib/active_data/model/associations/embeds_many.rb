@@ -14,17 +14,16 @@ module ActiveData
           build(attributes).tap(&:save!)
         end
 
+        def destroyed
+          @destroyed ||= []
+        end
+
         def apply_changes
           result = target.map do |object|
-            if object.marked_for_destruction?
-              object.destroy
-            elsif object.destroyed?
-              true
-            else
-              object.save
-            end
+            object.destroyed? || object.marked_for_destruction? ? object.destroy : object.save
           end.all?
-          target.reject!(&:destroyed?)
+          @destroyed = target.select(&:destroyed?)
+          target.delete_if(&:destroyed?)
           result
         end
 

@@ -14,9 +14,18 @@ module ActiveData
           build(attributes).tap(&:save!)
         end
 
+        def destroyed
+          @destroyed
+        end
+
         def apply_changes
           if target
-            target.marked_for_destruction? || target.destroyed? ? clear : target.save
+            if target.destroyed? || target.marked_for_destruction?
+              @destroyed = target
+              clear
+            else
+              target.save
+            end
           else
             true
           end
