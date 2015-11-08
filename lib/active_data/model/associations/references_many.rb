@@ -15,17 +15,17 @@ module ActiveData
 
         def load_target
           source = read_source
-          source.present? ? scope(source).to_a : default
+          source.present? ? scope(source).to_a : []
         end
 
         def default
           unless evar_loaded?
             default = Array.wrap(reflection.default(owner))
-            if default.all? { |object| object.is_a?(reflection.klass) }
-              default
+            if default.present? && default.all? { |object| object.is_a?(reflection.klass) }
+              default.map(&:id)
             else
-              scope(default).to_a
-            end if default.present?
+              default
+            end
           end || []
         end
 
@@ -35,6 +35,7 @@ module ActiveData
         end
 
         def replace objects
+          loaded!
           transaction do
             clear
             append objects

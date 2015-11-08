@@ -68,6 +68,52 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
       .to change { book.identify }.from(nil).to(author.id) }
   end
 
+  describe ':default' do
+    context do
+      before do
+        stub_model(:book) do
+          include ActiveData::Model::Associations
+          references_one :author
+          references_one :owner, class_name: 'Author', default: -> { author.id }
+        end
+      end
+
+      let(:author) { Author.create! }
+
+      specify { expect(Book.new(author: author).owner_id).to eq(author.id) }
+      specify { expect(Book.new(author: author).owner).to eq(author) }
+      specify { expect(Book.new(author: author, owner: nil).owner_id).to be_nil }
+      specify { expect(Book.new(author: author, owner: nil).owner).to be_nil }
+      specify { expect(Book.new(author: author, owner_id: nil).owner_id).to eq(author.id) }
+      specify { expect(Book.new(author: author, owner_id: nil).owner).to eq(author) }
+      specify { expect(Book.new(author: author, owner_id: '').owner_id).to be_nil }
+      specify { expect(Book.new(author: author, owner_id: '').owner).to be_nil }
+    end
+
+    context do
+      before do
+        stub_model(:book) do
+          include ActiveData::Model::Associations
+          references_one :author
+          references_one :owner, class_name: 'Author', default: -> { author }
+        end
+      end
+
+      let(:author) { Author.create! }
+
+      # specify { expect(Book.new(author: author).owner).to equal(author) }
+
+      specify { expect(Book.new(author: author).owner_id).to eq(author.id) }
+      specify { expect(Book.new(author: author).owner).to eq(author) }
+      specify { expect(Book.new(author: author, owner: nil).owner_id).to be_nil }
+      specify { expect(Book.new(author: author, owner: nil).owner).to be_nil }
+      specify { expect(Book.new(author: author, owner_id: nil).owner_id).to eq(author.id) }
+      specify { expect(Book.new(author: author, owner_id: nil).owner).to eq(author) }
+      specify { expect(Book.new(author: author, owner_id: '').owner_id).to be_nil }
+      specify { expect(Book.new(author: author, owner_id: '').owner).to be_nil }
+    end
+  end
+
   describe '#validate?' do
     specify { expect(described_class.new(:name)).not_to be_validate }
     specify { expect(described_class.new(:name, validate: true)).to be_validate }

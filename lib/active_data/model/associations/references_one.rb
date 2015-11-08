@@ -18,17 +18,17 @@ module ActiveData
 
         def load_target
           source = read_source
-          source ? scope(source).first : default
+          scope(source).first if source
         end
 
         def default
           unless evar_loaded?
             default = reflection.default(owner)
-            if default.is_a?(reflection.klass)
-              default
+            if default && default.is_a?(reflection.klass)
+              default.id
             else
-              scope(default).first
-            end if default
+              default
+            end
           end
         end
 
