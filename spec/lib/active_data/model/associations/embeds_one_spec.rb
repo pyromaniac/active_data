@@ -104,7 +104,13 @@ describe ActiveData::Model::Associations::EmbedsOne do
 
   describe '#default' do
     before { Book.embeds_one :author, default: -> { { name: 'Default' } } }
-    let(:new_author) { Author.new(name: 'Morty') }
+    before do
+      Author.class_eval do
+        include ActiveData::Model::Primary
+        primary :name
+      end
+    end
+    let(:new_author) { Author.new.tap { |a| a.name = 'Morty' } }
     let(:existing_book) { Book.instantiate title: 'My Life' }
 
     specify { expect(association.target.name).to eq('Default') }

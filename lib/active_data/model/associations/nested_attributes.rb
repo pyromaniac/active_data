@@ -104,8 +104,8 @@ module ActiveData
                 else
                   if association.reflection.embedded?
                     unless reject_new_object?(object, association_name, attributes)
-                      association.build.tap do |i|
-                        i.assign_attributes(attributes.except(DESTROY_ATTRIBUTE), false)
+                      association.reflection.klass.with_sanitize(false) do
+                        association.build(attributes.except(DESTROY_ATTRIBUTE))
                       end
                     end
                   else

@@ -18,9 +18,10 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
-        class_attribute :_attributes, :_attribute_aliases, instance_reader: false, instance_writer: false
+        class_attribute :_attributes, :_attribute_aliases, :_sanitize, instance_reader: false, instance_writer: false
         self._attributes = {}
         self._attribute_aliases = {}
+        self._sanitize = true
 
         delegate :attribute_names, :has_attribute?, to: 'self.class'
 
@@ -100,6 +101,13 @@ module ActiveData
           false
         end
 
+        def with_sanitize(value)
+          previous_sanitize, self._sanitize = _sanitize, value
+          yield
+        ensure
+          self._sanitize = previous_sanitize
+        end
+
       private
 
         def original_inspect
@@ -166,7 +174,7 @@ module ActiveData
       end
       alias_method :update_attributes, :update
 
-      def assign_attributes attrs, sanitize = true
+      def assign_attributes attrs
         if self.class.represented_attributes.present?
           attrs.stringify_keys!
           represented_attrs = self.class
@@ -174,10 +182,10 @@ module ActiveData
               hash[name] = attrs.delete(name) if attrs.has_key?(name)
             end
 
-          _assign_attributes(attrs, sanitize)
-          _assign_attributes(represented_attrs, sanitize)
+          _assign_attributes(attrs)
+          _assign_attributes(represented_attrs)
         else
-          _assign_attributes(attrs, sanitize)
+          _assign_attributes(attrs)
         end
       end
       alias_method :attributes=, :assign_attributes
@@ -196,10 +204,10 @@ module ActiveData
 
     private
 
-      def _assign_attributes attrs, sanitize
+      def _assign_attributes attrs
         attrs.each do |name, value|
           name = name.to_s
-          sanitize_value = sanitize && name == self.class.primary_name
+          sanitize_value = self.class._sanitize && name == self.class.primary_name
 
           if respond_to?("#{name}=") && !sanitize_value
             public_send("#{name}=", value)

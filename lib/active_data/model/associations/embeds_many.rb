@@ -46,8 +46,8 @@ module ActiveData
                 default
               else
                 default.map do |attributes|
-                  reflection.klass.new.tap do |object|
-                    object.assign_attributes(attributes, false)
+                  reflection.klass.with_sanitize(false) do
+                    reflection.klass.new(attributes)
                   end
                 end
               end

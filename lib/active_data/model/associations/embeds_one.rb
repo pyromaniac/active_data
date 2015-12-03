@@ -49,8 +49,8 @@ module ActiveData
               object = if default.is_a?(reflection.klass)
                 default
               else
-                reflection.klass.new.tap do |object|
-                  object.assign_attributes(default, false)
+                reflection.klass.with_sanitize(false) do
+                  reflection.klass.new(default)
                 end
               end
               object.send(:clear_changes_information) if reflection.klass.dirty?

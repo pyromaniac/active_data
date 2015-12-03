@@ -67,7 +67,6 @@ describe ActiveData::Model::Primary do
     specify { expect(model.new(name: 'Hello').tap { |o| o.id = 1 }).not_to eql(model.new(name: 'Hello').tap { |o| o.id = 2 }) }
     specify { expect(model.new(id: 1).id).to be_nil }
     specify { expect(model.new.tap { |o| o.assign_attributes(id: 1) }.id).to be_nil }
-    specify { expect(model.new.tap { |o| o.assign_attributes({id: 1}, false) }.id).to eq 1 }
     specify { expect(model.new.tap { |o| o.id = 1 }.id).to eq(1) }
 
     context do

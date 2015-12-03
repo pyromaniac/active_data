@@ -202,7 +202,13 @@ describe ActiveData::Model::Associations::EmbedsMany do
 
   describe '#default' do
     before { User.embeds_many :projects, default: -> { { title: 'Default' } } }
-    let(:new_project) { Project.new(title: 'Project') }
+    before do
+      Project.class_eval do
+        include ActiveData::Model::Primary
+        primary :title
+      end
+    end
+    let(:new_project) { Project.new.tap { |p| p.title = 'Project' } }
     let(:existing_user) { User.instantiate name: 'Rick' }
 
     specify { expect(association.target.map(&:title)).to eq(['Default']) }
