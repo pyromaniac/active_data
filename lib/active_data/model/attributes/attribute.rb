@@ -84,7 +84,12 @@ module ActiveData
           if pollute
             previous_value = read
             result = yield
-            owner.send(:set_attribute_was, name, previous_value) if previous_value != read
+            if previous_value != read || (
+              read.respond_to?(:changed?) &&
+              read.changed?
+            )
+              owner.send(:set_attribute_was, name, previous_value)
+            end
             result
           else
             yield
