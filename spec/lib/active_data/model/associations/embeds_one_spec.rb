@@ -6,7 +6,7 @@ describe ActiveData::Model::Associations::EmbedsOne do
     stub_model(:author) do
       include ActiveData::Model::Lifecycle
 
-      attribute :name
+      attribute :name, String
       validates :name, presence: true
     end
 
@@ -14,7 +14,7 @@ describe ActiveData::Model::Associations::EmbedsOne do
       include ActiveData::Model::Persistence
       include ActiveData::Model::Associations
 
-      attribute :title
+      attribute :title, String
       embeds_one :author
     end
   end

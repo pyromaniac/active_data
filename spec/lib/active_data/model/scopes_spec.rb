@@ -6,7 +6,7 @@ describe ActiveData::Model::Scopes do
     stub_model do
       include ActiveData::Model::Scopes
 
-      attribute :name
+      attribute :name, String
 
       class << self
         def except_first

@@ -5,12 +5,12 @@ describe ActiveData::Model::Associations::Reflections::EmbedsMany do
   before do
     stub_model(:project) do
       include ActiveData::Model::Lifecycle
-      attribute :title
+      attribute :title, String
     end
     stub_model(:user) do
       include ActiveData::Model::Associations
 
-      attribute :name
+      attribute :name, String
       embeds_many :projects
     end
   end
@@ -115,9 +115,9 @@ describe ActiveData::Model::Associations::Reflections::EmbedsMany do
         stub_model(:user) do
           include ActiveData::Model::Associations
 
-          attribute :title
+          attribute :title, String
           embeds_many :projects do
-            attribute :title
+            attribute :title, String
           end
         end
       end
@@ -133,9 +133,9 @@ describe ActiveData::Model::Associations::Reflections::EmbedsMany do
         stub_model(:user) do
           include ActiveData::Model::Associations
 
-          attribute :title
+          attribute :title, String
           embeds_many :projects, class_name: 'Project' do
-            attribute :value
+            attribute :value, String
           end
         end
       end

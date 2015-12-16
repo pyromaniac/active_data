@@ -84,7 +84,7 @@ describe ActiveData::Model::Attributes::Represents do
       end
 
       stub_model(:post) do
-        attribute :author
+        attribute :author, Object
         alias_attribute :a, :author
         represents :rate, of: :a
         alias_attribute :r, :rate
@@ -130,12 +130,12 @@ describe ActiveData::Model::Attributes::Represents do
     context 'multiple attributes in a single represents definition' do
       before do
         stub_model(:author) do
-          attribute :first_name
-          attribute :last_name
+          attribute :first_name, String
+          attribute :last_name, String
         end
 
         stub_model(:post) do
-          attribute :author
+          attribute :author, Object
           represents :first_name, :last_name, of: :author
         end
       end

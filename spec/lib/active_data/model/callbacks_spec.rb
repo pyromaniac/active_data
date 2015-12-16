@@ -5,7 +5,7 @@ describe ActiveData::Model::Callbacks do
   before do
     stub_model(:user) do
       include ActiveData::Model::Callbacks
-      attribute :actions, type: Array, default: []
+      attribute :actions, Array, default: []
 
       def append action
         self.actions = actions + [action]
@@ -224,8 +224,8 @@ describe ActiveData::Model::Callbacks do
       stub_model(:user) do
         include ActiveData::Model::Callbacks
 
-        attribute :actions, type: Array, default: []
-        attribute :validated, type: Boolean, default: false
+        attribute :actions, Array, default: []
+        attribute :validated, Boolean, default: false
 
         validates :validated, presence: true
 

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe ActiveData::Model::Validations do
   let(:model) do
     stub_model(:model) do
-      attribute :name
+      attribute :name, String
       validates :name, presence: true
     end
   end

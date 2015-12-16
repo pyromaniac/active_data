@@ -17,12 +17,12 @@ describe ActiveData::Model::Dirty do
 
       references_one :author
       embeds_one :something do
-        attribute :value
+        attribute :value, String
       end
       represents :name, of: :author
       alias_attribute :n, :name
       collection :numbers, Integer
-      localized :title
+      localized :title, String
     end
   end
 

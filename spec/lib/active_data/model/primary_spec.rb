@@ -6,7 +6,7 @@ describe ActiveData::Model::Primary do
       stub_model do
         include ActiveData::Model::Primary
 
-        attribute :name
+        attribute :name, String
       end
     end
 
@@ -29,7 +29,7 @@ describe ActiveData::Model::Primary do
         include ActiveData::Model::Primary
 
         primary_attribute
-        attribute :name
+        attribute :name, String
       end
     end
 

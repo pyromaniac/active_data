@@ -61,7 +61,7 @@ describe ActiveData::Model::Attributes::Collection do
   context 'integration' do
     before do
       stub_model(:post) do
-        collection :tags, type: String
+        collection :tags, String
       end
     end
 

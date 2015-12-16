@@ -10,14 +10,14 @@ describe ActiveData::Model::Associations::EmbedsMany do
     stub_model(:project) do
       include ActiveData::Model::Lifecycle
 
-      attribute :title
+      attribute :title, String
       validates :title, presence: true
     end
     stub_model(:user) do
       include ActiveData::Model::Persistence
       include ActiveData::Model::Associations
 
-      attribute :name
+      attribute :name, String
       embeds_many :projects
     end
   end

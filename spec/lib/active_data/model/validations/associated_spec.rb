@@ -6,7 +6,7 @@ describe ActiveData::Model::Validations::AssociatedValidator do
       include ActiveData::Model::Persistence
       include ActiveData::Model::Associations
 
-      attribute :name
+      attribute :name, String
 
       validates_presence_of :name
       validates_associated :validated_one, :unvalidated_one, :validated_many, :unvalidated_many
@@ -22,7 +22,7 @@ describe ActiveData::Model::Validations::AssociatedValidator do
     include ActiveData::Model
     include ActiveData::Model::Lifecycle
 
-    attribute :name
+    attribute :name, String
 
     validates_presence_of :name
   end
@@ -31,7 +31,7 @@ describe ActiveData::Model::Validations::AssociatedValidator do
     include ActiveData::Model
     include ActiveData::Model::Lifecycle
 
-    attribute :name
+    attribute :name, String
   end
 
   context do

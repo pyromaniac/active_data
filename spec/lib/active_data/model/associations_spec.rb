@@ -90,7 +90,7 @@ describe ActiveData::Model::Associations do
       stub_model(:user) do
         include ActiveData::Model::Associations
 
-        attribute :login
+        attribute :login, Object
 
         validates :login, presence: true
 

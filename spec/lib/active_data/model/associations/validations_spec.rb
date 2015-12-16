@@ -26,7 +26,7 @@ describe ActiveData::Model::Associations::Validations do
     stub_model(:user) do
       include ActiveData::Model::Associations
 
-      attribute :login
+      attribute :login, String
       validates :login, presence: true
 
       embeds_one :profile, validate: false

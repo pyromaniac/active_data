@@ -7,7 +7,7 @@ describe ActiveData::Model::Associations::NestedAttributes do
     stub_model :user do
       include ActiveData::Model::Associations
 
-      attribute :email, type: String
+      attribute :email, String
       embeds_one :profile
       embeds_many :projects
 

@@ -6,7 +6,7 @@ describe ActiveData::Model::Attributes do
 
   context 'object' do
     before { stub_class(:descendant) }
-    let(:model) { stub_model { attribute :column } }
+    let(:model) { stub_model { attribute :column, Object } }
 
     specify { expect(model.new(column: 'hello').column).to eq('hello') }
     specify { expect(model.new(column: []).column).to eq([]) }

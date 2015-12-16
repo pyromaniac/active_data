@@ -49,7 +49,7 @@ describe ActiveData::Model::Attributes::Reflections::Attribute do
       stub_class(:dummy_dummy, Dummy)
     end
 
-    specify { expect(reflection.typecaster).to eq(ActiveData.typecaster(Object)) }
+    specify { expect(reflection(type: Object).typecaster).to eq(ActiveData.typecaster(Object)) }
     specify { expect(reflection(type: String).typecaster).to eq(ActiveData.typecaster(String)) }
     specify { expect(reflection(type: Dummy).typecaster).to eq(ActiveData.typecaster(String)) }
     specify { expect(reflection(type: DummyDummy).typecaster).to eq(ActiveData.typecaster(String)) }

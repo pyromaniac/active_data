@@ -35,8 +35,14 @@ module ActiveData
           end
 
           def type
-            @type ||= options[:type].is_a?(Class) ? options[:type] :
-              options[:type].present? ? options[:type].to_s.camelize.constantize : Object
+            @type ||= case options[:type]
+            when Class
+              options[:type]
+            when nil
+              raise "Type is not specified for `#{name}`"
+            else
+              options[:type].to_s.camelize.constantize
+            end
           end
 
           def readonly

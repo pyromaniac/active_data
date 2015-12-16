@@ -6,7 +6,7 @@ describe ActiveData::ActiveRecord::Associations do
       include ActiveData::Model::Lifecycle
       include ActiveData::Model::Associations
 
-      attribute :title, type: String
+      attribute :title, String
 
       validates :title, presence: true
 
@@ -20,8 +20,8 @@ describe ActiveData::ActiveRecord::Associations do
     stub_model(:profile) do
       include ActiveData::Model::Lifecycle
 
-      attribute :first_name, type: String
-      attribute :last_name, type: String
+      attribute :first_name, String
+      attribute :last_name, String
     end
 
     stub_class(:user, ActiveRecord::Base) do
@@ -127,10 +127,10 @@ describe ActiveData::ActiveRecord::Associations do
     before do
       stub_class(:user, ActiveRecord::Base) do
         embeds_many :projects do
-          attribute :title, type: String
+          attribute :title, String
         end
         embeds_one :profile, class_name: 'Profile' do
-          attribute :age, type: Integer
+          attribute :age, Integer
         end
       end
     end

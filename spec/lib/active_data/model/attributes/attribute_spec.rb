@@ -5,7 +5,7 @@ describe ActiveData::Model::Attributes::Attribute do
 
   def attribute(*args)
     options = args.extract_options!
-    reflection = Dummy.add_attribute(ActiveData::Model::Attributes::Reflections::Attribute, :field, options)
+    reflection = Dummy.add_attribute(ActiveData::Model::Attributes::Reflections::Attribute, :field, {type: Object}.merge(options))
     Dummy.new.attribute(:field)
   end
 

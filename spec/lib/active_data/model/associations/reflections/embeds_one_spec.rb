@@ -5,13 +5,13 @@ describe ActiveData::Model::Associations::Reflections::EmbedsOne do
   before do
     stub_model(:author) do
       include ActiveData::Model::Lifecycle
-      attribute :name
+      attribute :name, String
     end
 
     stub_model(:book) do
       include ActiveData::Model::Associations
 
-      attribute :title
+      attribute :title, String
       embeds_one :author
     end
   end
@@ -87,9 +87,9 @@ describe ActiveData::Model::Associations::Reflections::EmbedsOne do
         stub_model(:book) do
           include ActiveData::Model::Associations
 
-          attribute :title
+          attribute :title, String
           embeds_one :author do
-            attribute :name
+            attribute :name, String
           end
         end
       end
@@ -105,9 +105,9 @@ describe ActiveData::Model::Associations::Reflections::EmbedsOne do
         stub_model(:book) do
           include ActiveData::Model::Associations
 
-          attribute :title
+          attribute :title, String
           embeds_one :author, class_name: 'Author' do
-            attribute :age
+            attribute :age, Integer
           end
         end
       end

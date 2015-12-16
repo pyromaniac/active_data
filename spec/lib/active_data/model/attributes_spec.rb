@@ -7,11 +7,11 @@ describe ActiveData::Model::Attributes do
       include ActiveData::Model::Associations
       include ActiveData::Model::Localization
 
-      attribute :id
-      attribute :full_name
+      attribute :id, Integer
+      attribute :full_name, String
       alias_attribute :name, :full_name
 
-      localized :t
+      localized :t, String
       alias_attribute :title, :t
 
       embeds_one(:author) {}
@@ -44,21 +44,21 @@ describe ActiveData::Model::Attributes do
     specify { expect(stub_model(:user).inspect).to eq('User(no attributes)') }
     specify { expect(stub_model {
       include ActiveData::Model::Primary
-      primary :count, type: Integer
-      attribute :object
+      primary :count, Integer
+      attribute :object, Object
     }.inspect).to match(/#<Class:0x\w+>\(\*count: Integer, object: Object\)/) }
     specify { expect(stub_model(:user) {
       include ActiveData::Model::Primary
-      primary :count, type: Integer
-      attribute :object
+      primary :count, Integer
+      attribute :object, Object
     }.inspect).to match('User(*count: Integer, object: Object)') }
   end
 
   describe '#==' do
     let(:model) do
       stub_model do
-        attribute :name
-        attribute :count, default: 0
+        attribute :name, String
+        attribute :count, Float, default: 0
       end
     end
     subject { model.new name: 'hello', count: 42 }
@@ -124,13 +124,13 @@ describe ActiveData::Model::Attributes do
     specify { expect(stub_model(:user).new.inspect).to match(/#<User \(no attributes\)>/) }
     specify { expect(stub_model {
       include ActiveData::Model::Primary
-      primary :count, type: Integer
-      attribute :object
+      primary :count, Integer
+      attribute :object, Object
     }.new(object: 'String').inspect).to match(/#<#<Class:0x\w+> \*count: nil, object: "String">/) }
     specify { expect(stub_model(:user) {
       include ActiveData::Model::Primary
-      primary :count, type: Integer
-      attribute :object
+      primary :count, Integer
+      attribute :object, Object
     }.new.inspect).to match(/#<User \*count: nil, object: nil>/) }
   end
 
@@ -141,15 +141,15 @@ describe ActiveData::Model::Attributes do
         include ActiveData::Model::Associations
         attr_accessor :name
 
-        attribute :id
-        attribute :hello
+        attribute :id, Integer
+        attribute :hello, Object
         attribute :string, String, default: ->(record){ record.name }
         attribute :count, Integer, default: '10'
         attribute(:calc, Integer) { 2 + 3 }
         attribute :enum, Integer, enum: [1, 2, 3]
         attribute :enum_with_default, Integer, enum: [1, 2, 3], default: '2'
         attribute :foo, Boolean, default: false
-        collection :array, enum: [1, 2, 3], default: 7
+        collection :array, Integer, enum: [1, 2, 3], default: 7
 
         def initialize name = nil
           super()
@@ -207,20 +207,20 @@ describe ActiveData::Model::Attributes do
     let!(:ancestor) do
       Class.new do
         include ActiveData::Model::Attributes
-        attribute :foo
+        attribute :foo, String
       end
     end
 
     let!(:descendant1) do
       Class.new ancestor do
-        attribute :bar
+        attribute :bar, String
       end
     end
 
     let!(:descendant2) do
       Class.new ancestor do
-        attribute :baz
-        attribute :moo
+        attribute :baz, String
+        attribute :moo, String
       end
     end
 

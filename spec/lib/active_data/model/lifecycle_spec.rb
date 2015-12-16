@@ -85,7 +85,7 @@ describe ActiveData::Model::Lifecycle do
           stub_model(:user) do
             include ActiveData::Model::Lifecycle
 
-            attribute :actions, type: Array, default: []
+            attribute :actions, Array, default: []
 
             def append action
               self.actions = actions + [action]
@@ -141,8 +141,8 @@ describe ActiveData::Model::Lifecycle do
         include ActiveData::Model::Lifecycle
         delegate :generate_id, to: 'self.class'
 
-        attribute :id, type: Integer, &:generate_id
-        attribute :name
+        attribute :id, Integer, &:generate_id
+        attribute :name, String
         validates :id, :name, presence: true
 
         def self.generate_id
