@@ -9,7 +9,7 @@ describe ActiveData::Model::Associations::ReferencesOne do
       include ActiveData::Model::Persistence
       include ActiveData::Model::Associations
 
-      attribute :title
+      attribute :title, String
       references_one :author
     end
   end

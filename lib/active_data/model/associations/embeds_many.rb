@@ -72,16 +72,13 @@ module ActiveData
           @proxy ||= Collection::Embedded.new self
         end
 
-        def writer objects
-          replace objects
-        end
-
         def replace objects
           transaction do
             clear
             append(objects) or raise ActiveData::AssociationChangesNotApplied
           end
         end
+        alias_method :writer, :replace
 
         def concat *objects
           append objects.flatten

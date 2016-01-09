@@ -13,7 +13,7 @@ module ActiveData
               reference.options[:validate] = true
             end
 
-            super target, generated_methods, name, *args, options, &block
+            super(target, generated_methods, name, *args, options, &block)
           end
 
           def initialize name, options
@@ -47,14 +47,6 @@ module ActiveData
 
           def inspect_reflection
             "#{name}: (represents)"
-          end
-
-        private
-
-          def build_instance target, name, *args, &block
-            options = args.extract_options!
-            options.merge!(default: block) if block
-            new(name, options)
           end
         end
       end

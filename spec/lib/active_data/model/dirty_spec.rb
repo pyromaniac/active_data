@@ -16,6 +16,7 @@ describe ActiveData::Model::Dirty do
       include ActiveData::Model::Dirty
 
       references_one :author
+      references_many :authors
       embeds_one :something do
         attribute :value, String
       end
@@ -30,8 +31,13 @@ describe ActiveData::Model::Dirty do
 
   specify { expect(Model.new.changes).to eq({}) }
   specify { expect(Model.new.tap { |m| m.create_something(value: 'Value') }.changes).to eq({}) }
+
   specify { expect(Model.new(author: author).changes).to eq('author_id' => [nil, author.id]) }
+  specify { expect(Model.new(author_id: author.id).changes).to eq('author_id' => [nil, author.id]) }
   specify { expect(Model.new(author: author, name: 'Name2').changes).to eq('author_id' => [nil, author.id], 'name' => ['Name', 'Name2']) }
+  specify { expect(Model.new(authors: [author]).changes).to eq('author_ids' => [[], [author.id]]) }
+  specify { expect(Model.new(author_ids: [author.id]).changes).to eq('author_ids' => [[], [author.id]]) }
+
   specify { expect(Model.new(a: 'blabla').changes).to eq('age' => [33, nil]) }
   specify { expect(Model.new(a: '42').changes).to eq('age' => [33, 42]) }
   specify { expect(Model.instantiate(age: '42').changes).to eq({}) }

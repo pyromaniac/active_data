@@ -5,15 +5,12 @@ module ActiveData
         class Base
           attr_reader :name, :options
           class << self
-            def build_instance target, generated_methods, name, *args, &block
+            def build target, generated_methods, name, *args, &block
               options = args.extract_options!
               options.merge!(type: args.first) if args.first
               options.merge!(default: block) if block
               new(name, options)
             end
-
-            alias_method :build, :build_instance
-            private :build_instance
 
             def generate_methods name, target
             end

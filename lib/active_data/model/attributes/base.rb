@@ -43,7 +43,7 @@ module ActiveData
         end
 
         def inspect_attribute
-          value = case type
+          value = case read
           when Date, Time, DateTime
             %("#{read.to_s(:db)}")
           else
@@ -54,6 +54,23 @@ module ActiveData
         end
 
       private
+        def pollute
+          pollute = owner.class.dirty? && !owner.send(:attribute_changed?, name)
+
+          if pollute
+            previous_value = read
+            result = yield
+            if previous_value != read || (
+              read.respond_to?(:changed?) &&
+              read.changed?
+            )
+              owner.send(:set_attribute_was, name, previous_value)
+            end
+            result
+          else
+            yield
+          end
+        end
 
         def evaluate *args, &block
           if block.arity >= 0 && block.arity <= args.length

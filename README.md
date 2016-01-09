@@ -98,6 +98,21 @@ q.answers.build(question_id: 42, content: 'blabla')
 q.save
 ```
 
+## Why?
+
+ActiveData is an ActiveModel-based library which provides the following abilities:
+
+  * Standard form objects building toolkit: attributes with typecasting, validations, etc.
+  * High-level universal ORM/ODM library using any data source (DB, http, redis, text files).
+  * Embedding objects into your ActiveRecord entities. Quite useful with PG JSON capabilities.
+
+Key features:
+
+  * Complete objects lifecycle support: saving, updating, destroying.
+  * Embedded and referenced associations.
+  * Backend-agnostic named scopes functionality.
+  * Callbacks and validations, dirty attributes inside.
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -114,7 +129,35 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+### Attributes
+
+#### Attribute
+#### Collection
+#### Dictionary
+#### Localized
+#### Represents
+
+### Associations
+
+#### EmbedsOne
+#### EmbedsMany
+#### ReferencesOne
+#### ReferencesMany
+#### Interacting with ActiveRecord
+
+### Primary
+
+### Persistence
+
+### Lifecycle
+
+### Callbacks
+
+### Dirty
+
+### Validations
+
+### Scopes
 
 ## Contributing
 

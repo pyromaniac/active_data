@@ -4,7 +4,7 @@ module ActiveData
       module Reflections
         class Localized < Attribute
           def self.build target, generated_methods, name, *args, &block
-            attribute = build_instance(target, generated_methods, name, *args, &block)
+            attribute = super(target, generated_methods, name, *args, &block)
             generate_methods name, generated_methods
             attribute
           end
