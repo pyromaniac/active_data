@@ -2,12 +2,12 @@ module ActiveData
   module Model
     module Attributes
       class Attribute < Base
-        delegate :defaultizer, :typecaster, :enumerizer, :normalizers, to: :reflection
+        delegate :defaultizer, :enumerizer, :normalizers, to: :reflection
 
         def write value
+          return if readonly?
           pollute do
-            reset
-            super
+            write_value value
           end
         end
 
@@ -29,14 +29,6 @@ module ActiveData
 
         def defaultize value, default_value = nil
           defaultizer && value.nil? ? default_value || default : value
-        end
-
-        def typecast value
-          if value.instance_of?(type)
-            value
-          else
-            typecaster.call(value, self) unless value.nil?
-          end
         end
 
         def enum

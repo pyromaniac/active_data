@@ -3,7 +3,7 @@ module ActiveData
     module Attributes
       class Base
         attr_reader :name, :owner
-        delegate :type, :readonly, to: :reflection
+        delegate :type, :typecaster, :readonly, to: :reflection
 
         def initialize name, owner
           @name, @owner = name, owner
@@ -13,13 +13,14 @@ module ActiveData
           @owner.class._attributes[name]
         end
 
-        def write_initial value
+        def write_value value
+          reset
           @value_cache = value
         end
 
         def write value
           return if readonly?
-          @value_cache = value
+          write_value value
         end
 
         def reset
@@ -38,6 +39,14 @@ module ActiveData
           !read.nil? && !(read.respond_to?(:empty?) && read.empty?)
         end
 
+        def typecast value
+          if value.instance_of?(type)
+            value
+          else
+            typecaster.call(value, self) unless value.nil?
+          end
+        end
+
         def readonly?
           !!(readonly.is_a?(Proc) ? evaluate(&readonly) : readonly)
         end
@@ -53,7 +62,6 @@ module ActiveData
           "#{name}: #{value}"
         end
 
-      private
         def pollute
           pollute = owner.class.dirty? && !owner.send(:attribute_changed?, name)
 
@@ -71,6 +79,8 @@ module ActiveData
             yield
           end
         end
+
+      private
 
         def evaluate *args, &block
           if block.arity >= 0 && block.arity <= args.length

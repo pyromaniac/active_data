@@ -27,7 +27,7 @@ module ActiveData
 
           def build_attribute owner, raw_value = nil
             attribute = self.class.attribute_class.new(name, owner)
-            attribute.write_initial(raw_value) if raw_value
+            attribute.write_value(raw_value) if raw_value
             attribute
           end
 
@@ -40,6 +40,10 @@ module ActiveData
             else
               options[:type].to_s.camelize.constantize
             end
+          end
+
+          def typecaster
+            @typecaster ||= ActiveData.typecaster(type.ancestors.grep(Class))
           end
 
           def readonly

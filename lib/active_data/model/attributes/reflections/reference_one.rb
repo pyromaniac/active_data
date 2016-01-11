@@ -2,11 +2,11 @@ module ActiveData
   module Model
     module Attributes
       module Reflections
-        class Attribute < Base
+        class ReferenceOne < Base
           def self.build target, generated_methods, name, *args, &block
-            attribute = super(target, generated_methods, name, *args, &block)
+            options = args.extract_options!
             generate_methods name, generated_methods
-            attribute
+            new(name, options)
           end
 
           def self.generate_methods name, target
@@ -26,27 +26,19 @@ module ActiveData
               def #{name}_before_type_cast
                 attribute('#{name}').read_before_type_cast
               end
-
-              def #{name}_default
-                attribute('#{name}').default
-              end
-
-              def #{name}_values
-                attribute('#{name}').enum.to_a
-              end
             RUBY
           end
 
-          def defaultizer
-            @defaultizer ||= options[:default]
+          def association
+            @association ||= options[:association].to_s
           end
 
-          def enumerizer
-            @enumerizer ||= options[:enum] || options[:in]
+          def inspect_reflection
+            "#{name}: (#{association} reference)"
           end
 
-          def normalizers
-            @normalizers ||= Array.wrap(options[:normalize] || options[:normalizer] || options[:normalizers])
+          def type
+            Integer
           end
         end
       end

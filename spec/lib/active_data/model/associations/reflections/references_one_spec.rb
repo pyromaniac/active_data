@@ -69,12 +69,12 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
   end
 
   describe ':default' do
-    context do
+    shared_examples_for :persisted_default do |default|
       before do
         stub_model(:book) do
           include ActiveData::Model::Associations
           references_one :author
-          references_one :owner, class_name: 'Author', default: -> { author.id }
+          references_one :owner, class_name: 'Author', default: default
         end
       end
 
@@ -90,28 +90,32 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
       specify { expect(Book.new(author: author, owner_id: '').owner).to be_nil }
     end
 
-    context do
+    it_behaves_like :persisted_default, -> { author.id }
+    it_behaves_like :persisted_default, -> { author }
+
+    shared_examples_for :new_record_default do |default|
       before do
         stub_model(:book) do
           include ActiveData::Model::Associations
           references_one :author
-          references_one :owner, class_name: 'Author', default: -> { author }
+          references_one :owner, class_name: 'Author', default: default
         end
       end
 
       let(:author) { Author.create! }
 
-      # specify { expect(Book.new(author: author).owner).to equal(author) }
-
-      specify { expect(Book.new(author: author).owner_id).to eq(author.id) }
-      specify { expect(Book.new(author: author).owner).to eq(author) }
-      specify { expect(Book.new(author: author, owner: nil).owner_id).to be_nil }
-      specify { expect(Book.new(author: author, owner: nil).owner).to be_nil }
-      specify { expect(Book.new(author: author, owner_id: nil).owner_id).to eq(author.id) }
-      specify { expect(Book.new(author: author, owner_id: nil).owner).to eq(author) }
-      specify { expect(Book.new(author: author, owner_id: '').owner_id).to be_nil }
-      specify { expect(Book.new(author: author, owner_id: '').owner).to be_nil }
+      specify { expect(Book.new.owner_id).to be_nil }
+      specify { expect(Book.new.owner).to be_a(Author).and have_attributes(name: 'Author') }
+      specify { expect(Book.new(owner: nil).owner_id).to be_nil }
+      specify { expect(Book.new(owner: nil).owner).to be_nil }
+      specify { expect(Book.new(owner_id: nil).owner_id).to be_nil }
+      specify { expect(Book.new(owner_id: nil).owner).to be_a(Author).and have_attributes(name: 'Author') }
+      specify { expect(Book.new(owner_id: '').owner_id).to be_nil }
+      specify { expect(Book.new(owner_id: '').owner).to be_nil }
     end
+
+    it_behaves_like :new_record_default, name: 'Author'
+    it_behaves_like :new_record_default, -> { Author.new(name: 'Author') }
   end
 
   describe '#validate?' do
@@ -168,6 +172,13 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
     context 'model not persisted' do
       let(:author) { Author.new }
       specify { expect { book.author = author }.to change { book.author }.from(nil).to(author) }
+      specify { expect { book.author = author }.not_to change { book.author_id }.from(nil) }
+
+      context do
+        before { book.author = author }
+        specify { expect { author.save! }.to change { book.author_id }.from(nil).to(an_instance_of(Fixnum)) }
+        specify { expect { author.save! }.not_to change { book.author } }
+      end
     end
   end
 
@@ -175,6 +186,9 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
     let(:author) { Author.create!(name: 'Author') }
     specify { expect { book.author_id = author.id }.to change { book.author_id }.from(nil).to(author.id) }
     specify { expect { book.author_id = author.id }.to change { book.author }.from(nil).to(author) }
+
+    specify { expect { book.author_id = author.id.next.to_s }.to change { book.author_id }.from(nil).to(author.id.next) }
+    specify { expect { book.author_id = author.id.next.to_s }.not_to change { book.author }.from(nil) }
 
     context do
       let(:other) { Author.create!(name: 'Other') }

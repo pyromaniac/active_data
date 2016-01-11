@@ -74,12 +74,12 @@ describe ActiveData::Model::Associations::Reflections::ReferencesMany do
   end
 
   describe ':default' do
-    context do
+    shared_examples_for :persisted_default do |default|
       before do
         stub_model(:book) do
           include ActiveData::Model::Associations
           references_many :authors
-          references_many :owners, class_name: 'Author', default: -> { authors.map(&:id) }
+          references_many :owners, class_name: 'Author', default: default
         end
       end
 
@@ -91,32 +91,36 @@ describe ActiveData::Model::Associations::Reflections::ReferencesMany do
       specify { expect(Book.new(authors: [author], owners: []).owners).to eq([]) }
       specify { expect(Book.new(authors: [author], owner_ids: []).owner_ids).to eq([author.id]) }
       specify { expect(Book.new(authors: [author], owner_ids: []).owners).to eq([author]) }
-      specify { expect(Book.new(authors: [author], owner_ids: [nil]).owner_ids).to eq([nil]) }
+      specify { expect(Book.new(authors: [author], owner_ids: [nil]).owner_ids).to eq([]) }
       specify { expect(Book.new(authors: [author], owner_ids: [nil]).owners).to eq([]) }
     end
 
-    context do
+    it_behaves_like :persisted_default, -> { authors.map(&:id) }
+    it_behaves_like :persisted_default, -> { authors }
+
+    shared_examples_for :new_record_default do |default|
       before do
         stub_model(:book) do
           include ActiveData::Model::Associations
           references_many :authors
-          references_many :owners, class_name: 'Author', default: -> { authors }
+          references_many :owners, class_name: 'Author', default: default
         end
       end
 
       let(:author) { Author.create! }
 
-      # specify { expect(Book.new(authors: [author]).owners.first).to equal(author) }
-
-      specify { expect(Book.new(authors: [author]).owner_ids).to eq([author.id]) }
-      specify { expect(Book.new(authors: [author]).owners).to eq([author]) }
-      specify { expect(Book.new(authors: [author], owners: []).owner_ids).to eq([]) }
-      specify { expect(Book.new(authors: [author], owners: []).owners).to eq([]) }
-      specify { expect(Book.new(authors: [author], owner_ids: []).owner_ids).to eq([author.id]) }
-      specify { expect(Book.new(authors: [author], owner_ids: []).owners).to eq([author]) }
-      specify { expect(Book.new(authors: [author], owner_ids: [nil]).owner_ids).to eq([nil]) }
-      specify { expect(Book.new(authors: [author], owner_ids: [nil]).owners).to eq([]) }
+      specify { expect(Book.new.owner_ids).to eq([nil]) }
+      specify { expect(Book.new.owners).to match([an_instance_of(Author).and(have_attributes(name: 'Author'))]) }
+      specify { expect(Book.new(owners: []).owner_ids).to eq([]) }
+      specify { expect(Book.new(owners: []).owners).to eq([]) }
+      specify { expect(Book.new(owner_ids: []).owner_ids).to eq([nil]) }
+      specify { expect(Book.new(owner_ids: []).owners).to match([an_instance_of(Author).and(have_attributes(name: 'Author'))]) }
+      specify { expect(Book.new(owner_ids: [nil]).owner_ids).to eq([]) }
+      specify { expect(Book.new(owner_ids: [nil]).owners).to eq([]) }
     end
+
+    it_behaves_like :new_record_default, name: 'Author'
+    it_behaves_like :new_record_default, -> { Author.new(name: 'Author') }
   end
 
   describe '#validate?' do
@@ -134,16 +138,20 @@ describe ActiveData::Model::Associations::Reflections::ReferencesMany do
 
     let!(:author1) { Author.create!(name: 'Rick') }
     let!(:author2) { Author.create!(name: 'Aaron') }
+    specify { expect { book.authors = [author1, author2] }
+      .to change { book.authors }.from([]).to([author1, author2]) }
+    specify { expect { book.authors = [author1, author2] }
+      .to change { book.author_ids }.from([]).to([author1.id, author2.id]) }
 
     specify { expect { book.author_ids = [author1.id, author2.id] }
       .to change { book.authors }.from([]).to([author2]) }
-    specify { expect { book.authors = [author1, author2] }
-      .to change { book.author_ids }.from([]).to([author1.id, author2.id]) }
+    specify { expect { book.author_ids = [author1.id, author2.id] }
+      .to change { book.author_ids }.from([]).to([author2.id]) }
 
     specify { expect { book.authors = [author1, author2] }
       .to change { book.authors.reload }.from([]).to([author2]) }
     specify { expect { book.authors = [author1, author2] }
-      .to change { book.authors.reload; book.author_ids }.from([]).to([author1.id, author2.id]) }
+      .to change { book.authors.reload; book.author_ids }.from([]).to([author2.id]) }
   end
 
   describe '#author' do
@@ -178,7 +186,7 @@ describe ActiveData::Model::Associations::Reflections::ReferencesMany do
 
   describe '#author_ids' do
     it { expect(book_with_author.author_ids).to eq([author.id]) }
-    it { expect { book_with_author.author_ids << other.id }.to change { book_with_author.authors }.from([author]).to([author, other]) }
+    xit { expect { book_with_author.author_ids << other.id }.to change { book_with_author.authors }.from([author]).to([author, other]) }
     it { expect { book_with_author.author_ids = [other.id] }.to change { book_with_author.authors }.from([author]).to([other]) }
   end
 
@@ -196,13 +204,27 @@ describe ActiveData::Model::Associations::Reflections::ReferencesMany do
 
     context 'model not persisted' do
       let(:author) { Author.new }
-      specify { expect { book.authors = [author] }.to change { book.authors }.from([]).to([author]) }
+      specify { expect { book.authors = [author, other] }.to change { book.authors }.from([]).to([author, other]) }
+      specify { expect { book.authors = [author, other] }.to change { book.author_ids }.from([]).to([nil, other.id]) }
+
+      context do
+        before { book.authors = [author, other] }
+        specify { expect { author.save! }.to change { book.author_ids }.from([nil, other.id])
+          .to(match([an_instance_of(Fixnum), other.id])) }
+        specify { expect { author.save! }.not_to change { book.authors } }
+      end
     end
   end
 
   describe '#author_ids=' do
     specify { expect { book.author_ids = [author.id] }.to change { book.author_ids }.from([]).to([author.id]) }
     specify { expect { book.author_ids = [author.id] }.to change { book.authors }.from([]).to([author]) }
+
+    specify { expect { book.author_ids = [author.id.next.to_s] }.not_to change { book.author_ids }.from([]) }
+    specify { expect { book.author_ids = [author.id.next.to_s] }.not_to change { book.authors }.from([]) }
+
+    specify { expect { book.author_ids = [author.id.next.to_s, author.id] }.to change { book.author_ids }.from([]).to([author.id]) }
+    specify { expect { book.author_ids = [author.id.next.to_s, author.id] }.to change { book.authors }.from([]).to([author]) }
 
     context do
       before { book.authors = [other] }
