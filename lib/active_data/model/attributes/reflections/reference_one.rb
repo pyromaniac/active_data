@@ -3,10 +3,28 @@ module ActiveData
     module Attributes
       module Reflections
         class ReferenceOne < Base
+          TYPES = {
+            integer: Integer,
+            float: Float,
+            decimal: BigDecimal,
+            datetime: Time,
+            timestamp: Time,
+            time: Time,
+            date: Date,
+            text: String,
+            string: String,
+            binary: String,
+            boolean: Boolean
+          }
           def self.build target, generated_methods, name, *args, &block
             options = args.extract_options!
             generate_methods name, generated_methods
-            new(name, options.reverse_merge(type: Integer))
+            type_proc = -> {
+              reflection = target.reflect_on_association(options[:association])
+              column = reflection.klass.columns_hash[reflection.primary_key.to_s]
+              TYPES[column.type]
+            }
+            new(name, options.reverse_merge(type: type_proc))
           end
 
           def self.generate_methods name, target
