@@ -6,7 +6,7 @@ module ActiveData
           def self.build target, generated_methods, name, *args, &block
             options = args.extract_options!
             generate_methods name, generated_methods
-            new(name, options)
+            new(name, options.reverse_merge(type: Integer))
           end
 
           def self.generate_methods name, target
@@ -31,14 +31,6 @@ module ActiveData
 
           def association
             @association ||= options[:association].to_s
-          end
-
-          def inspect_reflection
-            "#{name}: (#{association} reference)"
-          end
-
-          def type
-            Integer
           end
         end
       end

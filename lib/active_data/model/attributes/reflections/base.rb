@@ -33,6 +33,8 @@ module ActiveData
 
           def type
             @type ||= case options[:type]
+            when Proc
+              options[:type].call
             when Class
               options[:type]
             when nil
