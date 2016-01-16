@@ -4,8 +4,10 @@ module ActiveData
       class ReferenceOne < Base
         def write value
           pollute do
-            association.reset if value != type_casted_value
-            write_value value
+            previous = type_casted_value
+            result = write_value value
+            association.reset if type_casted_value != previous
+            result
           end
         end
 
