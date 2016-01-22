@@ -79,15 +79,21 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
       end
 
       let(:author) { Author.create! }
+      let(:other) { Author.create! }
+      let(:book) { Book.new(author: author) }
 
       specify { expect(Book.new(author: author).owner_id).to eq(author.id) }
       specify { expect(Book.new(author: author).owner).to eq(author) }
-      specify { expect(Book.new(author: author, owner: nil).owner_id).to be_nil }
-      specify { expect(Book.new(author: author, owner: nil).owner).to be_nil }
-      specify { expect(Book.new(author: author, owner_id: nil).owner_id).to eq(author.id) }
-      specify { expect(Book.new(author: author, owner_id: nil).owner).to eq(author) }
-      specify { expect(Book.new(author: author, owner_id: '').owner_id).to be_nil }
-      specify { expect(Book.new(author: author, owner_id: '').owner).to be_nil }
+      specify { expect { book.owner = other }.to change { book.owner_id }.from(author.id).to(other.id) }
+      specify { expect { book.owner = other }.to change { book.owner }.from(author).to(other) }
+      specify { expect { book.owner_id = other.id }.to change { book.owner_id }.from(author.id).to(other.id) }
+      specify { expect { book.owner_id = other.id }.to change { book.owner }.from(author).to(other) }
+      specify { expect { book.owner = nil }.to change { book.owner_id }.from(author.id).to(nil) }
+      specify { expect { book.owner = nil }.to change { book.owner }.from(author).to(nil) }
+      specify { expect { book.owner_id = nil }.not_to change { book.owner_id }.from(author.id) }
+      specify { expect { book.owner_id = nil }.not_to change { book.owner }.from(author) }
+      specify { expect { book.owner_id = '' }.to change { book.owner_id }.from(author.id).to(nil) }
+      specify { expect { book.owner_id = '' }.to change { book.owner }.from(author).to(nil) }
     end
 
     it_behaves_like :persisted_default, -> { author.id }
@@ -102,16 +108,21 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
         end
       end
 
-      let(:author) { Author.create! }
+      let(:other) { Author.create! }
+      let(:book) { Book.new }
 
       specify { expect(Book.new.owner_id).to be_nil }
       specify { expect(Book.new.owner).to be_a(Author).and have_attributes(name: 'Author') }
-      specify { expect(Book.new(owner: nil).owner_id).to be_nil }
-      specify { expect(Book.new(owner: nil).owner).to be_nil }
-      specify { expect(Book.new(owner_id: nil).owner_id).to be_nil }
-      specify { expect(Book.new(owner_id: nil).owner).to be_a(Author).and have_attributes(name: 'Author') }
-      specify { expect(Book.new(owner_id: '').owner_id).to be_nil }
-      specify { expect(Book.new(owner_id: '').owner).to be_nil }
+      specify { expect { book.owner = other }.to change { book.owner_id }.from(nil).to(other.id) }
+      specify { expect { book.owner = other }.to change { book.owner }.from(instance_of(Author)).to(other) }
+      specify { expect { book.owner_id = other.id }.to change { book.owner_id }.from(nil).to(other.id) }
+      specify { expect { book.owner_id = other.id }.to change { book.owner }.from(instance_of(Author)).to(other) }
+      specify { expect { book.owner = nil }.not_to change { book.owner_id }.from(nil) }
+      specify { expect { book.owner = nil }.to change { book.owner }.from(instance_of(Author)).to(nil) }
+      specify { expect { book.owner_id = nil }.not_to change { book.owner_id }.from(nil) }
+      specify { expect { book.owner_id = nil }.not_to change { book.owner }.from(instance_of(Author)) }
+      specify { expect { book.owner_id = '' }.not_to change { book.owner_id }.from(nil) }
+      specify { expect { book.owner_id = '' }.to change { book.owner }.from(instance_of(Author)).to(nil) }
     end
 
     it_behaves_like :new_record_default, name: 'Author'
