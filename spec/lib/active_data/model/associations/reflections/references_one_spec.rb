@@ -82,8 +82,8 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
       let(:other) { Author.create! }
       let(:book) { Book.new(author: author) }
 
-      specify { expect(Book.new(author: author).owner_id).to eq(author.id) }
-      specify { expect(Book.new(author: author).owner).to eq(author) }
+      specify { expect(book.owner_id).to eq(author.id) }
+      specify { expect(book.owner).to eq(author) }
       specify { expect { book.owner = other }.to change { book.owner_id }.from(author.id).to(other.id) }
       specify { expect { book.owner = other }.to change { book.owner }.from(author).to(other) }
       specify { expect { book.owner_id = other.id }.to change { book.owner_id }.from(author.id).to(other.id) }
@@ -111,8 +111,8 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
       let(:other) { Author.create! }
       let(:book) { Book.new }
 
-      specify { expect(Book.new.owner_id).to be_nil }
-      specify { expect(Book.new.owner).to be_a(Author).and have_attributes(name: 'Author') }
+      specify { expect(book.owner_id).to be_nil }
+      specify { expect(book.owner).to be_a(Author).and have_attributes(name: 'Author') }
       specify { expect { book.owner = other }.to change { book.owner_id }.from(nil).to(other.id) }
       specify { expect { book.owner = other }.to change { book.owner }.from(instance_of(Author)).to(other) }
       specify { expect { book.owner_id = other.id }.to change { book.owner_id }.from(nil).to(other.id) }

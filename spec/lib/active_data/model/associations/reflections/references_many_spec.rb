@@ -84,15 +84,27 @@ describe ActiveData::Model::Associations::Reflections::ReferencesMany do
       end
 
       let(:author) { Author.create! }
+      let(:other) { Author.create! }
+      let(:book) { Book.new(authors: [author]) }
 
-      specify { expect(Book.new(authors: [author]).owner_ids).to eq([author.id]) }
-      specify { expect(Book.new(authors: [author]).owners).to eq([author]) }
-      specify { expect(Book.new(authors: [author], owners: []).owner_ids).to eq([]) }
-      specify { expect(Book.new(authors: [author], owners: []).owners).to eq([]) }
-      specify { expect(Book.new(authors: [author], owner_ids: []).owner_ids).to eq([author.id]) }
-      specify { expect(Book.new(authors: [author], owner_ids: []).owners).to eq([author]) }
-      specify { expect(Book.new(authors: [author], owner_ids: [nil]).owner_ids).to eq([]) }
-      specify { expect(Book.new(authors: [author], owner_ids: [nil]).owners).to eq([]) }
+      specify { expect(book.owner_ids).to eq([author.id]) }
+      specify { expect(book.owners).to eq([author]) }
+      specify { expect { book.owners = [other] }.to change { book.owner_ids }.from([author.id]).to([other.id]) }
+      specify { expect { book.owners = [other] }.to change { book.owners }.from([author]).to([other]) }
+      specify { expect { book.owner_ids = [other.id] }.to change { book.owner_ids }.from([author.id]).to([other.id]) }
+      specify { expect { book.owner_ids = [other.id] }.to change { book.owners }.from([author]).to([other]) }
+      specify { expect { book.owners = [] }.to change { book.owner_ids }.from([author.id]).to([]) }
+      specify { expect { book.owners = [] }.to change { book.owners }.from([author]).to([]) }
+      specify { expect { book.owner_ids = [] }.not_to change { book.owner_ids }.from([author.id]) }
+      specify { expect { book.owner_ids = [] }.not_to change { book.owners }.from([author]) }
+      specify { expect { book.owner_ids = [nil] }.to change { book.owner_ids }.from([author.id]).to([]) }
+      specify { expect { book.owner_ids = [nil] }.to change { book.owners }.from([author]).to([]) }
+      specify { expect { book.owner_ids = [''] }.to change { book.owner_ids }.from([author.id]).to([]) }
+      specify { expect { book.owner_ids = [''] }.to change { book.owners }.from([author]).to([]) }
+      specify { expect { book.owner_ids = nil }.not_to change { book.owner_ids }.from([author.id]) }
+      specify { expect { book.owner_ids = nil }.not_to change { book.owners }.from([author]) }
+      specify { expect { book.owner_ids = '' }.to change { book.owner_ids }.from([author.id]).to([]) }
+      specify { expect { book.owner_ids = '' }.to change { book.owners }.from([author]).to([]) }
     end
 
     it_behaves_like :persisted_default, -> { authors.map(&:id) }
@@ -108,15 +120,26 @@ describe ActiveData::Model::Associations::Reflections::ReferencesMany do
       end
 
       let(:author) { Author.create! }
+      let(:book) { Book.new }
 
-      specify { expect(Book.new.owner_ids).to eq([nil]) }
-      specify { expect(Book.new.owners).to match([an_instance_of(Author).and(have_attributes(name: 'Author'))]) }
-      specify { expect(Book.new(owners: []).owner_ids).to eq([]) }
-      specify { expect(Book.new(owners: []).owners).to eq([]) }
-      specify { expect(Book.new(owner_ids: []).owner_ids).to eq([nil]) }
-      specify { expect(Book.new(owner_ids: []).owners).to match([an_instance_of(Author).and(have_attributes(name: 'Author'))]) }
-      specify { expect(Book.new(owner_ids: [nil]).owner_ids).to eq([]) }
-      specify { expect(Book.new(owner_ids: [nil]).owners).to eq([]) }
+      specify { expect(book.owner_ids).to eq([nil]) }
+      specify { expect(book.owners).to match([an_instance_of(Author).and(have_attributes(name: 'Author'))]) }
+      specify { expect { book.owners = [other] }.to change { book.owner_ids }.from([nil]).to([other.id]) }
+      specify { expect { book.owners = [other] }.to change { book.owners }.from([an_instance_of(Author)]).to([other]) }
+      specify { expect { book.owner_ids = [other.id] }.to change { book.owner_ids }.from([nil]).to([other.id]) }
+      specify { expect { book.owner_ids = [other.id] }.to change { book.owners }.from([an_instance_of(Author)]).to([other]) }
+      specify { expect { book.owners = [] }.to change { book.owner_ids }.from([nil]).to([]) }
+      specify { expect { book.owners = [] }.to change { book.owners }.from([an_instance_of(Author)]).to([]) }
+      specify { expect { book.owner_ids = [] }.not_to change { book.owner_ids }.from([nil]) }
+      specify { expect { book.owner_ids = [] }.not_to change { book.owners }.from([an_instance_of(Author)]) }
+      specify { expect { book.owner_ids = [nil] }.to change { book.owner_ids }.from([nil]).to([]) }
+      specify { expect { book.owner_ids = [nil] }.to change { book.owners }.from([an_instance_of(Author)]).to([]) }
+      specify { expect { book.owner_ids = [''] }.to change { book.owner_ids }.from([nil]).to([]) }
+      specify { expect { book.owner_ids = [''] }.to change { book.owners }.from([an_instance_of(Author)]).to([]) }
+      specify { expect { book.owner_ids = nil }.not_to change { book.owner_ids }.from([nil]) }
+      specify { expect { book.owner_ids = nil }.not_to change { book.owners }.from([an_instance_of(Author)]) }
+      specify { expect { book.owner_ids = '' }.to change { book.owner_ids }.from([nil]).to([]) }
+      specify { expect { book.owner_ids = '' }.to change { book.owners }.from([an_instance_of(Author)]).to([]) }
     end
 
     it_behaves_like :new_record_default, name: 'Author'
