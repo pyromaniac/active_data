@@ -62,7 +62,30 @@ shared_examples 'nested attributes' do
       context ':update_only' do
         before { User.accepts_nested_attributes_for :profile, update_only: true }
 
-        specify { expect { user.profile_attributes = {identifier: 42, first_name: 'User 1'} }.to change { user.profile.first_name }.to('User 1') }
+        specify { expect { user.profile_attributes = {identifier: 42, first_name: 'User 1'} }
+          .to change { user.profile.first_name }.to('User 1') }
+      end
+    end
+
+    context 'not primary' do
+      before do
+        stub_model :profile do
+          include ActiveData::Model::Lifecycle
+
+          attribute :identifier, Integer
+          attribute :first_name, String
+        end
+      end
+
+      specify { expect { user.profile_attributes = {} }.to change { user.profile }.to(an_instance_of(Profile)) }
+      specify { expect { user.profile_attributes = {first_name: 'User'} }.to change { user.profile.try(:first_name) }.to('User') }
+
+      context do
+        let(:profile) { Profile.new(first_name: 'User') }
+        let(:user) { User.new profile: profile }
+
+        specify { expect { user.profile_attributes = {identifier: 42, first_name: 'User 1'} }
+          .to change { user.profile.first_name }.to('User 1') }
       end
     end
   end
