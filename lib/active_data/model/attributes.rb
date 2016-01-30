@@ -179,18 +179,29 @@ module ActiveData
       alias_method :update_attributes, :update
 
       def assign_attributes attrs
-        if self.class.represented_attributes.present?
+        if self.class.represented_attributes.present? ||
+            (self.class.is_a?(ActiveData::Model::Associations::NestedAttributes) &&
+            self.class.nested_attributes_options.present?)
           attrs.stringify_keys!
-          represented_attrs = self.class
-            .represented_names_and_aliases.each_with_object({}) do |name, hash|
-              hash[name] = attrs.delete(name) if attrs.has_key?(name)
+          represented_attrs = self.class.represented_names_and_aliases
+            .each_with_object({}) do |name, result|
+              result[name] = attrs.delete(name) if attrs.has_key?(name)
             end
+          if self.class.is_a?(ActiveData::Model::Associations::NestedAttributes)
+            nested_attrs = self.class.nested_attributes_options.keys
+              .each_with_object({}) do |association_name, result|
+                name = "#{association_name}_attributes"
+                result[name] = attrs.delete(name) if attrs.has_key?(name)
+              end
+          end
 
           _assign_attributes(attrs)
           _assign_attributes(represented_attrs)
+          _assign_attributes(nested_attrs) if nested_attrs
         else
           _assign_attributes(attrs)
         end
+        true
       end
       alias_method :attributes=, :assign_attributes
 
