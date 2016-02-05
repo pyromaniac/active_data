@@ -35,8 +35,12 @@ module ActiveData
           @value_cache
         end
 
-        def value_present?
+        def value_exist?
           !read.nil? && !(read.respond_to?(:empty?) && read.empty?)
+        end
+
+        def value_present?
+          !(read.respond_to?(:zero?) ? read.zero? : read.blank?)
         end
 
         def typecast value
