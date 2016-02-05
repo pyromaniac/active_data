@@ -16,6 +16,7 @@ module ActiveData
             binary: String,
             boolean: Boolean
           }
+
           def self.build target, generated_methods, name, *args, &block
             options = args.extract_options!
             generate_methods name, generated_methods

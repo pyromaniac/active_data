@@ -7,6 +7,7 @@ module ActiveData
           WRITE = ->(reflection, object, value) { object.write_attribute reflection.name, value }
 
           attr_reader :name, :options
+          # AR compatibility
           attr_accessor :parent_reflection
           delegate :association_class, to: 'self.class'
 
@@ -25,6 +26,7 @@ module ActiveData
                 klass
               end
             end
+            generate_methods name, generated_methods
             new(name, options)
           end
 
