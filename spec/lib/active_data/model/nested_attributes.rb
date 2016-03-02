@@ -184,5 +184,19 @@ shared_examples 'nested attributes' do
           .to change { user.projects.map(&:title) }.to(['Project 2']) }
       end
     end
+
+    context 'primary absence causes exception' do
+      before do
+        stub_model :project do
+          include ActiveData::Model::Primary
+          include ActiveData::Model::Lifecycle
+
+          attribute :slug, String
+          attribute :title, String
+        end
+      end
+
+      specify { expect { user.projects_attributes = {} }.to raise_error ActiveData::UndefinedPrimaryAttribute }
+    end
   end
 end

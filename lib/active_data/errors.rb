@@ -51,6 +51,20 @@ module ActiveData
     end
   end
 
+  class UndefinedPrimaryAttribute < ActiveDataError
+    def initialize klass, association_name
+      super <<-EOS
+Undefined primary attribute for `#{association_name}` in #{klass}.
+It is required for embeds_many nested attributes proper operation.
+You can define this association as:
+
+  embeds_many :#{association_name} do
+    primary :attribute_name
+  end
+      EOS
+    end
+  end
+
   class NormalizerMissing < NoMethodError
     def initialize name
       super <<-EOS

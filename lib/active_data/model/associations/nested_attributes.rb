@@ -77,6 +77,8 @@ module ActiveData
             association = object.association(association_name)
             primary_attribute_name = primary_name_for(association.reflection.klass)
 
+            raise ActiveData::UndefinedPrimaryAttribute.new(object.class, association_name) unless primary_attribute_name
+
             if attributes_collection.is_a? Hash
               keys = attributes_collection.keys
               attributes_collection = if keys.include?(primary_attribute_name) || keys.include?(primary_attribute_name.to_sym)
