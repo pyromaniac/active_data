@@ -44,11 +44,6 @@ describe ActiveData::Model::Associations::Reflections::EmbedsMany do
       .to([{title: 'Genesis'}, {title: 'Project 1'}, {title: 'Project 2'}].to_json) }
   end
 
-  describe '#validate?' do
-    specify { expect(described_class.new(:name)).to be_validate }
-    specify { expect(described_class.new(:name, validate: false)).not_to be_validate }
-  end
-
   describe '#projects' do
     specify { expect(user.projects).to eq([]) }
 

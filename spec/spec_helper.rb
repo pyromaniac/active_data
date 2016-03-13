@@ -25,6 +25,8 @@ end
 RSpec.configure do |config|
   config.mock_with :rspec
   config.order = :random
+  config.run_all_when_everything_filtered = true
+  config.filter_run focus: true
 
   config.include ModelHelpers
 

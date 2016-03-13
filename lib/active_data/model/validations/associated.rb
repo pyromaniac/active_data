@@ -4,7 +4,7 @@ module ActiveData
       class AssociatedValidator < ActiveModel::EachValidator
         def validate_each(record, attribute, value)
           if Array.wrap(value).reject { |r| r.respond_to?(:valid?) && r.valid?(record.validation_context) }.any?
-            record.errors.add(attribute, :invalid, options.merge(:value => value))
+            record.errors.add(attribute, :invalid, options.merge(value: value))
           end
         end
       end

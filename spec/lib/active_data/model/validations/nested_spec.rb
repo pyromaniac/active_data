@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ActiveData::Model::Validations::AssociatedValidator do
+describe ActiveData::Model::Validations::NestedValidator do
   before do
     stub_model(:validated_assoc) do
       include ActiveData::Model
@@ -25,9 +25,8 @@ describe ActiveData::Model::Validations::AssociatedValidator do
       attribute :name, String
 
       validates_presence_of :name
-      validates_associated :validated_one, :unvalidated_one, :validated_many, :unvalidated_many
 
-      embeds_one :validated_one, validate: false, class_name: 'ValidatedAssoc'
+      embeds_one :validated_one, class_name: 'ValidatedAssoc'
       embeds_one :unvalidated_one, class_name: 'UnvalidatedAssoc'
       embeds_many :validated_many, class_name: 'ValidatedAssoc'
       embeds_many :unvalidated_many, class_name: 'UnvalidatedAssoc'
@@ -43,7 +42,7 @@ describe ActiveData::Model::Validations::AssociatedValidator do
     subject(:instance) { Main.instantiate name: 'hello', validated_one: { } }
     it { is_expected.not_to be_valid }
     specify { expect { instance.validate }.to change { instance.errors.messages }
-      .to(validated_one: ['is invalid']) }
+      .to(:'validated_one.name' => ["can't be blank"]) }
   end
 
   context do
@@ -65,7 +64,7 @@ describe ActiveData::Model::Validations::AssociatedValidator do
     subject(:instance) { Main.instantiate name: 'hello', validated_many: [{ }] }
     it { is_expected.not_to be_valid }
     specify { expect { instance.validate }.to change { instance.errors.messages }
-      .to(:'validated_many.0.name' => ["can't be blank"], validated_many: ['is invalid']) }
+      .to(:'validated_many.0.name' => ["can't be blank"]) }
   end
 
   context do
@@ -82,13 +81,13 @@ describe ActiveData::Model::Validations::AssociatedValidator do
     subject(:instance) { Main.instantiate name: 'hello', validated_many: [{ name: 'name' }], validated_one: { } }
     it { is_expected.not_to be_valid }
     specify { expect { instance.validate }.to change { instance.errors.messages }
-      .to(validated_one: ['is invalid']) }
+      .to(:'validated_one.name' => ["can't be blank"]) }
   end
 
   context do
     subject(:instance) { Main.instantiate name: 'hello', validated_many: [{ }], validated_one: { name: 'name' } }
     it { is_expected.not_to be_valid }
     specify { expect { instance.validate }.to change { instance.errors.messages }
-      .to(:'validated_many.0.name' => ["can't be blank"], validated_many: ['is invalid']) }
+      .to(:'validated_many.0.name' => ["can't be blank"]) }
   end
 end

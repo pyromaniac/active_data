@@ -129,11 +129,6 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
     it_behaves_like :new_record_default, -> { Author.new(name: 'Author') }
   end
 
-  describe '#validate?' do
-    specify { expect(described_class.new(:name)).not_to be_validate }
-    specify { expect(described_class.new(:name, validate: true)).to be_validate }
-  end
-
   describe '#scope' do
     before do
       stub_model(:book) do

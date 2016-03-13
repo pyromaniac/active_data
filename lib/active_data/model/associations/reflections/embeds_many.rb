@@ -7,12 +7,8 @@ module ActiveData
             if target < ActiveData::Model::Attributes
               target.add_attribute(ActiveData::Model::Attributes::Reflections::Base, name)
             end
-            super
-          end
-
-          def initialize name, options = {}
-            super
             options[:validate] = true unless options.key?(:validate)
+            super
           end
 
           def collection?

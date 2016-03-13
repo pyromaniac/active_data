@@ -4,7 +4,8 @@ module ActiveData
       module Validations
         def valid_ancestry?
           errors.clear
-          run_validations!(true)
+          validate_nested!
+          run_validations!
         end
         alias_method :validate_ancestry, :valid_ancestry?
 
@@ -17,48 +18,26 @@ module ActiveData
         end
 
       private
-        def run_validations!(deep = false) #:nodoc:
-          validate_associations!(deep)
-          super()
+
+        def run_validations! #:nodoc:
+          super
           emerge_represented_attributes_errors!
           errors.empty?
         end
 
-        def validate_associations!(deep)
+        def validate_nested!
           association_names.each do |name|
             association = association(name)
-            if association.collection?
-              association.target.each.with_index do |object, i|
-                if object_invalid?(object, deep)
-                  object.errors.each do |key, message|
-                    key = "#{name}.#{i}.#{key}"
-                    errors[key] << message
-                    errors[key].uniq!
-                  end
-                end
-              end
+            invalid_block = if association.reflection.klass.method_defined?(:invalid_ansestry?)
+              lambda { |object| object.invalid_ansestry? }
             else
-              if association.target && object_invalid?(association.target, deep)
-                association.target.errors.each do |key, message|
-                  key = "#{name}.#{key}"
-                  errors[key] << message
-                  errors[key].uniq!
-                end
-              end
-            end if deep || association.validate?
+              lambda { |object| object.invalid? }
+            end
+
+            ActiveData::Model::Validations::NestedValidator
+              .validate_nested(self, name, association.target, &invalid_block)
           end
         end
-
-        def object_invalid?(object, deep)
-          if deep
-            object.respond_to?(:invalid_ancestry?) ?
-              object.invalid_ancestry? :
-              object.invalid?
-          else
-            object.invalid?
-          end
-        end
-
 
         # Move represent attribute errors to the top level:
         #

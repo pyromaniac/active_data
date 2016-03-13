@@ -27,6 +27,7 @@ module ActiveData
               end
             end
             generate_methods name, generated_methods
+            target.validates_nested name if options.delete(:validate) && target.respond_to?(:validates_nested)
             new(name, options)
           end
 
@@ -58,10 +59,6 @@ module ActiveData
             @klass ||= options[:class] ?
               options[:class].call(self) :
               (options[:class_name].presence || name.to_s.classify).to_s.constantize
-          end
-
-          def validate?
-            !!options[:validate]
           end
 
           def belongs_to?

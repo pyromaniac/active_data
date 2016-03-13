@@ -45,11 +45,6 @@ describe ActiveData::Model::Associations::Reflections::EmbedsOne do
       .from({name: 'Duke'}.to_json).to({name: 'Rick'}.to_json) }
   end
 
-  describe '#validate?' do
-    specify { expect(described_class.new(:name)).to be_validate }
-    specify { expect(described_class.new(:name, validate: false)).not_to be_validate }
-  end
-
   describe '#author=' do
     let(:author) { Author.new name: 'Author' }
     specify { expect { book.author = author }.to change { book.author }.from(nil).to(author) }

@@ -10,7 +10,7 @@ module ActiveData
             reference ||= target.reflect_on_attribute(options[:of]) if target.respond_to?(:reflect_on_attribute)
             if reference
               options[:of] = reference.name
-              reference.options[:validate] = true
+              target.validates_nested options[:of]
             end
 
             super(target, generated_methods, name, *args, options, &block)
