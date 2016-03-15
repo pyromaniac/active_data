@@ -28,7 +28,7 @@ module ActiveData
               end
 
               def #{name}?
-                attribute('#{name}').locale_value_present?(self.class.locale)
+                attribute('#{name}').locale_query(self.class.locale)
               end
 
               def #{name}_before_type_cast

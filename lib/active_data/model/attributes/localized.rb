@@ -32,9 +32,9 @@ module ActiveData
           end.to_s]
         end
 
-        def locale_value_present? locale
+        def locale_query locale
           value = read_locale(locale)
-          !value.nil? && !(value.respond_to?(:empty?) && value.empty?)
+          !(value.respond_to?(:zero?) ? value.zero? : value.blank?)
         end
       end
     end

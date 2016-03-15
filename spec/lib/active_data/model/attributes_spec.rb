@@ -103,6 +103,12 @@ describe ActiveData::Model::Attributes do
     specify { expect(model.new.attribute_names(false)).to eq(%w[id full_name t])  }
   end
 
+  describe '#attribute_present?' do
+    specify { expect(model.new.attribute_present?(:name)).to be(false) }
+    specify { expect(model.new(name: '').attribute_present?(:name)).to be(false) }
+    specify { expect(model.new(name: 'Name').attribute_present?(:name)).to be(true) }
+  end
+
   describe '#attributes' do
     specify { expect(stub_model.new.attributes).to eq({})  }
     specify { expect(model.new(name: 'Name').attributes)

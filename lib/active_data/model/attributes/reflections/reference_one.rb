@@ -39,7 +39,7 @@ module ActiveData
               end
 
               def #{name}?
-                attribute('#{name}').value_present?
+                attribute('#{name}').query
               end
 
               def #{name}_before_type_cast

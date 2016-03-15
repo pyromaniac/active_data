@@ -38,30 +38,13 @@ describe ActiveData::Model::Attributes::Base do
     end
   end
 
-  describe '#value_exist?' do
-    let(:field) { attribute }
-
-    specify { expect(field.tap { |r| r.write(0) }).to be_value_exist }
-    specify { expect(field.tap { |r| r.write(42) }).to be_value_exist }
-    specify { expect(field.tap { |r| r.write(true) }).to be_value_exist }
-    specify { expect(field.tap { |r| r.write(false) }).to be_value_exist }
-    specify { expect(field.tap { |r| r.write(nil) }).not_to be_value_exist }
-    specify { expect(field.tap { |r| r.write('') }).not_to be_value_exist }
-    specify { expect(field.tap { |r| r.write(:world) }).to be_value_exist }
-    specify { expect(field.tap { |r| r.write(Object.new) }).to be_value_exist }
-    specify { expect(field.tap { |r| r.write([]) }).not_to be_value_exist }
-    specify { expect(field.tap { |r| r.write([42]) }).to be_value_exist }
-    specify { expect(field.tap { |r| r.write({}) }).not_to be_value_exist }
-    specify { expect(field.tap { |r| r.write({hello: 42}) }).to be_value_exist }
-  end
-
   describe '#value_present?' do
     let(:field) { attribute }
 
-    specify { expect(field.tap { |r| r.write(0) }).not_to be_value_present }
+    specify { expect(field.tap { |r| r.write(0) }).to be_value_present }
     specify { expect(field.tap { |r| r.write(42) }).to be_value_present }
     specify { expect(field.tap { |r| r.write(true) }).to be_value_present }
-    specify { expect(field.tap { |r| r.write(false) }).not_to be_value_present }
+    specify { expect(field.tap { |r| r.write(false) }).to be_value_present }
     specify { expect(field.tap { |r| r.write(nil) }).not_to be_value_present }
     specify { expect(field.tap { |r| r.write('') }).not_to be_value_present }
     specify { expect(field.tap { |r| r.write(:world) }).to be_value_present }
@@ -70,6 +53,23 @@ describe ActiveData::Model::Attributes::Base do
     specify { expect(field.tap { |r| r.write([42]) }).to be_value_present }
     specify { expect(field.tap { |r| r.write({}) }).not_to be_value_present }
     specify { expect(field.tap { |r| r.write({hello: 42}) }).to be_value_present }
+  end
+
+  describe '#query' do
+    let(:field) { attribute }
+
+    specify { expect(field.tap { |r| r.write(0) }.query).to be(false) }
+    specify { expect(field.tap { |r| r.write(42) }.query).to be(true) }
+    specify { expect(field.tap { |r| r.write(true) }.query).to be(true) }
+    specify { expect(field.tap { |r| r.write(false) }.query).to be(false) }
+    specify { expect(field.tap { |r| r.write(nil) }.query).to be(false) }
+    specify { expect(field.tap { |r| r.write('') }.query).to be(false) }
+    specify { expect(field.tap { |r| r.write(:world) }.query).to be(true) }
+    specify { expect(field.tap { |r| r.write(Object.new) }.query).to be(true) }
+    specify { expect(field.tap { |r| r.write([]) }.query).to be(false) }
+    specify { expect(field.tap { |r| r.write([42]) }.query).to be(true) }
+    specify { expect(field.tap { |r| r.write({}) }.query).to be(false) }
+    specify { expect(field.tap { |r| r.write({hello: 42}) }.query).to be(true) }
   end
 
   describe '#readonly?' do
