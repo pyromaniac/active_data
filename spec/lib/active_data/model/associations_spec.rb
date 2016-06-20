@@ -48,7 +48,7 @@ describe ActiveData::Model::Associations do
           include ActiveData::Model::Associations
 
           embeds_one :author, class_name: 'Borogoves'
-        end.reflect_on_association(:author).klass end.to raise_error NameError
+        end.reflect_on_association(:author).data_source end.to raise_error NameError
     end
 
     specify do
@@ -59,7 +59,7 @@ describe ActiveData::Model::Associations do
           embeds_many :projects, class_name: 'Borogoves' do
             attribute :title
           end
-        end.reflect_on_association(:projects).klass end.to raise_error NameError
+        end.reflect_on_association(:projects).data_source end.to raise_error NameError
     end
   end
 
