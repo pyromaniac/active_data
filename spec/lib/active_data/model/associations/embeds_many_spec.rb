@@ -266,7 +266,11 @@ describe ActiveData::Model::Associations::EmbedsMany do
     context do
       let(:existing_user) { User.instantiate name: 'Rick', projects: [{title: 'Genesis'}, {title: 'Swordfish'}] }
       before { Project.send(:include, ActiveData::Model::Callbacks) }
-      before { Project.before_destroy { title == 'Genesis' } }
+      if ActiveModel.version >= Gem::Version.new('5.0.0')
+        before { Project.before_destroy { throw :abort } }
+      else
+        before { Project.before_destroy { false } }
+      end
 
       specify { expect(existing_association.clear).to eq(false) }
       specify { expect { existing_association.clear }

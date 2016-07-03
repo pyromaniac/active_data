@@ -38,38 +38,33 @@ module ActiveData
 
         include ActiveModel::Validations::Callbacks
         include Lifecycle
+        prepend PrependMethods
 
         define_model_callbacks :initialize, only: :after
         define_model_callbacks :save, :create, :update, :destroy
-
-        alias_method_chain :initialize, :callbacks
-        alias_method_chain :save_object, :callbacks
-        alias_method_chain :create_object, :callbacks
-        alias_method_chain :update_object, :callbacks
-        alias_method_chain :destroy_object, :callbacks
       end
 
-    private
+      module PrependMethods
+        def initialize *_
+          super(*_)
+          run_callbacks :initialize
+        end
 
-      def initialize_with_callbacks *_
-        initialize_without_callbacks(*_)
-        run_callbacks :initialize
-      end
+        def save_object &block
+          run_callbacks(:save) { super(&block) }
+        end
 
-      def save_object_with_callbacks &block
-        run_callbacks(:save) { save_object_without_callbacks(&block) }
-      end
+        def create_object &block
+          run_callbacks(:create) { super(&block) }
+        end
 
-      def create_object_with_callbacks &block
-        run_callbacks(:create) { create_object_without_callbacks(&block) }
-      end
+        def update_object &block
+          run_callbacks(:update) { super(&block) }
+        end
 
-      def update_object_with_callbacks &block
-        run_callbacks(:update) { update_object_without_callbacks(&block) }
-      end
-
-      def destroy_object_with_callbacks &block
-        run_callbacks(:destroy) { destroy_object_without_callbacks(&block) }
+        def destroy_object &block
+          run_callbacks(:destroy) { super(&block) }
+        end
       end
     end
   end
