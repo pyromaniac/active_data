@@ -172,7 +172,11 @@ describe ActiveData::Model::Associations::EmbedsOne do
 
     context do
       before { Author.send(:include, ActiveData::Model::Callbacks) }
-      before { Author.before_destroy { false } }
+      if ActiveModel.version >= Gem::Version.new('5.0.0')
+        before { Author.before_destroy { throw :abort } }
+      else
+        before { Author.before_destroy { false } }
+      end
       specify { expect(existing_association.clear).to eq(false) }
       specify { expect { existing_association.clear }
         .not_to change { existing_association.reader } }

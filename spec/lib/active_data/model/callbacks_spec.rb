@@ -34,9 +34,9 @@ describe ActiveData::Model::Callbacks do
 
     specify { expect(User.create.actions).to eq([:before_save, :create, :after_save]) }
     specify { expect(User.new.tap(&:save).actions).to eq([:before_save, :create, :after_save]) }
-    specify { expect(User.new.tap{ |u| u.update({}) }.actions).to eq([:before_save, :create, :after_save]) }
+    specify { expect(User.new.tap { |u| u.update({}) }.actions).to eq([:before_save, :create, :after_save]) }
     specify { expect(User.create.tap(&:save).actions).to eq([:before_save, :create, :after_save, :before_save, :update, :after_save]) }
-    specify { expect(User.create.tap{ |u| u.update({}) }.actions).to eq([:before_save, :create, :after_save, :before_save, :update, :after_save]) }
+    specify { expect(User.create.tap { |u| u.update({}) }.actions).to eq([:before_save, :create, :after_save, :before_save, :update, :after_save]) }
 
     specify { expect(User.new.tap { |u| u.save { false } }.actions).to eq([:before_save]) }
     specify { expect(User.create.tap { |u| u.save { false } }.actions).to eq([:before_save, :create, :after_save, :before_save]) }
@@ -53,9 +53,9 @@ describe ActiveData::Model::Callbacks do
 
     specify { expect(User.create.actions).to eq([:before_around_save, :create, :after_around_save]) }
     specify { expect(User.new.tap(&:save).actions).to eq([:before_around_save, :create, :after_around_save]) }
-    specify { expect(User.new.tap{ |u| u.update({}) }.actions).to eq([:before_around_save, :create, :after_around_save]) }
+    specify { expect(User.new.tap { |u| u.update({}) }.actions).to eq([:before_around_save, :create, :after_around_save]) }
     specify { expect(User.create.tap(&:save).actions).to eq([:before_around_save, :create, :after_around_save, :before_around_save, :update, :after_around_save]) }
-    specify { expect(User.create.tap{ |u| u.update({}) }.actions).to eq([:before_around_save, :create, :after_around_save, :before_around_save, :update, :after_around_save]) }
+    specify { expect(User.create.tap { |u| u.update({}) }.actions).to eq([:before_around_save, :create, :after_around_save, :before_around_save, :update, :after_around_save]) }
 
     specify { expect(User.new.tap { |u| u.save { false } }.actions).to eq([:before_around_save, :after_around_save]) }
     specify { expect(User.create.tap { |u| u.save { false } }.actions).to eq([:before_around_save, :create, :after_around_save, :before_around_save, :after_around_save]) }
@@ -69,9 +69,9 @@ describe ActiveData::Model::Callbacks do
 
     specify { expect(User.create.actions).to eq([:before_create, :create, :after_create]) }
     specify { expect(User.new.tap(&:save).actions).to eq([:before_create, :create, :after_create]) }
-    specify { expect(User.new.tap{ |u| u.update({}) }.actions).to eq([:before_create, :create, :after_create]) }
+    specify { expect(User.new.tap { |u| u.update({}) }.actions).to eq([:before_create, :create, :after_create]) }
     specify { expect(User.create.tap(&:save).actions).to eq([:before_create, :create, :after_create, :update]) }
-    specify { expect(User.create.tap{ |u| u.update({}) }.actions).to eq([:before_create, :create, :after_create, :update]) }
+    specify { expect(User.create.tap { |u| u.update({}) }.actions).to eq([:before_create, :create, :after_create, :update]) }
 
     specify { expect(User.new.tap { |u| u.save { false } }.actions).to eq([:before_create]) }
   end
@@ -87,9 +87,9 @@ describe ActiveData::Model::Callbacks do
 
     specify { expect(User.create.actions).to eq([:before_around_create, :create, :after_around_create]) }
     specify { expect(User.new.tap(&:save).actions).to eq([:before_around_create, :create, :after_around_create]) }
-    specify { expect(User.new.tap{ |u| u.update({}) }.actions).to eq([:before_around_create, :create, :after_around_create]) }
+    specify { expect(User.new.tap { |u| u.update({}) }.actions).to eq([:before_around_create, :create, :after_around_create]) }
     specify { expect(User.create.tap(&:save).actions).to eq([:before_around_create, :create, :after_around_create, :update]) }
-    specify { expect(User.create.tap{ |u| u.update({}) }.actions).to eq([:before_around_create, :create, :after_around_create, :update]) }
+    specify { expect(User.create.tap { |u| u.update({}) }.actions).to eq([:before_around_create, :create, :after_around_create, :update]) }
 
     specify { expect(User.new.tap { |u| u.save { false } }.actions).to eq([:before_around_create, :after_around_create]) }
   end
@@ -102,9 +102,9 @@ describe ActiveData::Model::Callbacks do
 
     specify { expect(User.create.actions).to eq([:create]) }
     specify { expect(User.new.tap(&:save).actions).to eq([:create]) }
-    specify { expect(User.new.tap{ |u| u.update({}) }.actions).to eq([:create]) }
+    specify { expect(User.new.tap { |u| u.update({}) }.actions).to eq([:create]) }
     specify { expect(User.create.tap(&:save).actions).to eq([:create, :before_update, :update, :after_update]) }
-    specify { expect(User.create.tap{ |u| u.update({}) }.actions).to eq([:create, :before_update, :update, :after_update]) }
+    specify { expect(User.create.tap { |u| u.update({}) }.actions).to eq([:create, :before_update, :update, :after_update]) }
 
     specify { expect(User.create.tap { |u| u.save { false } }.actions).to eq([:create, :before_update]) }
   end
@@ -120,9 +120,9 @@ describe ActiveData::Model::Callbacks do
 
     specify { expect(User.create.actions).to eq([:create]) }
     specify { expect(User.new.tap(&:save).actions).to eq([:create]) }
-    specify { expect(User.new.tap{ |u| u.update({}) }.actions).to eq([:create]) }
+    specify { expect(User.new.tap { |u| u.update({}) }.actions).to eq([:create]) }
     specify { expect(User.create.tap(&:save).actions).to eq([:create, :before_around_update, :update, :after_around_update]) }
-    specify { expect(User.create.tap{ |u| u.update({}) }.actions).to eq([:create, :before_around_update, :update, :after_around_update]) }
+    specify { expect(User.create.tap { |u| u.update({}) }.actions).to eq([:create, :before_around_update, :update, :after_around_update]) }
 
     specify { expect(User.create.tap { |u| u.save { false } }.actions).to eq([:create, :before_around_update, :after_around_update]) }
   end

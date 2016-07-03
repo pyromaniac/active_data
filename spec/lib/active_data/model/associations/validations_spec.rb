@@ -146,8 +146,8 @@ describe ActiveData::Model::Associations::Validations do
     let(:post) { Post.new(author: Author.new) }
 
     specify { expect { post.validate_ancestry }.to change { post.errors.messages }
-      .to(:'author.user.email' => ['is invalid'], name: ["can't be blank"]) }
+      .to(hash_including(:'author.user.email' => ['is invalid'], name: ["can't be blank"])) }
     specify { expect { post.validate }.to change { post.errors.messages }
-      .to(:'author.user.email' => ['is invalid'], name: ["can't be blank"]) }
+      .to(hash_including(:'author.user.email' => ['is invalid'], name: ["can't be blank"])) }
   end
 end

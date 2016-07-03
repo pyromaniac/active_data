@@ -3,7 +3,7 @@
 
 # ActiveData
 
-ActiveData is a ActiveModel-based frontend for your data. You might need to use it in the following cases:
+ActiveData is a ActiveModel-based front-end for your data. You might need to use it in the following cases:
 
 * When you need a form objects pattern.
 
@@ -26,11 +26,12 @@ end
 
 class ProfileController < ApplicationController
   def edit
-    @form = ProfileForm.new current_user.attributes.slice(*%w(full_name birth_date))
+    @form = ProfileForm.new current_user.attributes
   end
+
   def update
     result = ProfileForm.new(params[:profile_form]).save do |form|
-      current_user.update_attributes(form.attributes.slice(*%w(full_name birth_date)))
+      current_user.update_attributes(form.attributes)
     end
 
     if result
@@ -100,7 +101,7 @@ q.save
 
 ## Why?
 
-ActiveData is an ActiveModel-based library which provides the following abilities:
+ActiveData is an ActiveModel-based library that provides the following abilities:
 
   * Standard form objects building toolkit: attributes with typecasting, validations, etc.
   * High-level universal ORM/ODM library using any data source (DB, http, redis, text files).
@@ -111,7 +112,7 @@ Key features:
   * Complete objects lifecycle support: saving, updating, destroying.
   * Embedded and referenced associations.
   * Backend-agnostic named scopes functionality.
-  * Callbacks and validations, dirty attributes inside.
+  * Callbacks, validations and dirty attributes inside.
 
 ## Installation
 
@@ -129,7 +130,11 @@ Or install it yourself as:
 
 ## Usage
 
+ActiveData has modular architecture, so it is required to include modules to obtain additional features. By default ActiveData supports attributes definition and validations.
+
 ### Attributes
+
+
 
 #### Attribute
 #### Collection

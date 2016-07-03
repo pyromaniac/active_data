@@ -9,9 +9,9 @@ module ActiveData
 
       included do
         class_attribute :_primary_name, instance_writer: false
-
         delegate :has_primary_attribute?, to: 'self.class'
-        alias_method_chain :==, :primary
+
+        prepend PrependMethods
         alias_method :eql?, :==
       end
 
@@ -36,13 +36,15 @@ module ActiveData
         end
       end
 
-      define_method :'=_with_primary=' do |other|
-        other.instance_of?(self.class) &&
-          has_primary_attribute? ?
-            primary_attribute ?
-              primary_attribute == other.primary_attribute :
-              object_id == other.object_id :
-            send(:'=_without_primary=', other)
+      module PrependMethods
+        def == other
+          other.instance_of?(self.class) &&
+            has_primary_attribute? ?
+              primary_attribute ?
+                primary_attribute == other.primary_attribute :
+                object_id == other.object_id :
+              super(other)
+        end
       end
     end
   end
