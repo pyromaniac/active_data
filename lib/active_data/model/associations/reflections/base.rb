@@ -61,6 +61,7 @@ module ActiveData
               (options[:class_name].presence || name.to_s.classify).to_s.constantize
           end
 
+          # AR compatibility
           def belongs_to?
             false
           end

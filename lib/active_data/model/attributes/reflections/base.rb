@@ -33,9 +33,7 @@ module ActiveData
 
           def type
             @type ||= case options[:type]
-            when Proc
-              options[:type].call
-            when Class
+            when Class, Module
               options[:type]
             when nil
               raise "Type is not specified for `#{name}`"
