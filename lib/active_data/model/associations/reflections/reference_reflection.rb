@@ -27,11 +27,13 @@ module ActiveData
             @primary_key ||= options[:primary_key].presence.try(:to_sym) || :id
           end
 
-          def scope
-            @scope ||= begin
-              scope = klass.unscoped
-              scope = scope.instance_exec(&@scope_proc) if @scope_proc
-              scope
+          def scope owner
+            scope = klass.unscoped
+            return scope unless @scope_proc
+            if @scope_proc.arity.zero?
+              scope.instance_exec(&@scope_proc)
+            else
+              scope.instance_exec(owner, &@scope_proc)
             end
           end
 
