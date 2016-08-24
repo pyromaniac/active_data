@@ -66,7 +66,7 @@ module ActiveData
         end
 
         def scope source = read_source
-          reflection.scope.where(reflection.primary_key => source)
+          reflection.scope(owner).where(reflection.primary_key => source)
         end
 
         def identify

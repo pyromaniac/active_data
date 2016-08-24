@@ -4,7 +4,8 @@ require 'spec_helper'
 describe ActiveData::Model::Associations::Reflections::ReferencesOne do
   before do
     stub_class(:author, ActiveRecord::Base) do
-      scope :name_starts_with_a, -> { where('name LIKE "a%"') }
+      scope :name_starts_with_a, -> { name_starts_with('a') }
+      scope :name_starts_with, ->(letter) { where("name LIKE '#{letter}%'") }
     end
 
     stub_model(:book) do
@@ -133,10 +134,12 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
     before do
       stub_model(:book) do
         include ActiveData::Model::Associations
-        references_one :author, -> { name_starts_with_a }
+        references_one :author, ->(owner) { name_starts_with(owner.letter) }
+        attribute :letter, String
       end
     end
 
+    let(:book) { Book.new(letter: 'a') }
     let!(:author1) { Author.create!(name: 'Rick') }
     let!(:author2) { Author.create!(name: 'Aaron') }
 
@@ -159,6 +162,17 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
       .not_to change { book.association(:author).reload; book.author } }
     specify { expect { book.author = author2 }
       .to change { book.association(:author).reload; book.author }.from(nil).to(author2) }
+
+    context do
+      let(:book2) { Book.new(letter: 'r') }
+
+      specify 'scope is not cached too much' do
+        expect { book.author_id = author2.id }
+          .to change { book.author }.from(nil).to(author2)
+        expect { book2.author_id = author1.id }
+          .to change { book2.author }.from(nil).to(author1)
+      end
+    end
   end
 
   describe '#author=' do
