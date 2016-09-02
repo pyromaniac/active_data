@@ -29,6 +29,14 @@ module ActiveData
             RUBY
           end
 
+          def type
+            Object
+          end
+
+          def inspect_reflection
+            "#{name}: (reference)"
+          end
+
           def association
             @association ||= options[:association].to_s
           end

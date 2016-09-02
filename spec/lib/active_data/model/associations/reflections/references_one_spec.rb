@@ -11,7 +11,7 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
     stub_model(:book) do
       include ActiveData::Model::Associations
 
-      attribute :title
+      attribute :title, String
       references_one :author
     end
   end
@@ -24,7 +24,7 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
       stub_model(:book) do
         include ActiveData::Model::Associations
 
-        attribute :title
+        attribute :title, String
         references_one :creator, class_name: 'Author'
       end
     end
@@ -128,6 +128,10 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
 
     it_behaves_like :new_record_default, name: 'Author'
     it_behaves_like :new_record_default, -> { Author.new(name: 'Author') }
+  end
+
+  describe 'Book.inspect' do
+    specify { expect(Book.inspect).to eq('Book(author: ReferencesOne(Author), title: String, author_id: (reference))') }
   end
 
   describe '#scope' do

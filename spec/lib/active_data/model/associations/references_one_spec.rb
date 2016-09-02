@@ -27,6 +27,10 @@ describe ActiveData::Model::Associations::ReferencesOne do
     specify { expect(association).to eq(book.association(:author)) }
   end
 
+  describe 'book#inspect' do
+    specify { expect(existing_book.inspect).to eq('#<Book author: #<ReferencesOne #<Author id: 1, name: "Johny">>, title: "My Life", author_id: 1>') }
+  end
+
   describe '#target' do
     specify { expect(association.target).to be_nil }
     specify { expect(existing_association.target).to eq(existing_book.author) }

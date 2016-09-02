@@ -12,7 +12,7 @@ describe ActiveData::Model::Associations::ReferencesMany do
       include ActiveData::Model::Persistence
       include ActiveData::Model::Associations
 
-      attribute :title
+      attribute :title, String
       references_many :authors
     end
   end
@@ -29,6 +29,10 @@ describe ActiveData::Model::Associations::ReferencesMany do
   describe 'book#association' do
     specify { expect(association).to be_a described_class }
     specify { expect(association).to eq(book.association(:authors)) }
+  end
+
+  describe 'book#inspect' do
+    specify { expect(existing_book.inspect).to eq('#<Book authors: #<ReferencesMany [#<Author id: 1, name: "Rick">]>, title: "Genesis", author_ids: [1]>') }
   end
 
   describe '#scope' do
