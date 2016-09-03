@@ -21,20 +21,18 @@ module ActiveData
             options[:reject_if] = REJECT_ALL_BLANK_PROC if options[:reject_if] == :all_blank
 
             attr_names.each do |association_name|
-              if reflection = klass.reflect_on_association(association_name)
-                klass.nested_attributes_options = klass.nested_attributes_options.merge(association_name.to_sym => options)
+              reflection = klass.reflect_on_association(association_name)
+              raise ArgumentError, "No association found for name `#{association_name}'. Has it been defined yet?" unless reflection
+              klass.nested_attributes_options = klass.nested_attributes_options.merge(association_name.to_sym => options)
 
-                klass.validates_nested association_name if klass.respond_to?(:validates_nested)
-                type = (reflection.collection? ? :collection : :one_to_one)
-                klass.class_eval <<-METHOD, __FILE__, __LINE__ + 1
-                  def #{association_name}_attributes=(attributes)
-                    ActiveData::Model::Associations::NestedAttributes::NestedAttributesMethods
-                      .assign_nested_attributes_for_#{type}_association(self, :#{association_name}, attributes)
-                  end
-                METHOD
-              else
-                raise ArgumentError, "No association found for name `#{association_name}'. Has it been defined yet?"
-              end
+              klass.validates_nested association_name if klass.respond_to?(:validates_nested)
+              type = (reflection.collection? ? :collection : :one_to_one)
+              klass.class_eval <<-METHOD, __FILE__, __LINE__ + 1
+                def #{association_name}_attributes=(attributes)
+                  ActiveData::Model::Associations::NestedAttributes::NestedAttributesMethods
+                    .assign_nested_attributes_for_#{type}_association(self, :#{association_name}, attributes)
+                end
+              METHOD
             end
           end
 

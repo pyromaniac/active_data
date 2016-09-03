@@ -149,10 +149,10 @@ module ActiveData
       alias_method :eql?, :==
 
       def attribute(name)
-        if reflection = self.class.reflect_on_attribute(name)
-          (@_attributes ||= {})[reflection.name] ||= reflection
-            .build_attribute(self, @initial_attributes.try(:[], reflection.name))
-        end
+        reflection = self.class.reflect_on_attribute(name)
+        return unless reflection
+        (@_attributes ||= {})[reflection.name] ||= reflection
+          .build_attribute(self, @initial_attributes.try(:[], reflection.name))
       end
 
       def write_attribute name, value

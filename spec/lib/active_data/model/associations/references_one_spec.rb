@@ -3,7 +3,7 @@ require 'spec_helper'
 
 describe ActiveData::Model::Associations::ReferencesOne do
   before do
-    stub_class(:author, ActiveRecord::Base) { }
+    stub_class(:author, ActiveRecord::Base) {}
 
     stub_model(:book) do
       include ActiveData::Model::Persistence

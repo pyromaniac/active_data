@@ -3,7 +3,7 @@ require 'spec_helper'
 
 describe ActiveData::Model::Dirty do
   before do
-    stub_class(:author, ActiveRecord::Base) { }
+    stub_class(:author, ActiveRecord::Base) {}
     stub_model :premodel do
       include ActiveData::Model::Persistence
       include ActiveData::Model::Localization
