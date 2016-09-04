@@ -52,7 +52,7 @@ describe ActiveData::Model::Attributes::Base do
     specify { expect(field.tap { |r| r.write([]) }).not_to be_value_present }
     specify { expect(field.tap { |r| r.write([42]) }).to be_value_present }
     specify { expect(field.tap { |r| r.write({}) }).not_to be_value_present }
-    specify { expect(field.tap { |r| r.write({hello: 42}) }).to be_value_present }
+    specify { expect(field.tap { |r| r.write(hello: 42) }).to be_value_present }
   end
 
   describe '#query' do
@@ -69,7 +69,7 @@ describe ActiveData::Model::Attributes::Base do
     specify { expect(field.tap { |r| r.write([]) }.query).to be(false) }
     specify { expect(field.tap { |r| r.write([42]) }.query).to be(true) }
     specify { expect(field.tap { |r| r.write({}) }.query).to be(false) }
-    specify { expect(field.tap { |r| r.write({hello: 42}) }.query).to be(true) }
+    specify { expect(field.tap { |r| r.write(hello: 42) }.query).to be(true) }
   end
 
   describe '#readonly?' do

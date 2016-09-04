@@ -110,8 +110,8 @@ module ActiveData
           object.define_create do
             source = association.send(:read_source)
             index = association.target.select do |one|
-              one.persisted? || one === self
-            end.index { |one| one === self }
+              one.persisted? || one.equal?(self)
+            end.index { |one| one.equal?(self) }
 
             source.insert(index, attributes)
             association.send(:write_source, source)
@@ -119,7 +119,7 @@ module ActiveData
 
           object.define_update do
             source = association.send(:read_source)
-            index = association.target.select(&:persisted?).index { |one| one === self }
+            index = association.target.select(&:persisted?).index { |one| one.equal?(self) }
 
             source[index] = attributes
             association.send(:write_source, source)
@@ -127,7 +127,7 @@ module ActiveData
 
           object.define_destroy do
             source = association.send(:read_source)
-            index = association.target.select(&:persisted?).index { |one| one === self }
+            index = association.target.select(&:persisted?).index { |one| one.equal?(self) }
 
             source.delete_at(index) if index
             association.send(:write_source, source)

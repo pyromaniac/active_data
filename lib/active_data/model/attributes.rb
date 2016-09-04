@@ -120,7 +120,7 @@ module ActiveData
 
         def attributes_for_inspect
           attribute_names(false).map do |name|
-            prefix = respond_to?(:_primary_name) && _primary_name == name ? ?* : ''
+            prefix = respond_to?(:_primary_name) && _primary_name == name ? '*' : ''
             "#{prefix}#{_attributes[name].inspect_reflection}"
           end.join(', ')
         end
@@ -189,13 +189,13 @@ module ActiveData
           attrs.stringify_keys!
           represented_attrs = self.class.represented_names_and_aliases
             .each_with_object({}) do |name, result|
-              result[name] = attrs.delete(name) if attrs.has_key?(name)
+              result[name] = attrs.delete(name) if attrs.key?(name)
             end
           if self.class.is_a?(ActiveData::Model::Associations::NestedAttributes)
             nested_attrs = self.class.nested_attributes_options.keys
               .each_with_object({}) do |association_name, result|
                 name = "#{association_name}_attributes"
-                result[name] = attrs.delete(name) if attrs.has_key?(name)
+                result[name] = attrs.delete(name) if attrs.key?(name)
               end
           end
 
@@ -238,7 +238,7 @@ module ActiveData
 
       def attributes_for_inspect
         attribute_names(false).map do |name|
-          prefix = self.class.primary_name == name ? ?* : ''
+          prefix = self.class.primary_name == name ? '*' : ''
           "#{prefix}#{attribute(name).inspect_attribute}"
         end.join(', ')
       end

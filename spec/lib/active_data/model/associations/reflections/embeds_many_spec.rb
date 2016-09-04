@@ -34,15 +34,15 @@ describe ActiveData::Model::Associations::Reflections::EmbedsMany do
       end
     end
 
-    let(:user) { User.instantiate name: 'Rick', projects: [{title: 'Genesis'}].to_json }
+    let(:user) { User.instantiate name: 'Rick', projects: [{ title: 'Genesis' }].to_json }
     let(:new_project1) { Project.new(title: 'Project 1') }
     let(:new_project2) { Project.new(title: 'Project 2') }
 
     specify do
       expect { user.projects.concat([new_project1, new_project2]) }
         .to change { user.read_attribute(:projects) }
-        .from([{title: 'Genesis'}].to_json)
-        .to([{title: 'Genesis'}, {title: 'Project 1'}, {title: 'Project 2'}].to_json)
+        .from([{ title: 'Genesis' }].to_json)
+        .to([{ title: 'Genesis' }, { title: 'Project 1' }, { title: 'Project 2' }].to_json)
     end
   end
 
@@ -122,7 +122,7 @@ describe ActiveData::Model::Associations::Reflections::EmbedsMany do
       specify { expect(User.reflect_on_association(:projects).klass).to eq(User::Project) }
       specify { expect(User.new.projects).to eq([]) }
       specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.projects).to be_a(ActiveData::Model::Associations::Collection::Embedded) }
-      specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.read_attribute(:projects)).to eq([{'title' => 'Project'}]) }
+      specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.read_attribute(:projects)).to eq([{ 'title' => 'Project' }]) }
     end
 
     context do
@@ -140,7 +140,7 @@ describe ActiveData::Model::Associations::Reflections::EmbedsMany do
       specify { expect(User.reflect_on_association(:projects).klass).to eq(User::Project) }
       specify { expect(User.new.projects).to eq([]) }
       specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.projects).to be_a(ActiveData::Model::Associations::Collection::Embedded) }
-      specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.read_attribute(:projects)).to eq([{'title' => 'Project', 'value' => nil}]) }
+      specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.read_attribute(:projects)).to eq([{ 'title' => 'Project', 'value' => nil }]) }
     end
   end
 end

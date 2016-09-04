@@ -115,11 +115,11 @@ describe ActiveData::Model::Attributes do
     specify { expect(stub_model.new.attributes).to eq({})  }
     specify do
       expect(model.new(name: 'Name').attributes)
-        .to match({'id' => nil, 'full_name' => 'Name', 't' => {}, 'author' => nil, 'projects' => nil})
+        .to match('id' => nil, 'full_name' => 'Name', 't' => {}, 'author' => nil, 'projects' => nil)
     end
     specify do
       expect(model.new(name: 'Name').attributes(false))
-        .to match({'id' => nil, 'full_name' => 'Name', 't' => {}})
+        .to match('id' => nil, 'full_name' => 'Name', 't' => {})
     end
   end
 

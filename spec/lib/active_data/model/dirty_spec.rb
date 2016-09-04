@@ -73,7 +73,7 @@ describe ActiveData::Model::Dirty do
 
   # Have no idea how should it work right now
   specify { expect(Model.new(title: 'Hello').changes).to eq('title' => [{}, 'Hello']) }
-  specify { expect(Model.new(title_translations: {en: 'Hello'}).changes).to eq('title' => [{}, 'Hello']) }
+  specify { expect(Model.new(title_translations: { en: 'Hello' }).changes).to eq('title' => [{}, 'Hello']) }
 
   specify { expect(Model.new).not_to respond_to :something_changed? }
   specify { expect(Model.new).to respond_to :n_changed? }

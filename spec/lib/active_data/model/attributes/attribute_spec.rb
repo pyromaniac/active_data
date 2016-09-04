@@ -5,7 +5,7 @@ describe ActiveData::Model::Attributes::Attribute do
 
   def attribute(*args)
     options = args.extract_options!
-    Dummy.add_attribute(ActiveData::Model::Attributes::Reflections::Attribute, :field, {type: Object}.merge(options))
+    Dummy.add_attribute(ActiveData::Model::Attributes::Reflections::Attribute, :field, { type: Object }.merge(options))
     Dummy.new.attribute(:field)
   end
 
@@ -123,7 +123,7 @@ describe ActiveData::Model::Attributes::Attribute do
       specify { expect(attribute(normalizer: [:strip, :trim]).normalize(' hello ')).to eq('he') }
       specify { expect(attribute(normalizer: [:trim, :strip]).normalize(' hello ')).to eq('h') }
       specify { expect(attribute(normalizer: [:strip, { trim: { length: 4 } }]).normalize(' hello ')).to eq('hell') }
-      specify { expect(attribute(normalizer: {strip: { }, trim: { length: 4 } }).normalize(' hello ')).to eq('hell') }
+      specify { expect(attribute(normalizer: { strip: {}, trim: { length: 4 } }).normalize(' hello ')).to eq('hell') }
       specify do
         expect(attribute(normalizer: [:strip, { trim: { length: 4 } }, ->(v) { v.last(2) }])
         .normalize(' hello ')).to eq('ll')
@@ -137,7 +137,7 @@ describe ActiveData::Model::Attributes::Attribute do
         let(:length) { 3 }
 
         specify { expect(attribute(normalizer: [:strip, { trim: { length: 4 } }]).normalize(' hello ')).to eq('hel') }
-        specify { expect(attribute(normalizer: {strip: { }, trim: { length: 4 } }).normalize(' hello ')).to eq('hel') }
+        specify { expect(attribute(normalizer: { strip: {}, trim: { length: 4 } }).normalize(' hello ')).to eq('hel') }
         specify do
           expect(attribute(normalizer: [:strip, { trim: { length: 4 } }, ->(v) { v.last(2) }])
           .normalize(' hello ')).to eq('el')

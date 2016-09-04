@@ -36,7 +36,7 @@ describe ActiveData::Model::Persistence do
 
     context do
       before { model.send(:include, ActiveData::Model::Scopes) }
-      subject(:instances) { model.instantiate_collection([{ name: 'Hello', foo: 'Bar' }, {name: 'World'}]) }
+      subject(:instances) { model.instantiate_collection([{ name: 'Hello', foo: 'Bar' }, { name: 'World' }]) }
 
       specify { expect(subject).to be_a ActiveData::Model::Scopes::ScopeProxy }
       specify { expect(subject.count).to eq(2) }

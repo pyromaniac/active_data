@@ -22,7 +22,7 @@ describe ActiveData::Model::Associations::EmbedsOne do
   let(:book) { Book.new }
   let(:association) { book.association(:author) }
 
-  let(:existing_book) { Book.instantiate title: 'My Life', author: {'name' => 'Johny'} }
+  let(:existing_book) { Book.instantiate title: 'My Life', author: { 'name' => 'Johny' } }
   let(:existing_association) { existing_book.association(:author) }
 
   describe 'book#association' do

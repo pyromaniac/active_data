@@ -17,3 +17,6 @@ Style/AlignParameters:
 
 Style/AndOr:
   EnforcedStyle: conditionals
+
+Style/CaseIndentation:
+  IndentWhenRelativeTo: end
