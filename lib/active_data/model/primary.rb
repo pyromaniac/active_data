@@ -40,12 +40,15 @@ module ActiveData
 
       module PrependMethods
         def ==(other)
-          other.instance_of?(self.class) &&
-            has_primary_attribute? ?
-              primary_attribute ?
-                primary_attribute == other.primary_attribute :
-                object_id == other.object_id :
-              super(other)
+          if other.instance_of?(self.class) && has_primary_attribute?
+            if primary_attribute
+              primary_attribute == other.primary_attribute
+            else
+              object_id == other.object_id
+            end
+          else
+            super(other)
+          end
         end
       end
     end

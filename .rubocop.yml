@@ -21,6 +21,9 @@ Style/AndOr:
 Style/CaseIndentation:
   IndentWhenRelativeTo: end
 
+Style/DoubleNegation:
+  Enabled: false
+
 Style/IndentArray:
   EnforcedStyle: consistent
 

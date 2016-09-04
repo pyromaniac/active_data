@@ -57,9 +57,11 @@ module ActiveData
           end
 
           def klass
-            @klass ||= options[:class] ?
-              options[:class].call(self) :
+            @klass ||= if options[:class]
+              options[:class].call(self)
+            else
               (options[:class_name].presence || name.to_s.classify).to_s.constantize
+            end
           end
 
           # AR compatibility

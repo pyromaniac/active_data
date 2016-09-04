@@ -184,8 +184,18 @@ describe ActiveData::Model::Associations::EmbedsMany do
   end
 
   describe '#apply_changes' do
-    specify { expect { association.build; association.apply_changes }.to change { association.target.map(&:persisted?) }.to([false]) }
-    specify { expect { association.build(title: 'Genesis'); association.apply_changes }.to change { association.target.map(&:persisted?) }.to([true]) }
+    specify do
+      expect do
+        association.build
+        association.apply_changes
+      end.to change { association.target.map(&:persisted?) }.to([false])
+    end
+    specify do
+      expect do
+        association.build(title: 'Genesis')
+        association.apply_changes
+      end.to change { association.target.map(&:persisted?) }.to([true])
+    end
     specify do
       expect do
         existing_association.target.first.mark_for_destruction
@@ -219,8 +229,18 @@ describe ActiveData::Model::Associations::EmbedsMany do
   end
 
   describe '#apply_changes!' do
-    specify { expect { association.build; association.apply_changes! }.to raise_error ActiveData::AssociationChangesNotApplied }
-    specify { expect { association.build(title: 'Genesis'); association.apply_changes! }.to change { association.target.map(&:persisted?) }.to([true]) }
+    specify do
+      expect do
+        association.build
+        association.apply_changes!
+      end.to raise_error ActiveData::AssociationChangesNotApplied
+    end
+    specify do
+      expect do
+        association.build(title: 'Genesis')
+        association.apply_changes!
+      end.to change { association.target.map(&:persisted?) }.to([true])
+    end
     specify do
       expect do
         existing_association.target.first.mark_for_destruction

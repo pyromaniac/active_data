@@ -105,7 +105,10 @@ describe ActiveData::ActiveRecord::Associations do
             .to([{ title: 'First', author: { name: 'Author' } }].to_json)
         end
         specify do
-          expect { user.projects << project; user.save }
+          expect do
+            user.projects << project
+            user.save
+          end
             .to change { user.reload.attributes['projects'] }.from(nil)
             .to([{ title: 'First', author: { name: 'Author' } }].to_json)
         end
@@ -128,7 +131,10 @@ describe ActiveData::ActiveRecord::Associations do
           .to({ first_name: 'google.com', last_name: nil }.to_json)
       end
       specify do
-        expect { user.profile = Profile.new(first_name: 'google.com'); user.save }
+        expect do
+          user.profile = Profile.new(first_name: 'google.com')
+          user.save
+        end
           .to change { user.reload.attributes['profile'] }.from(nil)
           .to({ first_name: 'google.com', last_name: nil }.to_json)
       end

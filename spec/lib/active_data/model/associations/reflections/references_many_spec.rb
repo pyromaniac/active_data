@@ -200,7 +200,10 @@ describe ActiveData::Model::Associations::Reflections::ReferencesMany do
     end
     specify do
       expect { book.authors = [author1, author2] }
-        .to change { book.authors.reload; book.author_ids }.from([]).to([author2.id])
+        .to change {
+          book.authors.reload
+          book.author_ids
+        }.from([]).to([author2.id])
     end
 
     context do

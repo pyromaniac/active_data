@@ -179,20 +179,32 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
 
     specify do
       expect { book.author = author1 }
-        .to change { book.association(:author).reload; book.author_id }.from(nil).to(author1.id)
+        .to change {
+          book.association(:author).reload
+          book.author_id
+        }.from(nil).to(author1.id)
     end
     specify do
       expect { book.author = author2 }
-        .to change { book.association(:author).reload; book.author_id }.from(nil).to(author2.id)
+        .to change {
+          book.association(:author).reload
+          book.author_id
+        }.from(nil).to(author2.id)
     end
 
     specify do
       expect { book.author = author1 }
-        .not_to change { book.association(:author).reload; book.author }
+        .not_to change {
+          book.association(:author).reload
+          book.author
+        }
     end
     specify do
       expect { book.author = author2 }
-        .to change { book.association(:author).reload; book.author }.from(nil).to(author2)
+        .to change {
+          book.association(:author).reload
+          book.author
+        }.from(nil).to(author2)
     end
 
     context do

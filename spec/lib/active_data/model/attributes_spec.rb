@@ -191,19 +191,49 @@ describe ActiveData::Model::Attributes do
     specify { expect { subject.calc = 15 }.to change { subject.calc }.from(5).to(15) }
 
     context 'enums' do
-      specify { subject.enum = 3; expect(subject.enum).to eq(3) }
-      specify { subject.enum = '3'; expect(subject.enum).to eq(3) }
-      specify { subject.enum = 10; expect(subject.enum).to eq(nil) }
-      specify { subject.enum = 'hello'; expect(subject.enum).to eq(nil) }
-      specify { subject.enum_with_default = 3; expect(subject.enum_with_default).to eq(3) }
-      specify { subject.enum_with_default = 10; expect(subject.enum_with_default).to be_nil }
+      specify do
+        subject.enum = 3
+        expect(subject.enum).to eq(3)
+      end
+      specify do
+        subject.enum = '3'
+        expect(subject.enum).to eq(3)
+      end
+      specify do
+        subject.enum = 10
+        expect(subject.enum).to eq(nil)
+      end
+      specify do
+        subject.enum = 'hello'
+        expect(subject.enum).to eq(nil)
+      end
+      specify do
+        subject.enum_with_default = 3
+        expect(subject.enum_with_default).to eq(3)
+      end
+      specify do
+        subject.enum_with_default = 10
+        expect(subject.enum_with_default).to be_nil
+      end
     end
 
     context 'array' do
-      specify { subject.array = [2, 4]; expect(subject.array).to eq([2, nil]) }
-      specify { subject.array = [2, 4]; expect(subject.array?).to eq(true) }
-      specify { subject.array = [2, 4]; expect(subject.array_values).to eq([1, 2, 3]) }
-      specify { subject.array = [2, 4]; expect(subject.array_default).to eq(7) }
+      specify do
+        subject.array = [2, 4]
+        expect(subject.array).to eq([2, nil])
+      end
+      specify do
+        subject.array = [2, 4]
+        expect(subject.array?).to eq(true)
+      end
+      specify do
+        subject.array = [2, 4]
+        expect(subject.array_values).to eq([1, 2, 3])
+      end
+      specify do
+        subject.array = [2, 4]
+        expect(subject.array_default).to eq(7)
+      end
     end
 
     context 'attribute caching' do

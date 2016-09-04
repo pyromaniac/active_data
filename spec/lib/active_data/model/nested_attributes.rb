@@ -46,7 +46,12 @@ shared_examples 'nested attributes' do
       specify { expect { user.profile_attributes = { identifier: profile.identifier.to_s, first_name: 'User 1' } }.to change { user.profile.first_name }.to('User 1') }
       specify { expect { user.profile_attributes = { first_name: 'User 1' } }.to change { user.profile.first_name }.to('User 1') }
       specify { expect { user.profile_attributes = { first_name: 'User 1', _destroy: '1' } }.not_to change { user.profile.first_name } }
-      specify { expect { user.profile_attributes = { first_name: 'User 1', _destroy: '1' }; user.save { true } }.not_to change { user.profile.first_name } }
+      specify do
+        expect do
+          user.profile_attributes = { first_name: 'User 1', _destroy: '1' }
+          user.save { true }
+        end.not_to change { user.profile.first_name }
+      end
       specify { expect { user.profile_attributes = { identifier: profile.identifier.to_s, first_name: 'User 1', _destroy: '1' } }.to change { user.profile.first_name }.to('User 1') }
       specify do
         expect do
@@ -59,9 +64,19 @@ shared_examples 'nested attributes' do
         before { User.accepts_nested_attributes_for :profile, allow_destroy: true }
 
         specify { expect { user.profile_attributes = { first_name: 'User 1', _destroy: '1' } }.not_to change { user.profile.first_name } }
-        specify { expect { user.profile_attributes = { first_name: 'User 1', _destroy: '1' }; user.save { true } }.not_to change { user.profile.first_name } }
+        specify do
+          expect do
+            user.profile_attributes = { first_name: 'User 1', _destroy: '1' }
+            user.save { true }
+          end.not_to change { user.profile.first_name }
+        end
         specify { expect { user.profile_attributes = { identifier: profile.identifier.to_s, first_name: 'User 1', _destroy: '1' } }.to change { user.profile.first_name }.to('User 1') }
-        specify { expect { user.profile_attributes = { identifier: profile.identifier.to_s, first_name: 'User 1', _destroy: '1' }; user.save { true } }.to change { user.profile }.to(nil) }
+        specify do
+          expect do
+            user.profile_attributes = { identifier: profile.identifier.to_s, first_name: 'User 1', _destroy: '1' }
+            user.save { true }
+          end.to change { user.profile }.to(nil)
+        end
       end
 
       context ':update_only' do
