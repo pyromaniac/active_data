@@ -29,7 +29,7 @@ module ActiveData
         end
         alias_method :primary_attribute, :primary
 
-        def has_primary_attribute?
+        def has_primary_attribute? # rubocop:disable Style/PredicateName
           has_attribute? _primary_name
         end
 

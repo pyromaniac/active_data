@@ -32,8 +32,8 @@ module ActiveData
     'y' => true,
     'n' => false,
     'yes' => true,
-    'no' => false,
-  }
+    'no' => false
+  }.freeze
 
   def self.config
     ActiveData::Config.instance
@@ -42,7 +42,7 @@ module ActiveData
   singleton_class.delegate(*ActiveData::Config.delegated, to: :config)
 
   typecaster('Object') { |value, attribute| value if value.class < attribute.type }
-  typecaster('String') { |value| value.to_s }
+  typecaster('String') { |value, _| value.to_s }
   typecaster('Array') do |value|
     case value
     when ::Array then

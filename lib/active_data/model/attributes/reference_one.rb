@@ -14,7 +14,7 @@ module ActiveData
           string: String,
           binary: String,
           boolean: Boolean
-        }
+        }.freeze
 
         def write(value)
           pollute do

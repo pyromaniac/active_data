@@ -8,7 +8,8 @@ module ActiveData
 
             target.add_attribute(
               ActiveData::Model::Attributes::Reflections::ReferenceMany,
-              reflection.reference_key, association: name)
+              reflection.reference_key, association: name
+            )
 
             reflection
           end

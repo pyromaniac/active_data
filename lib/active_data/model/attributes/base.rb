@@ -6,7 +6,8 @@ module ActiveData
         delegate :type, :typecaster, :readonly, to: :reflection
 
         def initialize(name, owner)
-          @name, @owner = name, owner
+          @name = name
+          @owner = owner
         end
 
         def reflection

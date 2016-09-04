@@ -113,9 +113,9 @@ module ActiveData
 
           object.define_create do
             source = association.send(:read_source)
-            index = association.target.select do |one|
-              one.persisted? || one.equal?(self)
-            end.index { |one| one.equal?(self) }
+            index = association.target
+              .select { |one| one.persisted? || one.equal?(self) }
+              .index { |one| one.equal?(self) }
 
             source.insert(index, attributes)
             association.send(:write_source, source)

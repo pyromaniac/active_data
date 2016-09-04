@@ -2,6 +2,8 @@ module ActiveData
   module Model
     module Associations
       class EmbedsOne < Base
+        attr_reader :destroyed
+
         def build(attributes = {})
           self.target = reflection.klass.new(attributes)
         end
@@ -12,10 +14,6 @@ module ActiveData
 
         def create!(attributes = {})
           build(attributes).tap(&:save!)
-        end
-
-        def destroyed
-          @destroyed
         end
 
         def apply_changes

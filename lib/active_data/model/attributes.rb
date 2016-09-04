@@ -29,7 +29,7 @@ module ActiveData
 
         delegate :attribute_names, :has_attribute?, to: 'self.class'
 
-        %w[attribute collection dictionary].each do |kind|
+        %w(attribute collection dictionary).each do |kind|
           define_singleton_method kind do |*args, &block|
             add_attribute("ActiveData::Model::Attributes::Reflections::#{kind.camelize}".constantize, *args, &block)
           end
@@ -68,7 +68,7 @@ module ActiveData
           _attributes[_attribute_aliases[name] || name]
         end
 
-        def has_attribute?(name)
+        def has_attribute?(name) # rubocop:disable Style/PredicateName
           name = name.to_s
           _attributes.key?(_attribute_aliases[name] || name)
         end
@@ -104,7 +104,8 @@ module ActiveData
         end
 
         def with_sanitize(value)
-          previous_sanitize, self._sanitize = _sanitize, value
+          previous_sanitize = _sanitize
+          self._sanitize = value
           yield
         ensure
           self._sanitize = previous_sanitize
@@ -126,7 +127,7 @@ module ActiveData
         def generated_attributes_methods
           @generated_attributes_methods ||=
             const_set(:GeneratedAttributesMethods, Module.new)
-            .tap { |proxy| include proxy }
+              .tap { |proxy| include proxy }
         end
 
         def inverted_attribute_aliases

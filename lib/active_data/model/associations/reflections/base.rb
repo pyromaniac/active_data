@@ -48,7 +48,8 @@ module ActiveData
           end
 
           def initialize(name, options = {})
-            @name, @options = name.to_sym, options
+            @name = name.to_sym
+            @options = options
           end
 
           def macro
@@ -81,7 +82,7 @@ module ActiveData
           def default(object)
             defaultizer = options[:default]
             if defaultizer.is_a?(Proc)
-              if defaultizer.arity != 0
+              if defaultizer.arity.nonzero?
                 defaultizer.call(object)
               else
                 object.instance_exec(&defaultizer)

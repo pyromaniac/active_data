@@ -4,7 +4,7 @@ module ActiveData
       module NestedAttributes
         extend ActiveSupport::Concern
 
-        DESTROY_ATTRIBUTE = '_destroy'
+        DESTROY_ATTRIBUTE = '_destroy'.freeze
 
         included do
           class_attribute :nested_attributes_options, instance_writer: false
@@ -100,7 +100,7 @@ module ActiveData
                   record.primary_attribute == primary_attribute_value
                 end
                 if existing_record
-                  if !call_reject_if(object, association_name, attributes)
+                  unless call_reject_if(object, association_name, attributes)
                     assign_to_or_mark_for_destruction(existing_record, attributes, options[:allow_destroy])
                   end
                 elsif association.reflection.embedded?
@@ -135,22 +135,22 @@ module ActiveData
 
           def self.assign_to_or_mark_for_destruction(object, attributes, allow_destroy)
             object.assign_attributes(attributes.except(*unassignable_keys(object)))
-            object.mark_for_destruction if has_destroy_flag?(attributes) && allow_destroy
+            object.mark_for_destruction if destroy_flag?(attributes) && allow_destroy
           end
 
-          def self.has_destroy_flag?(hash)
+          def self.destroy_flag?(hash)
             ActiveData.typecaster(Boolean).call(hash[DESTROY_ATTRIBUTE])
           end
 
           def self.reject_new_object?(object, association_name, attributes)
-            has_destroy_flag?(attributes) || call_reject_if(object, association_name, attributes)
+            destroy_flag?(attributes) || call_reject_if(object, association_name, attributes)
           end
 
           def self.call_reject_if(object, association_name, attributes)
-            return false if has_destroy_flag?(attributes)
+            return false if destroy_flag?(attributes)
             case callback = object.nested_attributes_options[association_name][:reject_if]
             when Symbol
-              method(callback).arity == 0 ? send(callback) : send(callback, attributes)
+              method(callback).arity.zero? ? send(callback) : send(callback, attributes)
             when Proc
               callback.call(attributes)
             end

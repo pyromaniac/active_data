@@ -36,11 +36,19 @@ module ActiveData
         end
 
         def method_missing(method, *args, &block)
-          with_scope { self.class._scope_model.public_send(method, *args, &block) }
+          with_scope do
+            model = self.class._scope_model
+            if model.respond_to?(method)
+              self.class._scope_model.public_send(method, *args, &block)
+            else
+              super
+            end
+          end
         end
 
         def with_scope
-          previous_scope, self.class._scope_model.current_scope = self.class._scope_model.current_scope, self
+          previous_scope = self.class._scope_model.current_scope
+          self.class._scope_model.current_scope = self
           result = yield
           self.class._scope_model.current_scope = previous_scope
           result

@@ -6,7 +6,8 @@ module ActiveData
         delegate :macro, :collection?, to: :reflection
 
         def initialize(owner, reflection)
-          @owner, @reflection = owner, reflection
+          @owner = owner
+          @reflection = reflection
           @evar_loaded = owner.persisted?
           reset
         end

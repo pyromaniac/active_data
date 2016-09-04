@@ -105,9 +105,7 @@ describe ActiveData::Model::Attributes::Attribute do
     context 'integration' do
       before do
         allow(ActiveData).to receive_messages(config: ActiveData::Config.send(:new))
-        ActiveData.normalizer(:strip) do |value|
-          value.strip
-        end
+        ActiveData.normalizer(:strip) { |value, _, _| value.strip }
         ActiveData.normalizer(:trim) do |value, options, _attribute|
           value.first(length || options[:length] || 2)
         end

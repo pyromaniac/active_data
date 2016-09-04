@@ -35,8 +35,8 @@ describe ActiveData::Model::Attributes do
 
   describe '.attribute_names' do
     specify { expect(stub_model.attribute_names).to eq([]) }
-    specify { expect(model.attribute_names).to eq(%w[id full_name t author projects]) }
-    specify { expect(model.attribute_names(false)).to eq(%w[id full_name t]) }
+    specify { expect(model.attribute_names).to eq(%w(id full_name t author projects)) }
+    specify { expect(model.attribute_names(false)).to eq(%w(id full_name t)) }
   end
 
   describe '.inspect' do
@@ -101,8 +101,8 @@ describe ActiveData::Model::Attributes do
 
   describe '#attribute_names' do
     specify { expect(stub_model.new.attribute_names).to eq([]) }
-    specify { expect(model.new.attribute_names).to eq(%w[id full_name t author projects]) }
-    specify { expect(model.new.attribute_names(false)).to eq(%w[id full_name t]) }
+    specify { expect(model.new.attribute_names).to eq(%w(id full_name t author projects)) }
+    specify { expect(model.new.attribute_names(false)).to eq(%w(id full_name t)) }
   end
 
   describe '#attribute_present?' do
