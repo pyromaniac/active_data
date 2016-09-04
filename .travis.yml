@@ -14,3 +14,7 @@ gemfile:
 matrix:
   allow_failures:
     - rvm: rbx
+
+script:
+  - bundle exec rspec
+  - bundle exec rubocop

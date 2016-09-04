@@ -24,6 +24,8 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'database_cleaner'
   gem.add_development_dependency 'activerecord', '>= 4.0'
   gem.add_development_dependency 'uuidtools'
+  gem.add_development_dependency 'rubocop'
+
   gem.add_runtime_dependency 'activesupport', '>= 4.0'
   gem.add_runtime_dependency 'activemodel', '>= 4.0'
   gem.add_runtime_dependency 'tzinfo'
