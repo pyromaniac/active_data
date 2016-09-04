@@ -39,7 +39,7 @@ module ActiveData
     ActiveData::Config.instance
   end
 
-  singleton_class.delegate *ActiveData::Config.delegated, to: :config
+  singleton_class.delegate(*ActiveData::Config.delegated, to: :config)
 
   typecaster('Object') { |value, attribute| value if value.class < attribute.type }
   typecaster('String') { |value| value.to_s }

@@ -15,8 +15,8 @@ module ActiveData
           end
 
           ActiveData::Model::Associations::NestedAttributes::NestedAttributesMethods
-            .accepts_nested_attributes_for self, *active_data_associations, options.dup
-          accepts_nested_attributes_for_without_active_data *active_record_association, options.dup
+            .accepts_nested_attributes_for(self, *active_data_associations, options.dup)
+          accepts_nested_attributes_for_without_active_data(*active_record_association, options.dup)
         end
       end
     end

@@ -53,16 +53,16 @@ module ActiveData
           if normalizers.none?
             value
           else
-            normalizers.inject(value) do |value, normalizer|
+            normalizers.inject(value) do |val, normalizer|
               case normalizer
               when Proc
-                evaluate(value, &normalizer)
+                evaluate(val, &normalizer)
               when Hash
-                normalizer.inject(value) do |value, (name, options)|
-                  ActiveData.normalizer(name).call(value, options, self)
+                normalizer.inject(val) do |v, (name, options)|
+                  ActiveData.normalizer(name).call(v, options, self)
                 end
               else
-                ActiveData.normalizer(normalizer).call(value, {}, self)
+                ActiveData.normalizer(normalizer).call(val, {}, self)
               end
             end
           end

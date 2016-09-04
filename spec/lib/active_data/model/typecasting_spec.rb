@@ -175,9 +175,9 @@ describe ActiveData::Model::Attributes do
     let(:uuid_tools) { UUIDTools::UUID.random_create }
 
     specify { expect(uuid.as_json).to eq(uuid.to_s) }
-    specify { expect(uuid.to_json).to eq("\"#{uuid.to_s}\"") }
+    specify { expect(uuid.to_json).to eq("\"#{uuid}\"") }
     specify { expect(uuid.to_param).to eq(uuid.to_s) }
-    specify { expect(uuid.to_query(:key)).to eq("key=#{uuid.to_s}") }
+    specify { expect(uuid.to_query(:key)).to eq("key=#{uuid}") }
 
     specify { expect(model.new(column: nil).column).to be_nil }
     specify { expect(model.new(column: Object.new).column).to be_nil }

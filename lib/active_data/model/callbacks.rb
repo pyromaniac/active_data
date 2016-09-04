@@ -46,7 +46,7 @@ module ActiveData
 
       module PrependMethods
         def initialize *_
-          super(*_)
+          super
           run_callbacks :initialize
         end
 

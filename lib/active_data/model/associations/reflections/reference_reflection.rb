@@ -3,7 +3,7 @@ module ActiveData
     module Associations
       module Reflections
         class ReferenceReflection < Base
-          def self.build target, generated_methods, name, *args, &block
+          def self.build _target, generated_methods, name, *args
             reflection = new(name, *args)
             generate_methods name, generated_methods
             reflection

@@ -6,7 +6,7 @@ describe ActiveData::Model::Attributes::Represents do
 
   def attribute(*args)
     options = args.extract_options!
-    reflection = Dummy.add_attribute(ActiveData::Model::Attributes::Reflections::Represents, :full_name, options.reverse_merge(of: :subject))
+    Dummy.add_attribute(ActiveData::Model::Attributes::Reflections::Represents, :full_name, options.reverse_merge(of: :subject))
     Dummy.new.attribute(:full_name)
   end
 

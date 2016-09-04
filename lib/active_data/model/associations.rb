@@ -91,9 +91,9 @@ module ActiveData
       alias_method :eql?, :==
 
       def association name
-        if reflection = self.class.reflect_on_association(name)
-          (@_associations ||= {})[reflection.name] ||= reflection.build_association(self)
-        end
+        reflection = self.class.reflect_on_association(name)
+        return unless reflection
+        (@_associations ||= {})[reflection.name] ||= reflection.build_association(self)
       end
 
       def apply_association_changes!

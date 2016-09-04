@@ -18,15 +18,15 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
-        { embeds_many: Reflections::EmbedsMany, embeds_one: Reflections::EmbedsOne }.each do |(name, reflection_class)|
-          define_singleton_method name do |name, options = {}, &block|
+        { embeds_many: Reflections::EmbedsMany, embeds_one: Reflections::EmbedsOne }.each do |(method, reflection_class)|
+          define_singleton_method method do |name, options = {}, &block|
             reflection = reflection_class.build(self, self, name, options.reverse_merge(
-              read: ->(reflection, object) {
-                value = object.read_attribute(reflection.name)
+              read: ->(ref, object) {
+                value = object.read_attribute(ref.name)
                 JSON.parse(value) if value.present?
               },
-              write: ->(reflection, object, value) {
-                object.send(:write_attribute, reflection.name, value ? value.to_json : nil)
+              write: ->(ref, object, value) {
+                object.send(:write_attribute, ref.name, value ? value.to_json : nil)
               }
             ), &block)
             if ::ActiveRecord::Reflection.respond_to? :add_reflection

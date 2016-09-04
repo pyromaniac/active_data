@@ -6,12 +6,12 @@ describe ActiveData::Model::Attributes::Dictionary do
 
   def attribute(*args)
     options = args.extract_options!
-    reflection = Dummy.add_attribute(ActiveData::Model::Attributes::Reflections::Dictionary, :field, options)
+    Dummy.add_attribute(ActiveData::Model::Attributes::Reflections::Dictionary, :field, options)
     Dummy.new.attribute(:field)
   end
 
   describe '#read' do
-    let(:field) { attribute(type: String, normalizer: ->(v){ v.delete_if { |_, v| v == nil } },
+    let(:field) { attribute(type: String, normalizer: ->(val){ val.delete_if { |_, v| v == nil } },
       default: :world, enum: ['hello', '42']) }
 
     specify { expect(field.tap { |r| r.write(nil) }.read).to eq({}) }
@@ -25,7 +25,7 @@ describe ActiveData::Model::Attributes::Dictionary do
     specify { expect(field.tap { |r| r.write({a: 'hello', x: '42'}) }.read).to eq({'a' => 'hello', 'x' => '42'}) }
 
     context do
-      let(:field) { attribute(type: String, normalizer: ->(v){ v.delete_if { |_, v| v == nil } },
+      let(:field) { attribute(type: String, normalizer: ->(val){ val.delete_if { |_, v| v == nil } },
         default: :world) }
 
       specify { expect(field.tap { |r| r.write(nil) }.read).to eq({}) }

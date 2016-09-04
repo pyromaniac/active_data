@@ -27,7 +27,7 @@ else
     end
 
     def inspect
-      "#<ActiveData::UUID:#{to_s}>"
+      "#<ActiveData::UUID:#{self}>"
     end
   end
 end

@@ -103,8 +103,8 @@ describe ActiveData::Model::Associations do
 
     let(:user) { User.new }
 
-    its(:projects) { should = [] }
-    its(:profile) { should = nil }
+    specify { expect(user.projects).to eq([]) }
+    specify { expect(user.profile).to be_nil }
 
     describe '.inspect' do
       specify { expect(User.inspect).to eq('User(profile: EmbedsOne(Profile), projects: EmbedsMany(Project), login: Object)') }

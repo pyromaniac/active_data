@@ -6,7 +6,7 @@ describe ActiveData::Model::Attributes::Collection do
 
   def attribute(*args)
     options = args.extract_options!
-    reflection = Dummy.add_attribute(ActiveData::Model::Attributes::Reflections::Collection, :field, options)
+    Dummy.add_attribute(ActiveData::Model::Attributes::Reflections::Collection, :field, options)
     Dummy.new.attribute(:field)
   end
 

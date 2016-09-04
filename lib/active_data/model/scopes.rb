@@ -60,7 +60,7 @@ module ActiveData
           if args.empty?
             current_scope
           else
-            scope_class.new *args
+            scope_class.new(*args)
           end
         end
 

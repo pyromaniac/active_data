@@ -64,8 +64,8 @@ module ActiveData
       included do
         include Persistence
 
-        class_attribute *[:save, :create, :update, :destroy].map { |action| "_#{action}_performer" }
-        private *[:save, :create, :update, :destroy].map { |action| "_#{action}_performer=" }
+        class_attribute(*[:save, :create, :update, :destroy].map { |action| "_#{action}_performer" })
+        private(*[:save, :create, :update, :destroy].map { |action| "_#{action}_performer=" })
       end
 
       module ClassMethods
@@ -196,7 +196,7 @@ module ActiveData
       #
       #   author.save { REDIS.set(id, attributes.to_json) }
       #
-      def save options = {}, &block
+      def save _options = {}, &block
         raise ActiveData::UnsavableObject unless block || savable?
         valid? && save_object(&block)
       end
@@ -216,7 +216,7 @@ module ActiveData
       #
       #   author.save! { REDIS.set(id, attributes.to_json) }
       #
-      def save! options = {}, &block
+      def save! _options = {}, &block
         raise ActiveData::UnsavableObject unless block || savable?
         validate!
         save_object(&block) or raise ActiveData::ObjectNotSaved

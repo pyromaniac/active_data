@@ -5,7 +5,7 @@ describe ActiveData::Model::Attributes::Attribute do
 
   def attribute(*args)
     options = args.extract_options!
-    reflection = Dummy.add_attribute(ActiveData::Model::Attributes::Reflections::Attribute, :field, {type: Object}.merge(options))
+    Dummy.add_attribute(ActiveData::Model::Attributes::Reflections::Attribute, :field, {type: Object}.merge(options))
     Dummy.new.attribute(:field)
   end
 
@@ -97,9 +97,9 @@ describe ActiveData::Model::Attributes::Attribute do
       before { allow_any_instance_of(Dummy).to receive_messages(value: 'value') }
       let(:other) { 'other' }
 
-      specify { expect(attribute(normalizer: ->(v) { value }).normalize(' hello ')).to eq('value') }
-      specify { expect(attribute(normalizer: ->(v, object) { object.value }).normalize(' hello ')).to eq('value') }
-      specify { expect(attribute(normalizer: ->(v, object) { other }).normalize(' hello ')).to eq('other') }
+      specify { expect(attribute(normalizer: ->(_v) { value }).normalize(' hello ')).to eq('value') }
+      specify { expect(attribute(normalizer: ->(_v, object) { object.value }).normalize(' hello ')).to eq('value') }
+      specify { expect(attribute(normalizer: ->(_v, _object) { other }).normalize(' hello ')).to eq('other') }
     end
 
     context 'integration' do
@@ -108,10 +108,10 @@ describe ActiveData::Model::Attributes::Attribute do
         ActiveData.normalizer(:strip) do |value|
           value.strip
         end
-        ActiveData.normalizer(:trim) do |value, options, attribute|
+        ActiveData.normalizer(:trim) do |value, options, _attribute|
           value.first(length || options[:length] || 2)
         end
-        ActiveData.normalizer(:reset) do |value, options, attribute|
+        ActiveData.normalizer(:reset) do |value, _options, attribute|
           empty = value.respond_to?(:empty?) ? value.empty? : value.nil?
           empty ? attribute.default : value
         end

@@ -67,7 +67,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
         {'title' => 'Project 1'}, {'title' => 'Project 2'}, {'title' => 'Project 3'}])
       p3.destroy!
       expect(user.read_attribute(:projects)).to eq([{'title' => 'Project 1'}, {'title' => 'Project 2'}])
-      p4 = user.projects.create(title: 'Project 4')
+      user.projects.create!(title: 'Project 4')
       expect(user.read_attribute(:projects)).to eq([
         {'title' => 'Project 1'}, {'title' => 'Project 2'}, {'title' => 'Project 4'}])
     end

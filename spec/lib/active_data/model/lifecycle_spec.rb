@@ -19,9 +19,9 @@ describe ActiveData::Model::Lifecycle do
       let(:foo) { true }
 
       specify { expect { subject.save { foo } }.to raise_error NameError }
-      specify { expect { subject.save { |instance| attributes } }.to raise_error NameError }
+      specify { expect { subject.save { |_| attributes } }.to raise_error NameError }
       specify { expect(subject.save { attributes }).to eq(true) }
-      specify { expect(subject.save { |instance| foo }).to eq(true) }
+      specify { expect(subject.save { |_| foo }).to eq(true) }
     end
 
     context 'save' do

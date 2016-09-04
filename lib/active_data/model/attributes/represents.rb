@@ -48,11 +48,10 @@ module ActiveData
 
         def read_value_before_type_cast
           ref = reference
-          if ref
-            ref.respond_to?(reader_before_type_cast) ?
-              ref.public_send(reader_before_type_cast) :
-              ref.public_send(reader)
-          end
+          return unless ref
+          ref.respond_to?(reader_before_type_cast) ?
+            ref.public_send(reader_before_type_cast) :
+            ref.public_send(reader)
         end
 
         def cached_value_before_type_cast

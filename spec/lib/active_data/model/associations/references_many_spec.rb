@@ -48,7 +48,7 @@ describe ActiveData::Model::Associations::ReferencesMany do
   end
 
   describe '#default' do
-    before { Book.references_many :authors, default: ->(book) { author.id } }
+    before { Book.references_many :authors, default: ->(_book) { author.id } }
     let(:existing_book) { Book.instantiate title: 'Genesis' }
 
     specify { expect(association.target).to eq([author]) }

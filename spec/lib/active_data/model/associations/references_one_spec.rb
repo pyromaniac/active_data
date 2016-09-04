@@ -69,7 +69,7 @@ describe ActiveData::Model::Associations::ReferencesOne do
   end
 
   describe '#default' do
-    before { Book.references_one :author, default: ->(book) { author.id } }
+    before { Book.references_one :author, default: ->(_book) { author.id } }
     let(:existing_book) { Book.instantiate title: 'My Life' }
 
     specify { expect(association.target).to eq(author) }

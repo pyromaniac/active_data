@@ -6,7 +6,7 @@ describe ActiveData::Model::Attributes::Localized do
 
   def attribute(*args)
     options = args.extract_options!
-    reflection = Dummy.add_attribute(ActiveData::Model::Attributes::Reflections::Localized, :field, options)
+    Dummy.add_attribute(ActiveData::Model::Attributes::Reflections::Localized, :field, options)
     described_class.new('field', Dummy.new)
   end
 

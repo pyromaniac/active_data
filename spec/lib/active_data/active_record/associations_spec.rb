@@ -32,11 +32,13 @@ describe ActiveData::ActiveRecord::Associations do
     end
   end
 
-  its(:projects) { should = [] }
-  its(:profile) { should = nil }
+  let(:user) { User.new }
+
+  specify { expect(user.projects).to eq([]) }
+  specify { expect(user.profile).to be_nil }
 
   context 'new owner' do
-    subject(:user) { User.new }
+    let(:user) { User.new }
 
     describe '#projects' do
       specify { expect { user.projects << Project.new }
@@ -66,7 +68,7 @@ describe ActiveData::ActiveRecord::Associations do
   end
 
   context 'persisted owner' do
-    subject(:user) { User.create }
+    let(:user) { User.create }
 
     describe '#projects' do
       specify { expect { user.projects << Project.new }
