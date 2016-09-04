@@ -11,8 +11,11 @@ describe ActiveData::Model::Attributes::Dictionary do
   end
 
   describe '#read' do
-    let(:field) { attribute(type: String, normalizer: ->(val){ val.delete_if { |_, v| v == nil } },
-      default: :world, enum: ['hello', '42']) }
+    let(:field) do
+      attribute(type: String,
+      normalizer: ->(val){ val.delete_if { |_, v| v == nil } },
+      default: :world, enum: ['hello', '42'])
+    end
 
     specify { expect(field.tap { |r| r.write(nil) }.read).to eq({}) }
     specify { expect(field.tap { |r| r.write({}) }.read).to eq({}) }
@@ -25,8 +28,11 @@ describe ActiveData::Model::Attributes::Dictionary do
     specify { expect(field.tap { |r| r.write({a: 'hello', x: '42'}) }.read).to eq({'a' => 'hello', 'x' => '42'}) }
 
     context do
-      let(:field) { attribute(type: String, normalizer: ->(val){ val.delete_if { |_, v| v == nil } },
-        default: :world) }
+      let(:field) do
+        attribute(type: String,
+        normalizer: ->(val){ val.delete_if { |_, v| v == nil } },
+        default: :world)
+      end
 
       specify { expect(field.tap { |r| r.write(nil) }.read).to eq({}) }
       specify { expect(field.tap { |r| r.write({}) }.read).to eq({}) }
@@ -73,8 +79,10 @@ describe ActiveData::Model::Attributes::Dictionary do
 
       specify { expect(field.tap { |r| r.write(nil) }.read_before_type_cast).to eq({}) }
       specify { expect(field.tap { |r| r.write({}) }.read_before_type_cast).to eq({}) }
-      specify { expect(field.tap { |r| r.write({a: 1, 'b' => 2, c: 3, 'd' => 4}) }.read_before_type_cast)
-        .to eq({'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4}) }
+      specify do
+        expect(field.tap { |r| r.write({a: 1, 'b' => 2, c: 3, 'd' => 4}) }.read_before_type_cast)
+          .to eq({'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4})
+      end
     end
   end
 

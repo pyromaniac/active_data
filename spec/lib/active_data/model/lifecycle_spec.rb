@@ -198,10 +198,14 @@ describe ActiveData::Model::Lifecycle do
       specify { expect { subject.update({}) }.not_to change { subject.persisted? } }
       specify { expect { subject.update!({}) }.to raise_error ActiveData::ValidationError }
 
-      specify { expect { subject.update(name: 'Jonny') }
-        .to change { Storage.storage.keys }.from([]).to([subject.id]) }
-      specify { expect { subject.update!(name: 'Jonny') }
-        .to change { Storage.storage.keys }.from([]).to([subject.id]) }
+      specify do
+        expect { subject.update(name: 'Jonny') }
+          .to change { Storage.storage.keys }.from([]).to([subject.id])
+      end
+      specify do
+        expect { subject.update!(name: 'Jonny') }
+          .to change { Storage.storage.keys }.from([]).to([subject.id])
+      end
     end
 
     describe '#update_attributes, #update_attributes!' do
@@ -213,10 +217,14 @@ describe ActiveData::Model::Lifecycle do
       specify { expect { subject.update_attributes({}) }.not_to change { subject.persisted? } }
       specify { expect { subject.update_attributes!({}) }.to raise_error ActiveData::ValidationError }
 
-      specify { expect { subject.update_attributes(name: 'Jonny') }
-        .to change { Storage.storage.keys }.from([]).to([subject.id]) }
-      specify { expect { subject.update_attributes!(name: 'Jonny') }
-        .to change { Storage.storage.keys }.from([]).to([subject.id]) }
+      specify do
+        expect { subject.update_attributes(name: 'Jonny') }
+          .to change { Storage.storage.keys }.from([]).to([subject.id])
+      end
+      specify do
+        expect { subject.update_attributes!(name: 'Jonny') }
+          .to change { Storage.storage.keys }.from([]).to([subject.id])
+      end
     end
 
     describe '#save, #save!' do
@@ -273,10 +281,14 @@ describe ActiveData::Model::Lifecycle do
         specify { expect { subject.save }.not_to change { subject.persisted? } }
         specify { expect { subject.save! }.not_to change { subject.persisted? } }
 
-        specify { expect { subject.save }.to change { Storage.storage[subject.id] }
-          .from(hash_including(name: 'Jonny')).to(hash_including(name: 'Jimmy')) }
-        specify { expect { subject.save! }.to change { Storage.storage[subject.id] }
-          .from(hash_including(name: 'Jonny')).to(hash_including(name: 'Jimmy')) }
+        specify do
+          expect { subject.save }.to change { Storage.storage[subject.id] }
+            .from(hash_including(name: 'Jonny')).to(hash_including(name: 'Jimmy'))
+        end
+        specify do
+          expect { subject.save! }.to change { Storage.storage[subject.id] }
+            .from(hash_including(name: 'Jonny')).to(hash_including(name: 'Jimmy'))
+        end
 
         context 'save failed' do
           before { User.define_save { false } }

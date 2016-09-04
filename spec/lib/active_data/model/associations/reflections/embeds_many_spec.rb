@@ -38,10 +38,12 @@ describe ActiveData::Model::Associations::Reflections::EmbedsMany do
     let(:new_project1) { Project.new(title: 'Project 1') }
     let(:new_project2) { Project.new(title: 'Project 2') }
 
-    specify { expect { user.projects.concat([new_project1, new_project2]) }
-      .to change { user.read_attribute(:projects) }
-      .from([{title: 'Genesis'}].to_json)
-      .to([{title: 'Genesis'}, {title: 'Project 1'}, {title: 'Project 2'}].to_json) }
+    specify do
+      expect { user.projects.concat([new_project1, new_project2]) }
+        .to change { user.read_attribute(:projects) }
+        .from([{title: 'Genesis'}].to_json)
+        .to([{title: 'Genesis'}, {title: 'Project 1'}, {title: 'Project 2'}].to_json)
+    end
   end
 
   describe '#projects' do

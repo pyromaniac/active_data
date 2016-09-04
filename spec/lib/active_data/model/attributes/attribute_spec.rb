@@ -124,8 +124,10 @@ describe ActiveData::Model::Attributes::Attribute do
       specify { expect(attribute(normalizer: [:trim, :strip]).normalize(' hello ')).to eq('h') }
       specify { expect(attribute(normalizer: [:strip, { trim: { length: 4 } }]).normalize(' hello ')).to eq('hell') }
       specify { expect(attribute(normalizer: {strip: { }, trim: { length: 4 } }).normalize(' hello ')).to eq('hell') }
-      specify { expect(attribute(normalizer: [:strip, { trim: { length: 4 } }, ->(v) { v.last(2) }])
-        .normalize(' hello ')).to eq('ll') }
+      specify do
+        expect(attribute(normalizer: [:strip, { trim: { length: 4 } }, ->(v) { v.last(2) }])
+        .normalize(' hello ')).to eq('ll')
+      end
       specify { expect(attribute(normalizer: :reset).normalize('')).to eq(nil) }
       specify { expect(attribute(normalizer: [:strip, :reset]).normalize('   ')).to eq(nil) }
       specify { expect(attribute(normalizer: :reset, default: '!!!').normalize(nil)).to eq('!!!') }
@@ -136,8 +138,10 @@ describe ActiveData::Model::Attributes::Attribute do
 
         specify { expect(attribute(normalizer: [:strip, { trim: { length: 4 } }]).normalize(' hello ')).to eq('hel') }
         specify { expect(attribute(normalizer: {strip: { }, trim: { length: 4 } }).normalize(' hello ')).to eq('hel') }
-        specify { expect(attribute(normalizer: [:strip, { trim: { length: 4 } }, ->(v) { v.last(2) }])
-          .normalize(' hello ')).to eq('el') }
+        specify do
+          expect(attribute(normalizer: [:strip, { trim: { length: 4 } }, ->(v) { v.last(2) }])
+          .normalize(' hello ')).to eq('el')
+        end
       end
     end
   end

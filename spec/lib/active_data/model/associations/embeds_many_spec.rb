@@ -77,17 +77,25 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { expect(association.build).to be_a Project }
     specify { expect(association.build).not_to be_persisted }
 
-    specify { expect { association.build(title: 'Swordfish') }
-      .not_to change { user.read_attribute(:projects) } }
-    specify { expect { association.build(title: 'Swordfish') }
-      .to change { association.reader.map(&:attributes) }
-      .from([]).to([{'title' => 'Swordfish'}]) }
+    specify do
+      expect { association.build(title: 'Swordfish') }
+        .not_to change { user.read_attribute(:projects) }
+    end
+    specify do
+      expect { association.build(title: 'Swordfish') }
+        .to change { association.reader.map(&:attributes) }
+        .from([]).to([{'title' => 'Swordfish'}])
+    end
 
-    specify { expect { existing_association.build(title: 'Swordfish') }
-      .not_to change { existing_user.read_attribute(:projects) } }
-    specify { expect { existing_association.build(title: 'Swordfish') }
-      .to change { existing_association.reader.map(&:attributes) }
-      .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Swordfish'}]) }
+    specify do
+      expect { existing_association.build(title: 'Swordfish') }
+        .not_to change { existing_user.read_attribute(:projects) }
+    end
+    specify do
+      expect { existing_association.build(title: 'Swordfish') }
+        .to change { existing_association.reader.map(&:attributes) }
+        .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Swordfish'}])
+    end
   end
 
   describe '#create' do
@@ -97,22 +105,34 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { expect(association.create(title: 'Swordfish')).to be_a Project }
     specify { expect(association.create(title: 'Swordfish')).to be_persisted }
 
-    specify { expect { association.create }
-      .not_to change { user.read_attribute(:projects) } }
-    specify { expect { association.create(title: 'Swordfish') }
-      .to change { user.read_attribute(:projects) }.from(nil).to([{'title' => 'Swordfish'}]) }
-    specify { expect { association.create(title: 'Swordfish') }
-      .to change { association.reader.map(&:attributes) }
-      .from([]).to([{'title' => 'Swordfish'}]) }
+    specify do
+      expect { association.create }
+        .not_to change { user.read_attribute(:projects) }
+    end
+    specify do
+      expect { association.create(title: 'Swordfish') }
+        .to change { user.read_attribute(:projects) }.from(nil).to([{'title' => 'Swordfish'}])
+    end
+    specify do
+      expect { association.create(title: 'Swordfish') }
+        .to change { association.reader.map(&:attributes) }
+        .from([]).to([{'title' => 'Swordfish'}])
+    end
 
-    specify { expect { existing_association.create }
-      .not_to change { existing_user.read_attribute(:projects) } }
-    specify { expect { existing_association.create(title: 'Swordfish') }
-      .to change { existing_user.read_attribute(:projects) }
-      .from([{title: 'Genesis'}]).to([{title: 'Genesis'}, {'title' => 'Swordfish'}]) }
-    specify { expect { existing_association.create(title: 'Swordfish') }
-      .to change { existing_association.reader.map(&:attributes) }
-      .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Swordfish'}]) }
+    specify do
+      expect { existing_association.create }
+        .not_to change { existing_user.read_attribute(:projects) }
+    end
+    specify do
+      expect { existing_association.create(title: 'Swordfish') }
+        .to change { existing_user.read_attribute(:projects) }
+        .from([{title: 'Genesis'}]).to([{title: 'Genesis'}, {'title' => 'Swordfish'}])
+    end
+    specify do
+      expect { existing_association.create(title: 'Swordfish') }
+        .to change { existing_association.reader.map(&:attributes) }
+        .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Swordfish'}])
+    end
   end
 
   describe '#create!' do
@@ -121,77 +141,101 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { expect(association.create!(title: 'Swordfish')).to be_a Project }
     specify { expect(association.create!(title: 'Swordfish')).to be_persisted }
 
-    specify { expect { association.create! rescue nil }
-      .not_to change { user.read_attribute(:projects) } }
-    specify { expect { association.create! rescue nil }
-      .to change { association.reader.map(&:attributes) }.from([]).to([{'title' => nil}]) }
-    specify { expect { association.create!(title: 'Swordfish') }
-      .to change { user.read_attribute(:projects) }.from(nil).to([{'title' => 'Swordfish'}]) }
-    specify { expect { association.create!(title: 'Swordfish') }
-      .to change { association.reader.map(&:attributes) }
-      .from([]).to([{'title' => 'Swordfish'}]) }
+    specify do
+      expect { association.create! rescue nil }
+        .not_to change { user.read_attribute(:projects) }
+    end
+    specify do
+      expect { association.create! rescue nil }
+        .to change { association.reader.map(&:attributes) }.from([]).to([{'title' => nil}])
+    end
+    specify do
+      expect { association.create!(title: 'Swordfish') }
+        .to change { user.read_attribute(:projects) }.from(nil).to([{'title' => 'Swordfish'}])
+    end
+    specify do
+      expect { association.create!(title: 'Swordfish') }
+        .to change { association.reader.map(&:attributes) }
+        .from([]).to([{'title' => 'Swordfish'}])
+    end
 
-    specify { expect { existing_association.create! rescue nil }
-      .not_to change { existing_user.read_attribute(:projects) } }
-    specify { expect { existing_association.create! rescue nil }
-      .to change { existing_association.reader.map(&:attributes) }
-      .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => nil}]) }
-    specify { expect { existing_association.create!(title: 'Swordfish') }
-      .to change { existing_user.read_attribute(:projects) }
-      .from([{title: 'Genesis'}]).to([{title: 'Genesis'}, {'title' => 'Swordfish'}]) }
-    specify { expect { existing_association.create!(title: 'Swordfish') }
-      .to change { existing_association.reader.map(&:attributes) }
-      .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Swordfish'}]) }
+    specify do
+      expect { existing_association.create! rescue nil }
+        .not_to change { existing_user.read_attribute(:projects) }
+    end
+    specify do
+      expect { existing_association.create! rescue nil }
+        .to change { existing_association.reader.map(&:attributes) }
+        .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => nil}])
+    end
+    specify do
+      expect { existing_association.create!(title: 'Swordfish') }
+        .to change { existing_user.read_attribute(:projects) }
+        .from([{title: 'Genesis'}]).to([{title: 'Genesis'}, {'title' => 'Swordfish'}])
+    end
+    specify do
+      expect { existing_association.create!(title: 'Swordfish') }
+        .to change { existing_association.reader.map(&:attributes) }
+        .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Swordfish'}])
+    end
   end
 
   describe '#apply_changes' do
     specify { expect { association.build; association.apply_changes }.to change { association.target.map(&:persisted?) }.to([false]) }
     specify { expect { association.build(title: 'Genesis'); association.apply_changes }.to change { association.target.map(&:persisted?) }.to([true]) }
-    specify { expect {
-      existing_association.target.first.mark_for_destruction
-      existing_association.build(title: 'Swordfish');
-      existing_association.apply_changes
-    }.to change { existing_association.target.map(&:title) }.to(['Swordfish']) }
-    specify { expect {
-      existing_association.target.first.mark_for_destruction
-      existing_association.build(title: 'Swordfish');
-      existing_association.apply_changes
-    }.not_to change { existing_association.target.map(&:persisted?) } }
-    specify { expect {
-      existing_association.target.first.mark_for_destruction
-      existing_association.build(title: 'Swordfish');
-      existing_association.apply_changes
-    }.to change { existing_association.destroyed.map(&:title) }.from([]).to(['Genesis']) }
-    specify { expect {
-      existing_association.target.first.destroy!
-      existing_association.build(title: 'Swordfish');
-      existing_association.apply_changes
-    }.to change { existing_association.target.map(&:title) }.to(['Swordfish']) }
-    specify { expect {
-      existing_association.target.first.destroy!
-      existing_association.build(title: 'Swordfish');
-      existing_association.apply_changes
-    }.to change { existing_association.destroyed.map(&:title) }.from([]).to(['Genesis']) }
+    specify do
+      expect do
+        existing_association.target.first.mark_for_destruction
+        existing_association.build(title: 'Swordfish');
+        existing_association.apply_changes
+      end.to change { existing_association.target.map(&:title) }.to(['Swordfish']) end
+    specify do
+      expect do
+        existing_association.target.first.mark_for_destruction
+        existing_association.build(title: 'Swordfish');
+        existing_association.apply_changes
+      end.not_to change { existing_association.target.map(&:persisted?) } end
+    specify do
+      expect do
+        existing_association.target.first.mark_for_destruction
+        existing_association.build(title: 'Swordfish');
+        existing_association.apply_changes
+      end.to change { existing_association.destroyed.map(&:title) }.from([]).to(['Genesis']) end
+    specify do
+      expect do
+        existing_association.target.first.destroy!
+        existing_association.build(title: 'Swordfish');
+        existing_association.apply_changes
+      end.to change { existing_association.target.map(&:title) }.to(['Swordfish']) end
+    specify do
+      expect do
+        existing_association.target.first.destroy!
+        existing_association.build(title: 'Swordfish');
+        existing_association.apply_changes
+      end.to change { existing_association.destroyed.map(&:title) }.from([]).to(['Genesis']) end
   end
 
   describe '#apply_changes!' do
     specify { expect { association.build; association.apply_changes! }.to raise_error ActiveData::AssociationChangesNotApplied }
     specify { expect { association.build(title: 'Genesis'); association.apply_changes! }.to change { association.target.map(&:persisted?) }.to([true]) }
-    specify { expect {
-      existing_association.target.first.mark_for_destruction
-      existing_association.build(title: 'Swordfish');
-      existing_association.apply_changes!
-    }.to change { existing_association.target.map(&:title) }.to(['Swordfish']) }
-    specify { expect {
-      existing_association.target.first.mark_for_destruction
-      existing_association.build(title: 'Swordfish');
-      existing_association.apply_changes!
-    }.not_to change { existing_association.target.map(&:persisted?) } }
-    specify { expect {
-      existing_association.target.first.destroy!
-      existing_association.build(title: 'Swordfish');
-      existing_association.apply_changes!
-    }.to change { existing_association.target.map(&:title) }.to(['Swordfish']) }
+    specify do
+      expect do
+        existing_association.target.first.mark_for_destruction
+        existing_association.build(title: 'Swordfish');
+        existing_association.apply_changes!
+      end.to change { existing_association.target.map(&:title) }.to(['Swordfish']) end
+    specify do
+      expect do
+        existing_association.target.first.mark_for_destruction
+        existing_association.build(title: 'Swordfish');
+        existing_association.apply_changes!
+      end.not_to change { existing_association.target.map(&:persisted?) } end
+    specify do
+      expect do
+        existing_association.target.first.destroy!
+        existing_association.build(title: 'Swordfish');
+        existing_association.apply_changes!
+      end.to change { existing_association.target.map(&:title) }.to(['Swordfish']) end
   end
 
   describe '#target' do
@@ -241,15 +285,19 @@ describe ActiveData::Model::Associations::EmbedsMany do
 
     context do
       before { association.build(title: 'Swordfish') }
-      specify { expect { association.reload }
-        .to change { association.reader.map(&:attributes) }.from([{'title' => 'Swordfish'}]).to([]) }
+      specify do
+        expect { association.reload }
+          .to change { association.reader.map(&:attributes) }.from([{'title' => 'Swordfish'}]).to([])
+      end
     end
 
     context do
       before { existing_association.build(title: 'Swordfish') }
-      specify { expect { existing_association.reload }
-        .to change { existing_association.reader.map(&:attributes) }
-        .from([{'title' => 'Genesis'}, {'title' => 'Swordfish'}]).to([{'title' => 'Genesis'}]) }
+      specify do
+        expect { existing_association.reload }
+          .to change { existing_association.reader.map(&:attributes) }
+          .from([{'title' => 'Genesis'}, {'title' => 'Swordfish'}]).to([{'title' => 'Genesis'}])
+      end
     end
   end
 
@@ -258,10 +306,14 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { expect { association.clear }.not_to change { association.reader } }
 
     specify { expect(existing_association.clear).to eq(true) }
-    specify { expect { existing_association.clear }
-      .to change { existing_association.reader.map(&:attributes) }.from([{'title' => 'Genesis'}]).to([]) }
-    specify { expect { existing_association.clear }
-      .to change { existing_user.read_attribute(:projects) }.from([{title: 'Genesis'}]).to([]) }
+    specify do
+      expect { existing_association.clear }
+        .to change { existing_association.reader.map(&:attributes) }.from([{'title' => 'Genesis'}]).to([])
+    end
+    specify do
+      expect { existing_association.clear }
+        .to change { existing_user.read_attribute(:projects) }.from([{title: 'Genesis'}]).to([])
+    end
 
     context do
       let(:existing_user) { User.instantiate name: 'Rick', projects: [{title: 'Genesis'}, {title: 'Swordfish'}] }
@@ -273,10 +325,14 @@ describe ActiveData::Model::Associations::EmbedsMany do
       end
 
       specify { expect(existing_association.clear).to eq(false) }
-      specify { expect { existing_association.clear }
-        .not_to change { existing_association.reader } }
-      specify { expect { existing_association.clear }
-        .not_to change { existing_user.read_attribute(:projects) } }
+      specify do
+        expect { existing_association.clear }
+          .not_to change { existing_association.reader }
+      end
+      specify do
+        expect { existing_association.clear }
+          .not_to change { existing_user.read_attribute(:projects) }
+      end
     end
   end
 
@@ -308,52 +364,82 @@ describe ActiveData::Model::Associations::EmbedsMany do
     let(:new_project2) { Project.new(title: 'Project 2') }
     let(:invalid_project) { Project.new }
 
-    specify { expect { association.writer([Dummy.new]) }
-      .to raise_error ActiveData::AssociationTypeMismatch }
+    specify do
+      expect { association.writer([Dummy.new]) }
+        .to raise_error ActiveData::AssociationTypeMismatch
+    end
 
     specify { expect { association.writer(nil) }.to raise_error NoMethodError }
     specify { expect { association.writer(new_project1) }.to raise_error NoMethodError }
     specify { expect(association.writer([])).to eq([]) }
 
     specify { expect(association.writer([new_project1])).to eq([new_project1]) }
-    specify { expect { association.writer([new_project1]) }
-      .to change { association.reader.map(&:attributes) }.from([]).to([{'title' => 'Project 1'}]) }
-    specify { expect { association.writer([new_project1]) }
-      .not_to change { user.read_attribute(:projects) } }
+    specify do
+      expect { association.writer([new_project1]) }
+        .to change { association.reader.map(&:attributes) }.from([]).to([{'title' => 'Project 1'}])
+    end
+    specify do
+      expect { association.writer([new_project1]) }
+        .not_to change { user.read_attribute(:projects) }
+    end
 
-    specify { expect { existing_association.writer([new_project1, invalid_project]) }
-      .to raise_error ActiveData::AssociationChangesNotApplied }
-    specify { expect { existing_association.writer([new_project1, invalid_project]) rescue nil }
-      .not_to change { existing_user.read_attribute(:projects) } }
-    specify { expect { existing_association.writer([new_project1, invalid_project]) rescue nil }
-      .not_to change { existing_association.reader } }
+    specify do
+      expect { existing_association.writer([new_project1, invalid_project]) }
+        .to raise_error ActiveData::AssociationChangesNotApplied
+    end
+    specify do
+      expect { existing_association.writer([new_project1, invalid_project]) rescue nil }
+        .not_to change { existing_user.read_attribute(:projects) }
+    end
+    specify do
+      expect { existing_association.writer([new_project1, invalid_project]) rescue nil }
+        .not_to change { existing_association.reader }
+    end
 
-    specify { expect { existing_association.writer([new_project1, Dummy.new, new_project2]) }
-      .to raise_error ActiveData::AssociationTypeMismatch }
-    specify { expect { existing_association.writer([new_project1, Dummy.new, new_project2]) rescue nil }
-      .not_to change { existing_user.read_attribute(:projects) } }
-    specify { expect { existing_association.writer([new_project1, Dummy.new, new_project2]) rescue nil }
-      .not_to change { existing_association.reader } }
+    specify do
+      expect { existing_association.writer([new_project1, Dummy.new, new_project2]) }
+        .to raise_error ActiveData::AssociationTypeMismatch
+    end
+    specify do
+      expect { existing_association.writer([new_project1, Dummy.new, new_project2]) rescue nil }
+        .not_to change { existing_user.read_attribute(:projects) }
+    end
+    specify do
+      expect { existing_association.writer([new_project1, Dummy.new, new_project2]) rescue nil }
+        .not_to change { existing_association.reader }
+    end
 
     specify { expect { existing_association.writer(nil) }.to raise_error NoMethodError }
-    specify { expect { existing_association.writer(nil) rescue nil }
-      .not_to change { existing_user.read_attribute(:projects) } }
-    specify { expect { existing_association.writer(nil) rescue nil }
-      .not_to change { existing_association.reader } }
+    specify do
+      expect { existing_association.writer(nil) rescue nil }
+        .not_to change { existing_user.read_attribute(:projects) }
+    end
+    specify do
+      expect { existing_association.writer(nil) rescue nil }
+        .not_to change { existing_association.reader }
+    end
 
     specify { expect(existing_association.writer([])).to eq([]) }
-    specify { expect { existing_association.writer([]) }
-      .to change { existing_user.read_attribute(:projects) }.to([]) }
-    specify { expect { existing_association.writer([]) }
-      .to change { existing_association.reader }.to([]) }
+    specify do
+      expect { existing_association.writer([]) }
+        .to change { existing_user.read_attribute(:projects) }.to([])
+    end
+    specify do
+      expect { existing_association.writer([]) }
+        .to change { existing_association.reader }.to([])
+    end
 
     specify { expect(existing_association.writer([new_project1, new_project2])).to eq([new_project1, new_project2]) }
-    specify { expect { existing_association.writer([new_project1, new_project2]) }
-      .to change { existing_association.reader.map(&:attributes) }
-      .from([{'title' => 'Genesis'}]).to([{'title' => 'Project 1'}, {'title' => 'Project 2'}]) }
-    specify { expect { existing_association.writer([new_project1, new_project2]) }
-      .to change { existing_user.read_attribute(:projects) }
-      .from([{title: 'Genesis'}]).to([{'title' => 'Project 1'}, {'title' => 'Project 2'}]) }
+    specify do
+      expect { existing_association.writer([new_project1, new_project2]) }
+        .to change { existing_association.reader.map(&:attributes) }
+        .from([{'title' => 'Genesis'}]).to([{'title' => 'Project 1'}, {'title' => 'Project 2'}])
+    end
+    specify do
+      expect { existing_association.writer([new_project1, new_project2]) }
+        .to change { existing_user.read_attribute(:projects) }
+        .from([{title: 'Genesis'}]).to([{'title' => 'Project 1'}, {'title' => 'Project 2'}])
+    end
   end
 
   describe '#concat' do
@@ -361,8 +447,10 @@ describe ActiveData::Model::Associations::EmbedsMany do
     let(:new_project2) { Project.new(title: 'Project 2') }
     let(:invalid_project) { Project.new }
 
-    specify { expect { association.concat(Dummy.new) }
-      .to raise_error ActiveData::AssociationTypeMismatch }
+    specify do
+      expect { association.concat(Dummy.new) }
+        .to raise_error ActiveData::AssociationTypeMismatch
+    end
 
     specify { expect { association.concat(nil) }.to raise_error ActiveData::AssociationTypeMismatch }
     specify { expect(association.concat([])).to eq([]) }
@@ -370,34 +458,54 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { expect(existing_association.concat).to eq(existing_user.projects) }
 
     specify { expect(association.concat(new_project1)).to eq([new_project1]) }
-    specify { expect { association.concat(new_project1) }
-      .to change { association.reader.map(&:attributes) }.from([]).to([{'title' => 'Project 1'}]) }
-    specify { expect { association.concat(new_project1) }
-      .not_to change { user.read_attribute(:projects) } }
+    specify do
+      expect { association.concat(new_project1) }
+        .to change { association.reader.map(&:attributes) }.from([]).to([{'title' => 'Project 1'}])
+    end
+    specify do
+      expect { association.concat(new_project1) }
+        .not_to change { user.read_attribute(:projects) }
+    end
 
     specify { expect(existing_association.concat(new_project1, invalid_project)).to eq(false) }
-    specify { expect { existing_association.concat(new_project1, invalid_project) }
-      .to change { existing_user.read_attribute(:projects) }
-      .from([{title: 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}]) }
-    specify { expect { existing_association.concat(new_project1, invalid_project) }
-      .to change { existing_association.reader.map(&:attributes) }
-      .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}, {'title' => nil}]) }
+    specify do
+      expect { existing_association.concat(new_project1, invalid_project) }
+        .to change { existing_user.read_attribute(:projects) }
+        .from([{title: 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}])
+    end
+    specify do
+      expect { existing_association.concat(new_project1, invalid_project) }
+        .to change { existing_association.reader.map(&:attributes) }
+        .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}, {'title' => nil}])
+    end
 
-    specify { expect { existing_association.concat(new_project1, Dummy.new, new_project2) }
-      .to raise_error ActiveData::AssociationTypeMismatch }
-    specify { expect { existing_association.concat(new_project1, Dummy.new, new_project2) rescue nil }
-      .not_to change { existing_user.read_attribute(:projects) } }
-    specify { expect { existing_association.concat(new_project1, Dummy.new, new_project2) rescue nil }
-      .to change { existing_association.reader.map(&:attributes) }
-      .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}]) }
+    specify do
+      expect { existing_association.concat(new_project1, Dummy.new, new_project2) }
+        .to raise_error ActiveData::AssociationTypeMismatch
+    end
+    specify do
+      expect { existing_association.concat(new_project1, Dummy.new, new_project2) rescue nil }
+        .not_to change { existing_user.read_attribute(:projects) }
+    end
+    specify do
+      expect { existing_association.concat(new_project1, Dummy.new, new_project2) rescue nil }
+        .to change { existing_association.reader.map(&:attributes) }
+        .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}])
+    end
 
-    specify { expect(existing_association.concat(new_project1, new_project2))
-      .to eq([existing_user.projects.first, new_project1, new_project2]) }
-    specify { expect { existing_association.concat([new_project1, new_project2]) }
-      .to change { existing_association.reader.map(&:attributes) }
-      .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}, {'title' => 'Project 2'}]) }
-    specify { expect { existing_association.concat([new_project1, new_project2]) }
-      .to change { existing_user.read_attribute(:projects) }
-      .from([{title: 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}, {'title' => 'Project 2'}]) }
+    specify do
+      expect(existing_association.concat(new_project1, new_project2))
+        .to eq([existing_user.projects.first, new_project1, new_project2])
+    end
+    specify do
+      expect { existing_association.concat([new_project1, new_project2]) }
+        .to change { existing_association.reader.map(&:attributes) }
+        .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}, {'title' => 'Project 2'}])
+    end
+    specify do
+      expect { existing_association.concat([new_project1, new_project2]) }
+        .to change { existing_user.read_attribute(:projects) }
+        .from([{title: 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}, {'title' => 'Project 2'}])
+    end
   end
 end

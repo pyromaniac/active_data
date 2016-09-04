@@ -43,21 +43,23 @@ describe ActiveData::Model::Associations do
 
   context 'class determine errors' do
     specify do
-      expect { stub_model do
-        include ActiveData::Model::Associations
+      expect do
+        stub_model do
+          include ActiveData::Model::Associations
 
-        embeds_one :author, class_name: 'Borogoves'
-      end.reflect_on_association(:author).klass }.to raise_error NameError
+          embeds_one :author, class_name: 'Borogoves'
+        end.reflect_on_association(:author).klass end.to raise_error NameError
     end
 
     specify do
-      expect { stub_model(:user) do
-        include ActiveData::Model::Associations
+      expect do
+        stub_model(:user) do
+          include ActiveData::Model::Associations
 
-        embeds_many :projects, class_name: 'Borogoves' do
-          attribute :title
-        end
-      end.reflect_on_association(:projects).klass }.to raise_error NameError
+          embeds_many :projects, class_name: 'Borogoves' do
+            attribute :title
+          end
+        end.reflect_on_association(:projects).klass end.to raise_error NameError
     end
   end
 
@@ -117,8 +119,10 @@ describe ActiveData::Model::Associations do
     describe '#inspect' do
       let(:profile) { Profile.new first_name: 'Name' }
       let(:project) { Project.new title: 'Project' }
-      specify { expect(User.new(login: 'Login', profile: profile, projects: [project]).inspect)
-        .to eq('#<User profile: #<EmbedsOne #<Profile first_name: "Name", last_name: nil>>, projects: #<EmbedsMany [#<Project author: #<EmbedsOne nil>, title: "P...]>, login: "Login">') }
+      specify do
+        expect(User.new(login: 'Login', profile: profile, projects: [project]).inspect)
+          .to eq('#<User profile: #<EmbedsOne #<Profile first_name: "Name", last_name: nil>>, projects: #<EmbedsMany [#<Project author: #<EmbedsOne nil>, title: "P...]>, login: "Login">')
+      end
     end
 
     describe '#==' do
@@ -163,10 +167,14 @@ describe ActiveData::Model::Associations do
       let(:user) { User.new(profile: profile, projects: [project]) }
       before { project.build_author(name: 'Author') }
 
-      specify { expect { user.apply_association_changes! }.to change { user.attributes['profile'] }
-        .from(nil).to('first_name' => 'Name', 'last_name' => nil) }
-      specify { expect { user.apply_association_changes! }.to change { user.attributes['projects'] }
-        .from(nil).to([{ 'title' => 'Project', 'author' => { 'name' => 'Author' } }]) }
+      specify do
+        expect { user.apply_association_changes! }.to change { user.attributes['profile'] }
+          .from(nil).to('first_name' => 'Name', 'last_name' => nil)
+      end
+      specify do
+        expect { user.apply_association_changes! }.to change { user.attributes['projects'] }
+          .from(nil).to([{ 'title' => 'Project', 'author' => { 'name' => 'Author' } }])
+      end
 
       context do
         let(:project) { Project.new }
@@ -182,8 +190,10 @@ describe ActiveData::Model::Associations do
       before { project.build_author(name: 'Author') }
 
       specify { expect(User.instantiate(JSON.parse(user.to_json))).to eq(user) }
-      specify { expect(User.instantiate(JSON.parse(user.to_json))
-        .tap { |u| u.projects.first.author.name = 'Other' }).not_to eq(user) }
+      specify do
+        expect(User.instantiate(JSON.parse(user.to_json))
+        .tap { |u| u.projects.first.author.name = 'Other' }).not_to eq(user)
+      end
     end
   end
 end

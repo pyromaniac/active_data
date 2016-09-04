@@ -30,10 +30,14 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
     end
     let(:author) { Author.create!(name: 'Rick') }
 
-    specify { expect { book.creator = author }
-      .to change { book.creator }.from(nil).to(author) }
-    specify { expect { book.creator = author }
-      .to change { book.creator_id }.from(nil).to(author.id) }
+    specify do
+      expect { book.creator = author }
+        .to change { book.creator }.from(nil).to(author)
+    end
+    specify do
+      expect { book.creator = author }
+        .to change { book.creator_id }.from(nil).to(author.id)
+    end
   end
 
   describe ':primary_key' do
@@ -47,10 +51,14 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
 
     let(:author) { Author.create!(name: 'Rick') }
 
-    specify { expect { book.author_name = author.name }
-      .to change { book.author }.from(nil).to(author) }
-    specify { expect { book.author = author }
-      .to change { book.author_name }.from(nil).to(author.name) }
+    specify do
+      expect { book.author_name = author.name }
+        .to change { book.author }.from(nil).to(author)
+    end
+    specify do
+      expect { book.author = author }
+        .to change { book.author_name }.from(nil).to(author.name)
+    end
   end
 
   describe ':reference_key' do
@@ -63,10 +71,14 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
 
     let(:author) { Author.create!(name: 'Rick') }
 
-    specify { expect { book.identify = author.id }
-      .to change { book.author }.from(nil).to(author) }
-    specify { expect { book.author = author }
-      .to change { book.identify }.from(nil).to(author.id) }
+    specify do
+      expect { book.identify = author.id }
+        .to change { book.author }.from(nil).to(author)
+    end
+    specify do
+      expect { book.author = author }
+        .to change { book.identify }.from(nil).to(author.id)
+    end
   end
 
   describe ':default' do
@@ -147,25 +159,41 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
     let!(:author1) { Author.create!(name: 'Rick') }
     let!(:author2) { Author.create!(name: 'Aaron') }
 
-    specify { expect { book.author_id = author1.id }
-      .not_to change { book.author } }
-    specify { expect { book.author_id = author2.id }
-      .to change { book.author }.from(nil).to(author2) }
+    specify do
+      expect { book.author_id = author1.id }
+        .not_to change { book.author }
+    end
+    specify do
+      expect { book.author_id = author2.id }
+        .to change { book.author }.from(nil).to(author2)
+    end
 
-    specify { expect { book.author = author1 }
-      .to change { book.author_id }.from(nil).to(author1.id) }
-    specify { expect { book.author = author2 }
-      .to change { book.author_id }.from(nil).to(author2.id) }
+    specify do
+      expect { book.author = author1 }
+        .to change { book.author_id }.from(nil).to(author1.id)
+    end
+    specify do
+      expect { book.author = author2 }
+        .to change { book.author_id }.from(nil).to(author2.id)
+    end
 
-    specify { expect { book.author = author1 }
-      .to change { book.association(:author).reload; book.author_id }.from(nil).to(author1.id) }
-    specify { expect { book.author = author2 }
-      .to change { book.association(:author).reload; book.author_id }.from(nil).to(author2.id) }
+    specify do
+      expect { book.author = author1 }
+        .to change { book.association(:author).reload; book.author_id }.from(nil).to(author1.id)
+    end
+    specify do
+      expect { book.author = author2 }
+        .to change { book.association(:author).reload; book.author_id }.from(nil).to(author2.id)
+    end
 
-    specify { expect { book.author = author1 }
-      .not_to change { book.association(:author).reload; book.author } }
-    specify { expect { book.author = author2 }
-      .to change { book.association(:author).reload; book.author }.from(nil).to(author2) }
+    specify do
+      expect { book.author = author1 }
+        .not_to change { book.association(:author).reload; book.author }
+    end
+    specify do
+      expect { book.author = author2 }
+        .to change { book.association(:author).reload; book.author }.from(nil).to(author2)
+    end
 
     context do
       let(:book2) { Book.new(letter: 'r') }

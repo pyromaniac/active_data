@@ -169,7 +169,8 @@ describe ActiveData::Model::Callbacks do
       end
     end
 
-    specify { expect(User.create.tap(&:save).destroy.actions).to eq([
+    specify do
+      expect(User.create.tap(&:save).destroy.actions).to eq([
       :before_validation, :after_validation,
       :before_save, :before_around_save,
       :before_create, :before_around_create,
@@ -187,7 +188,8 @@ describe ActiveData::Model::Callbacks do
       :before_destroy, :before_around_destroy,
       :destroy,
       :after_around_destroy, :after_destroy
-    ]) }
+    ])
+    end
   end
 
   describe '.before_destroy, .after_destroy' do

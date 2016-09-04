@@ -40,9 +40,11 @@ describe ActiveData::Model::Associations::Reflections::EmbedsOne do
     let(:book) { Book.instantiate author: {name: 'Duke'}.to_json }
     let(:author) { Author.new(name: 'Rick') }
 
-    specify { expect { book.author = author }
-      .to change { book.read_attribute(:author) }
-      .from({name: 'Duke'}.to_json).to({name: 'Rick'}.to_json) }
+    specify do
+      expect { book.author = author }
+        .to change { book.read_attribute(:author) }
+        .from({name: 'Duke'}.to_json).to({name: 'Rick'}.to_json)
+    end
   end
 
   describe '#author=' do

@@ -49,8 +49,10 @@ describe ActiveData::Model::Associations::Validations do
       let(:author_attributes) { {} }
 
       specify { expect(user.validate).to eq(false) }
-      specify { expect { user.validate }.to change { user.errors.messages }
-        .to(:'projects.0.author.name' => ["can't be blank"]) }
+      specify do
+        expect { user.validate }.to change { user.errors.messages }
+          .to(:'projects.0.author.name' => ["can't be blank"])
+      end
     end
 
     context do
@@ -64,8 +66,10 @@ describe ActiveData::Model::Associations::Validations do
       let(:projects) { [project, Project.new] }
 
       specify { expect(user.validate).to eq(false) }
-      specify { expect { user.validate }.to change { user.errors.messages }
-        .to(:'projects.1.title' => ["can't be blank"]) }
+      specify do
+        expect { user.validate }.to change { user.errors.messages }
+          .to(:'projects.1.title' => ["can't be blank"])
+      end
     end
   end
 
@@ -90,8 +94,10 @@ describe ActiveData::Model::Associations::Validations do
       specify { expect { user.validate_ancestry! }.to raise_error ActiveData::ValidationError }
       specify { expect(user.valid_ancestry?).to eq(false) }
       specify { expect(user.invalid_ancestry?).to eq(true) }
-      specify { expect { user.validate_ancestry }.to change { user.errors.messages }
-        .to(:'projects.0.author.name' => ["can't be blank"]) }
+      specify do
+        expect { user.validate_ancestry }.to change { user.errors.messages }
+          .to(:'projects.0.author.name' => ["can't be blank"])
+      end
     end
 
     context do
@@ -100,8 +106,10 @@ describe ActiveData::Model::Associations::Validations do
       specify { expect { user.validate_ancestry! }.to raise_error ActiveData::ValidationError }
       specify { expect(user.valid_ancestry?).to eq(false) }
       specify { expect(user.invalid_ancestry?).to eq(true) }
-      specify { expect { user.validate_ancestry }.to change { user.errors.messages }
-        .to(:'profile.first_name' => ["can't be blank"]) }
+      specify do
+        expect { user.validate_ancestry }.to change { user.errors.messages }
+          .to(:'profile.first_name' => ["can't be blank"])
+      end
     end
 
     context do
@@ -110,13 +118,17 @@ describe ActiveData::Model::Associations::Validations do
       specify { expect { user.validate_ancestry! }.to raise_error ActiveData::ValidationError }
       specify { expect(user.valid_ancestry?).to eq(false) }
       specify { expect(user.invalid_ancestry?).to eq(true) }
-      specify { expect { user.validate_ancestry }.to change { user.errors.messages }
-        .to(:'projects.1.title' => ["can't be blank"]) }
+      specify do
+        expect { user.validate_ancestry }.to change { user.errors.messages }
+          .to(:'projects.1.title' => ["can't be blank"])
+      end
 
       context do
         before { user.update(login: '') }
-        specify { expect { user.validate_ancestry }.to change { user.errors.messages }
-          .to(:'projects.1.title' => ["can't be blank"], login: ["can't be blank"]) }
+        specify do
+          expect { user.validate_ancestry }.to change { user.errors.messages }
+            .to(:'projects.1.title' => ["can't be blank"], login: ["can't be blank"])
+        end
       end
     end
   end
@@ -145,9 +157,13 @@ describe ActiveData::Model::Associations::Validations do
 
     let(:post) { Post.new(author: Author.new) }
 
-    specify { expect { post.validate_ancestry }.to change { post.errors.messages }
-      .to(hash_including(:'author.user.email' => ['is invalid'], name: ["can't be blank"])) }
-    specify { expect { post.validate }.to change { post.errors.messages }
-      .to(hash_including(:'author.user.email' => ['is invalid'], name: ["can't be blank"])) }
+    specify do
+      expect { post.validate_ancestry }.to change { post.errors.messages }
+        .to(hash_including(:'author.user.email' => ['is invalid'], name: ["can't be blank"]))
+    end
+    specify do
+      expect { post.validate }.to change { post.errors.messages }
+        .to(hash_including(:'author.user.email' => ['is invalid'], name: ["can't be blank"]))
+    end
   end
 end

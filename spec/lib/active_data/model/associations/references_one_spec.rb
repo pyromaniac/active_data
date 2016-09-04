@@ -55,9 +55,11 @@ describe ActiveData::Model::Associations::ReferencesOne do
 
     context do
       before { existing_association.reader.name = "New" }
-      specify { expect { existing_association.reload }
-        .to change { existing_association.reader.name }
-        .from('New').to('Johny') }
+      specify do
+        expect { existing_association.reload }
+          .to change { existing_association.reader.name }
+          .from('New').to('Johny')
+      end
     end
   end
 
@@ -92,46 +94,70 @@ describe ActiveData::Model::Associations::ReferencesOne do
         end
       end
 
-      specify { expect { association.writer(nil) }
-        .not_to change { book.author_id } }
-      specify { expect { association.writer(new_author) }
-        .to change { association.reader.name rescue nil }.from(nil).to('Morty') }
-      specify { expect { association.writer(new_author) }
-        .not_to change { book.author_id }.from(nil) }
+      specify do
+        expect { association.writer(nil) }
+          .not_to change { book.author_id }
+      end
+      specify do
+        expect { association.writer(new_author) }
+          .to change { association.reader.name rescue nil }.from(nil).to('Morty')
+      end
+      specify do
+        expect { association.writer(new_author) }
+          .not_to change { book.author_id }.from(nil)
+      end
 
     end
 
     context 'persisted owner' do
       let(:new_author) { Author.create(name: 'Morty') }
 
-      specify { expect { association.writer(stub_model(:dummy).new) }
-        .to raise_error ActiveData::AssociationTypeMismatch }
+      specify do
+        expect { association.writer(stub_model(:dummy).new) }
+          .to raise_error ActiveData::AssociationTypeMismatch
+      end
 
       specify { expect(association.writer(nil)).to be_nil }
       specify { expect(association.writer(new_author)).to eq(new_author) }
-      specify { expect { association.writer(nil) }
-        .not_to change { book.read_attribute(:author_id) } }
-      specify { expect { association.writer(new_author) }
-        .to change { association.reader.try(:attributes) }.from(nil).to('id' => 1, 'name' => 'Morty') }
-      specify { expect { association.writer(new_author) }
-        .to change { book.read_attribute(:author_id) } }
+      specify do
+        expect { association.writer(nil) }
+          .not_to change { book.read_attribute(:author_id) }
+      end
+      specify do
+        expect { association.writer(new_author) }
+          .to change { association.reader.try(:attributes) }.from(nil).to('id' => 1, 'name' => 'Morty')
+      end
+      specify do
+        expect { association.writer(new_author) }
+          .to change { book.read_attribute(:author_id) }
+      end
 
 
-      specify { expect { existing_association.writer(stub_class(:dummy, ActiveRecord::Base).new) rescue nil }
-        .not_to change { existing_book.read_attribute(:author_id) } }
-      specify { expect { existing_association.writer(stub_class(:dummy, ActiveRecord::Base).new) rescue nil }
-        .not_to change { existing_association.reader } }
+      specify do
+        expect { existing_association.writer(stub_class(:dummy, ActiveRecord::Base).new) rescue nil }
+          .not_to change { existing_book.read_attribute(:author_id) }
+      end
+      specify do
+        expect { existing_association.writer(stub_class(:dummy, ActiveRecord::Base).new) rescue nil }
+          .not_to change { existing_association.reader }
+      end
 
       specify { expect(existing_association.writer(nil)).to be_nil }
       specify { expect(existing_association.writer(new_author)).to eq(new_author) }
-      specify { expect { existing_association.writer(nil) }
-        .to change { existing_book.read_attribute(:author_id) }.from(author.id).to(nil) }
-      specify { expect { existing_association.writer(new_author) }
-        .to change { existing_association.reader.try(:attributes) }
-        .from('id' => 1, 'name' => 'Johny').to('id' => 2, 'name' => 'Morty') }
-      specify { expect { existing_association.writer(new_author) }
-        .to change { existing_book.read_attribute(:author_id) }
-        .from(author.id).to(new_author.id) }
+      specify do
+        expect { existing_association.writer(nil) }
+          .to change { existing_book.read_attribute(:author_id) }.from(author.id).to(nil)
+      end
+      specify do
+        expect { existing_association.writer(new_author) }
+          .to change { existing_association.reader.try(:attributes) }
+          .from('id' => 1, 'name' => 'Johny').to('id' => 2, 'name' => 'Morty')
+      end
+      specify do
+        expect { existing_association.writer(new_author) }
+          .to change { existing_book.read_attribute(:author_id) }
+          .from(author.id).to(new_author.id)
+      end
 
     end
   end

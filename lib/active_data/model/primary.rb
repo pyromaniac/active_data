@@ -2,10 +2,12 @@ module ActiveData
   module Model
     module Primary
       extend ActiveSupport::Concern
-      DEFAULT_PRIMARY_ATTRIBUTE_OPTIONS = -> { {
-        type: ActiveData::UUID,
-        default: -> { ActiveData::UUID.random_create }
-      } }
+      DEFAULT_PRIMARY_ATTRIBUTE_OPTIONS = -> do
+        {
+          type: ActiveData::UUID,
+          default: -> { ActiveData::UUID.random_create }
+        }
+      end
 
       included do
         class_attribute :_primary_name, instance_writer: false

@@ -41,12 +41,18 @@ describe ActiveData::ActiveRecord::Associations do
     let(:user) { User.new }
 
     describe '#projects' do
-      specify { expect { user.projects << Project.new }
-        .not_to change { user.read_attribute(:projects) } }
-      specify { expect { user.projects << Project.new(title: 'First') }
-        .not_to change { user.read_attribute(:projects) } }
-      specify { expect { user.projects << Project.new(title: 'First') }
-        .not_to change { user.projects.reload.count } }
+      specify do
+        expect { user.projects << Project.new }
+          .not_to change { user.read_attribute(:projects) }
+      end
+      specify do
+        expect { user.projects << Project.new(title: 'First') }
+          .not_to change { user.read_attribute(:projects) }
+      end
+      specify do
+        expect { user.projects << Project.new(title: 'First') }
+          .not_to change { user.projects.reload.count }
+      end
       specify do
         user.projects << Project.new(title: 'First')
         user.save
@@ -55,10 +61,14 @@ describe ActiveData::ActiveRecord::Associations do
     end
 
     describe '#profile' do
-      specify { expect { user.profile = Profile.new(first_name: 'google.com') }
-        .not_to change { user.read_attribute(:profile) } }
-      specify { expect { user.profile = Profile.new(first_name: 'google.com') }
-        .to change { user.profile }.from(nil).to(an_instance_of(Profile)) }
+      specify do
+        expect { user.profile = Profile.new(first_name: 'google.com') }
+          .not_to change { user.read_attribute(:profile) }
+      end
+      specify do
+        expect { user.profile = Profile.new(first_name: 'google.com') }
+          .to change { user.profile }.from(nil).to(an_instance_of(Profile))
+      end
       specify do
         user.profile = Profile.new(first_name: 'google.com')
         user.save
@@ -71,57 +81,75 @@ describe ActiveData::ActiveRecord::Associations do
     let(:user) { User.create }
 
     describe '#projects' do
-      specify { expect { user.projects << Project.new }
-        .not_to change { user.read_attribute(:projects) } }
-      specify { expect { user.projects << Project.new(title: 'First') }
-        .to change { user.projects.reload.count }.from(0).to(1) }
-      specify {
+      specify do
+        expect { user.projects << Project.new }
+          .not_to change { user.read_attribute(:projects) }
+      end
+      specify do
+        expect { user.projects << Project.new(title: 'First') }
+          .to change { user.projects.reload.count }.from(0).to(1)
+      end
+      specify do
         user.projects << Project.new(title: 'First')
         user.save
-        expect(user.reload.projects.first.title).to eq('First') }
+        expect(user.reload.projects.first.title).to eq('First')
+      end
 
       context do
         let(:project) { Project.new(title: 'First') }
         before { project.build_author(name: 'Author') }
 
-        specify { expect { user.projects << project }
-          .to change { user.attributes['projects'] }.from(nil)
-          .to([{title: 'First', author: {name: 'Author'}}].to_json) }
-        specify { expect { user.projects << project; user.save }
-          .to change { user.reload.attributes['projects'] }.from(nil)
-          .to([{title: 'First', author: {name: 'Author'}}].to_json) }
+        specify do
+          expect { user.projects << project }
+            .to change { user.attributes['projects'] }.from(nil)
+            .to([{title: 'First', author: {name: 'Author'}}].to_json)
+        end
+        specify do
+          expect { user.projects << project; user.save }
+            .to change { user.reload.attributes['projects'] }.from(nil)
+            .to([{title: 'First', author: {name: 'Author'}}].to_json)
+        end
       end
     end
 
     describe '#profile' do
-      specify { expect { user.profile = Profile.new(first_name: 'google.com') }
-        .to change { user.profile }.from(nil).to(an_instance_of(Profile)) }
-      specify {
+      specify do
+        expect { user.profile = Profile.new(first_name: 'google.com') }
+          .to change { user.profile }.from(nil).to(an_instance_of(Profile))
+      end
+      specify do
         user.profile = Profile.new(first_name: 'google.com')
         user.save
-        expect(user.reload.profile.first_name).to eq('google.com') }
-      specify { expect { user.profile = Profile.new(first_name: 'google.com') }
-        .to change { user.attributes['profile'] }.from(nil)
-        .to({first_name: 'google.com', last_name: nil}.to_json) }
-      specify { expect { user.profile = Profile.new(first_name: 'google.com'); user.save }
-        .to change { user.reload.attributes['profile'] }.from(nil)
-        .to({first_name: 'google.com', last_name: nil}.to_json) }
+        expect(user.reload.profile.first_name).to eq('google.com')
+      end
+      specify do
+        expect { user.profile = Profile.new(first_name: 'google.com') }
+          .to change { user.attributes['profile'] }.from(nil)
+          .to({first_name: 'google.com', last_name: nil}.to_json)
+      end
+      specify do
+        expect { user.profile = Profile.new(first_name: 'google.com'); user.save }
+          .to change { user.reload.attributes['profile'] }.from(nil)
+          .to({first_name: 'google.com', last_name: nil}.to_json)
+      end
     end
   end
 
   context 'class determine errors' do
     specify do
-      expect { stub_class(:book, ActiveRecord::Base) do
-        embeds_one :author, class_name: 'Borogoves'
-      end.reflect_on_association(:author).klass }.to raise_error NameError
+      expect do
+        stub_class(:book, ActiveRecord::Base) do
+          embeds_one :author, class_name: 'Borogoves'
+        end.reflect_on_association(:author).klass end.to raise_error NameError
     end
 
     specify do
-      expect { stub_class(:user, ActiveRecord::Base) do
-        embeds_many :projects, class_name: 'Borogoves' do
-          attribute :title
-        end
-      end.reflect_on_association(:projects).klass }.to raise_error NameError
+      expect do
+        stub_class(:user, ActiveRecord::Base) do
+          embeds_many :projects, class_name: 'Borogoves' do
+            attribute :title
+          end
+        end.reflect_on_association(:projects).klass end.to raise_error NameError
     end
   end
 

@@ -42,16 +42,18 @@ describe ActiveData::Model::Attributes do
   describe '.inspect' do
     specify { expect(stub_model.inspect).to match(/#<Class:0x\w+>\(no attributes\)/) }
     specify { expect(stub_model(:user).inspect).to eq('User(no attributes)') }
-    specify { expect(stub_model {
-      include ActiveData::Model::Primary
-      primary :count, Integer
-      attribute :object, Object
-    }.inspect).to match(/#<Class:0x\w+>\(\*count: Integer, object: Object\)/) }
-    specify { expect(stub_model(:user) {
-      include ActiveData::Model::Primary
-      primary :count, Integer
-      attribute :object, Object
-    }.inspect).to match('User(*count: Integer, object: Object)') }
+    specify do
+      expect(stub_model do
+               include ActiveData::Model::Primary
+               primary :count, Integer
+               attribute :object, Object
+             end.inspect).to match(/#<Class:0x\w+>\(\*count: Integer, object: Object\)/) end
+    specify do
+      expect(stub_model(:user) do
+               include ActiveData::Model::Primary
+               primary :count, Integer
+               attribute :object, Object
+             end.inspect).to match('User(*count: Integer, object: Object)') end
   end
 
   describe '#==' do
@@ -111,10 +113,14 @@ describe ActiveData::Model::Attributes do
 
   describe '#attributes' do
     specify { expect(stub_model.new.attributes).to eq({})  }
-    specify { expect(model.new(name: 'Name').attributes)
-      .to match({'id' => nil, 'full_name' => 'Name', 't' => {}, 'author' => nil, 'projects' => nil})  }
-    specify { expect(model.new(name: 'Name').attributes(false))
-      .to match({'id' => nil, 'full_name' => 'Name', 't' => {}})  }
+    specify do
+      expect(model.new(name: 'Name').attributes)
+        .to match({'id' => nil, 'full_name' => 'Name', 't' => {}, 'author' => nil, 'projects' => nil})
+    end
+    specify do
+      expect(model.new(name: 'Name').attributes(false))
+        .to match({'id' => nil, 'full_name' => 'Name', 't' => {}})
+    end
   end
 
   describe '#assign_attributes' do
@@ -128,16 +134,18 @@ describe ActiveData::Model::Attributes do
   describe '#inspect' do
     specify { expect(stub_model.new.inspect).to match(/#<#<Class:0x\w+> \(no attributes\)>/) }
     specify { expect(stub_model(:user).new.inspect).to match(/#<User \(no attributes\)>/) }
-    specify { expect(stub_model {
-      include ActiveData::Model::Primary
-      primary :count, Integer
-      attribute :object, Object
-    }.new(object: 'String').inspect).to match(/#<#<Class:0x\w+> \*count: nil, object: "String">/) }
-    specify { expect(stub_model(:user) {
-      include ActiveData::Model::Primary
-      primary :count, Integer
-      attribute :object, Object
-    }.new.inspect).to match(/#<User \*count: nil, object: nil>/) }
+    specify do
+      expect(stub_model do
+               include ActiveData::Model::Primary
+               primary :count, Integer
+               attribute :object, Object
+             end.new(object: 'String').inspect).to match(/#<#<Class:0x\w+> \*count: nil, object: "String">/) end
+    specify do
+      expect(stub_model(:user) do
+               include ActiveData::Model::Primary
+               primary :count, Integer
+               attribute :object, Object
+             end.new.inspect).to match(/#<User \*count: nil, object: nil>/) end
   end
 
   context 'attributes integration' do

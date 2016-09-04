@@ -38,21 +38,31 @@ describe ActiveData::Model::Dirty do
   specify { expect(Model.new(authors: [author]).changes).to eq('author_ids' => [[], [author.id]]) }
   specify { expect(Model.new(author_ids: [author.id]).changes).to eq('author_ids' => [[], [author.id]]) }
 
-  specify { expect(Model.new(author: author, name: 'Name2').changes)
-    .to eq('author_id' => [nil, author.id], 'name' => ['Name', 'Name2']) }
+  specify do
+    expect(Model.new(author: author, name: 'Name2').changes)
+      .to eq('author_id' => [nil, author.id], 'name' => ['Name', 'Name2'])
+  end
 
-  specify { expect(Model.instantiate(author_id: other_author.id)
+  specify do
+    expect(Model.instantiate(author_id: other_author.id)
     .tap { |m| m.update(author_id: author.id) }.changes)
-    .to eq('author_id' => [other_author.id, author.id]) }
-  specify { expect(Model.instantiate(author_id: other_author.id)
+      .to eq('author_id' => [other_author.id, author.id])
+  end
+  specify do
+    expect(Model.instantiate(author_id: other_author.id)
     .tap { |m| m.update(author: author) }.changes)
-    .to eq('author_id' => [other_author.id, author.id]) }
-  specify { expect(Model.instantiate(author_ids: [other_author.id])
+      .to eq('author_id' => [other_author.id, author.id])
+  end
+  specify do
+    expect(Model.instantiate(author_ids: [other_author.id])
     .tap { |m| m.update(author_ids: [author.id]) }.changes)
-    .to eq('author_ids' => [[other_author.id], [author.id]]) }
-  specify { expect(Model.instantiate(author_ids: [other_author.id])
+      .to eq('author_ids' => [[other_author.id], [author.id]])
+  end
+  specify do
+    expect(Model.instantiate(author_ids: [other_author.id])
     .tap { |m| m.update(authors: [author]) }.changes)
-    .to eq('author_ids' => [[other_author.id], [author.id]]) }
+      .to eq('author_ids' => [[other_author.id], [author.id]])
+  end
 
   specify { expect(Model.new(a: 'blabla').changes).to eq('age' => [33, nil]) }
   specify { expect(Model.new(a: '42').changes).to eq('age' => [33, 42]) }

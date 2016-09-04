@@ -48,76 +48,6 @@ Metrics/ModuleLength:
 Metrics/PerceivedComplexity:
   Max: 17
 
-# Offense count: 19
-# Cop supports --auto-correct.
-# Configuration parameters: SupportedStyles, IndentationWidth.
-# SupportedStyles: outdent, indent
-Style/AccessModifierIndentation:
-  EnforcedStyle: outdent
-
-# Offense count: 19
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: prefer_alias, prefer_alias_method
-Style/Alias:
-  Exclude:
-    - 'lib/active_data/model/associations.rb'
-    - 'lib/active_data/model/associations/collection/embedded.rb'
-    - 'lib/active_data/model/associations/collection/proxy.rb'
-    - 'lib/active_data/model/associations/embeds_many.rb'
-    - 'lib/active_data/model/associations/embeds_one.rb'
-    - 'lib/active_data/model/associations/references_many.rb'
-    - 'lib/active_data/model/associations/references_one.rb'
-    - 'lib/active_data/model/associations/validations.rb'
-    - 'lib/active_data/model/attributes.rb'
-    - 'lib/active_data/model/conventions.rb'
-    - 'lib/active_data/model/lifecycle.rb'
-    - 'lib/active_data/model/primary.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedHashRocketStyle, EnforcedColonStyle, EnforcedLastArgumentHashStyle, SupportedLastArgumentHashStyles.
-# SupportedLastArgumentHashStyles: always_inspect, always_ignore, ignore_implicit, ignore_explicit
-Style/AlignHash:
-  Exclude:
-    - 'spec/lib/active_data/model/attributes/dictionary_spec.rb'
-
-# Offense count: 3
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, IndentationWidth.
-# SupportedStyles: with_first_parameter, with_fixed_indentation
-Style/AlignParameters:
-  Exclude:
-    - 'lib/active_data/config.rb'
-    - 'spec/lib/active_data/model/associations/reflections/embeds_many_spec.rb'
-    - 'spec/lib/active_data/model/associations/reflections/embeds_one_spec.rb'
-
-# Offense count: 6
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: always, conditionals
-Style/AndOr:
-  Exclude:
-    - 'lib/active_data/config.rb'
-    - 'lib/active_data/model/associations/base.rb'
-    - 'lib/active_data/model/associations/embeds_many.rb'
-    - 'lib/active_data/model/lifecycle.rb'
-
-# Offense count: 272
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, ProceduralMethods, FunctionalMethods, IgnoredMethods.
-# SupportedStyles: line_count_based, semantic, braces_for_chaining
-# ProceduralMethods: benchmark, bm, bmbm, create, each_with_object, measure, new, realtime, tap, with_object
-# FunctionalMethods: let, let!, subject, watch
-# IgnoredMethods: lambda, proc, it
-Style/BlockDelimiters:
-  Enabled: false
-
-# Offense count: 244
-# Cop supports --auto-correct.
-Style/BlockEndNewline:
-  Enabled: false
-
 # Offense count: 89
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
@@ -339,11 +269,6 @@ Style/MultilineArrayBraceLayout:
 Style/MultilineBlockChain:
   Exclude:
     - 'lib/active_data/model/associations/embeds_many.rb'
-
-# Offense count: 256
-# Cop supports --auto-correct.
-Style/MultilineBlockLayout:
-  Enabled: false
 
 # Offense count: 2
 # Cop supports --auto-correct.
