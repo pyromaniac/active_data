@@ -56,7 +56,8 @@ describe ActiveData::Model::Associations::EmbedsMany do
       user.projects.map(&:save!)
       expect(user.read_attribute(:projects)).to eq([
         { 'title' => 'Project 1' }, { 'title' => 'Project 2' }, { 'title' => 'Project 3' },
-        { 'title' => 'Project 4' }, { 'title' => 'Project 5' }])
+        { 'title' => 'Project 4' }, { 'title' => 'Project 5' }
+      ])
       user.projects.map(&:destroy!)
       expect(user.read_attribute(:projects)).to eq([])
       user.projects.first(2).map(&:save!)
@@ -64,12 +65,14 @@ describe ActiveData::Model::Associations::EmbedsMany do
       expect(user.projects.reload.count).to eq(2)
       p3 = user.projects.create!(title: 'Project 3')
       expect(user.read_attribute(:projects)).to eq([
-        { 'title' => 'Project 1' }, { 'title' => 'Project 2' }, { 'title' => 'Project 3' }])
+        { 'title' => 'Project 1' }, { 'title' => 'Project 2' }, { 'title' => 'Project 3' }
+      ])
       p3.destroy!
       expect(user.read_attribute(:projects)).to eq([{ 'title' => 'Project 1' }, { 'title' => 'Project 2' }])
       user.projects.create!(title: 'Project 4')
       expect(user.read_attribute(:projects)).to eq([
-        { 'title' => 'Project 1' }, { 'title' => 'Project 2' }, { 'title' => 'Project 4' }])
+        { 'title' => 'Project 1' }, { 'title' => 'Project 2' }, { 'title' => 'Project 4' }
+      ])
     end
   end
 

@@ -49,16 +49,12 @@ module ActiveData
       value
     when ::String then
       value.split(',').map(&:strip)
-    else
-      nil
     end
   end
   typecaster('Hash') do |value|
     case value
     when ::Hash then
       value
-    else
-      nil
     end
   end
   typecaster('Date') do |value|
@@ -91,8 +87,6 @@ module ActiveData
     when String, Numeric, ActiveSupport::Duration
       value = Float(value) rescue value
       ActiveSupport::TimeZone[value]
-    else
-      nil
     end
   end
   typecaster('BigDecimal') { |value| ::BigDecimal.new Float(value).to_s rescue nil if value }
@@ -109,8 +103,6 @@ module ActiveData
       ActiveData::UUID.parse_string value
     when Integer
       ActiveData::UUID.parse_int value
-    else
-      nil
     end
   end
 end

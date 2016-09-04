@@ -11,7 +11,7 @@ describe ActiveData::Model::Attributes::Base do
   end
 
   describe '#read' do
-    let(:field) { attribute(type: String, normalizer: ->(v){ v ? v.strip : v }, default: :world, enum: ['hello', '42', 'world']) }
+    let(:field) { attribute(type: String, normalizer: ->(v){ v ? v.strip : v }, default: :world, enum: %w(hello 42 world)) }
     let(:object) { Object.new }
 
     specify { expect(field.tap { |r| r.write(nil) }.read).to be_nil }
@@ -25,7 +25,7 @@ describe ActiveData::Model::Attributes::Base do
   end
 
   describe '#read_before_type_cast' do
-    let(:field) { attribute(type: String, normalizer: ->(v){ v.strip }, default: :world, enum: ['hello', '42', 'world']) }
+    let(:field) { attribute(type: String, normalizer: ->(v){ v.strip }, default: :world, enum: %w(hello 42 world)) }
     let(:object) { Object.new }
 
     specify { expect(field.tap { |r| r.write(nil) }.read_before_type_cast).to be_nil }

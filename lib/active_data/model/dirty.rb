@@ -12,6 +12,7 @@ module ActiveData
         def self.append_features(base)
           unconcerned_append_features(base)
         end
+
         def self.included(_base)
         end
       end

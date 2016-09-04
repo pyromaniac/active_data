@@ -34,9 +34,9 @@ describe ActiveData::Model::Attributes do
   end
 
   describe '.attribute_names' do
-    specify { expect(stub_model.attribute_names).to eq([])  }
+    specify { expect(stub_model.attribute_names).to eq([]) }
     specify { expect(model.attribute_names).to eq(%w[id full_name t author projects]) }
-    specify { expect(model.attribute_names(false)).to eq(%w[id full_name t])  }
+    specify { expect(model.attribute_names(false)).to eq(%w[id full_name t]) }
   end
 
   describe '.inspect' do
@@ -100,9 +100,9 @@ describe ActiveData::Model::Attributes do
   end
 
   describe '#attribute_names' do
-    specify { expect(stub_model.new.attribute_names).to eq([])  }
+    specify { expect(stub_model.new.attribute_names).to eq([]) }
     specify { expect(model.new.attribute_names).to eq(%w[id full_name t author projects]) }
-    specify { expect(model.new.attribute_names(false)).to eq(%w[id full_name t])  }
+    specify { expect(model.new.attribute_names(false)).to eq(%w[id full_name t]) }
   end
 
   describe '#attribute_present?' do
@@ -112,7 +112,7 @@ describe ActiveData::Model::Attributes do
   end
 
   describe '#attributes' do
-    specify { expect(stub_model.new.attributes).to eq({})  }
+    specify { expect(stub_model.new.attributes).to eq({}) }
     specify do
       expect(model.new(name: 'Name').attributes)
         .to match('id' => nil, 'full_name' => 'Name', 't' => {}, 'author' => nil, 'projects' => nil)
@@ -241,10 +241,10 @@ describe ActiveData::Model::Attributes do
     specify { expect(ancestor._attributes.keys).to eq(['foo']) }
     specify { expect(ancestor.instance_methods).to include :foo, :foo= }
     specify { expect(ancestor.instance_methods).not_to include :bar, :bar=, :baz, :baz= }
-    specify { expect(descendant1._attributes.keys).to eq(['foo', 'bar']) }
+    specify { expect(descendant1._attributes.keys).to eq(%w(foo bar)) }
     specify { expect(descendant1.instance_methods).to include :foo, :foo=, :bar, :bar= }
     specify { expect(descendant1.instance_methods).not_to include :baz, :baz= }
-    specify { expect(descendant2._attributes.keys).to eq(['foo', 'baz', 'moo']) }
+    specify { expect(descendant2._attributes.keys).to eq(%w(foo baz moo)) }
     specify { expect(descendant2.instance_methods).to include :foo, :foo=, :baz, :baz=, :moo, :moo= }
     specify { expect(descendant2.instance_methods).not_to include :bar, :bar= }
   end

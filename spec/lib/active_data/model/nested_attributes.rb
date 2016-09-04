@@ -179,7 +179,7 @@ shared_examples 'nested attributes' do
             { slug: 33, title: 'Project 4' }
           ]
         end
-          .to change { user.projects.map(&:slug) }.to(['42', '43', '33'])
+          .to change { user.projects.map(&:slug) }.to(%w(42 43 33))
       end
       specify do
         expect do
@@ -225,8 +225,8 @@ shared_examples 'nested attributes' do
         specify do
           expect do
             user.projects_attributes = [
-   { slug: projects.first.slug.to_i, title: 'Project 3', _destroy: '1' },
-   { title: 'Project 4', _destroy: '1' }
+              { slug: projects.first.slug.to_i, title: 'Project 3', _destroy: '1' },
+              { title: 'Project 4', _destroy: '1' }
             ]
           end
             .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2'])
@@ -234,8 +234,8 @@ shared_examples 'nested attributes' do
         specify do
           expect do
             user.projects_attributes = [
-   { slug: projects.first.slug.to_i, title: 'Project 3', _destroy: '1' },
-   { title: 'Project 4', _destroy: '1' }
+              { slug: projects.first.slug.to_i, title: 'Project 3', _destroy: '1' },
+              { title: 'Project 4', _destroy: '1' }
             ]
           user.save { true }
           end

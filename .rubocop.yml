@@ -20,3 +20,6 @@ Style/AndOr:
 
 Style/CaseIndentation:
   IndentWhenRelativeTo: end
+
+Style/IndentArray:
+  EnforcedStyle: consistent

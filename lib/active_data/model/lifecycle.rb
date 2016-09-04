@@ -1,6 +1,5 @@
 module ActiveData
   module Model
-
     # == Lifecycle methods for ActiveData::Model
     #
     # Provides methods +save+ and +destroy+ and its bang variants.
@@ -69,7 +68,6 @@ module ActiveData
       end
 
       module ClassMethods
-
         # <tt>define_<action></tt> methods define performers for lifecycle
         # actions. Every action block must return boolean result, which
         # would mean the action success. If action performed unsuccessfully

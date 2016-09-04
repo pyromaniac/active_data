@@ -11,7 +11,7 @@ describe ActiveData::Model::Attributes::Localized do
   end
 
   describe '#read' do
-    let(:field) { attribute(type: String, default: :world, enum: ['hello', '42']) }
+    let(:field) { attribute(type: String, default: :world, enum: %w(hello 42)) }
 
     specify { expect(field.tap { |r| r.write(nil) }.read).to eq({}) }
     specify { expect(field.tap { |r| r.write(en: 'hello') }.read).to eq('en' => 'hello') }
@@ -33,7 +33,7 @@ describe ActiveData::Model::Attributes::Localized do
   end
 
   describe '#read_before_type_cast' do
-    let(:field) { attribute(type: String, default: :world, enum: ['hello', '42']) }
+    let(:field) { attribute(type: String, default: :world, enum: %w(hello 42)) }
 
     specify { expect(field.tap { |r| r.write(nil) }.read_before_type_cast).to eq({}) }
     specify { expect(field.tap { |r| r.write(en: 'hello') }.read_before_type_cast).to eq('en' => 'hello') }

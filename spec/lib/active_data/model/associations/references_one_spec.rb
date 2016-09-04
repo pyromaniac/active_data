@@ -83,7 +83,6 @@ describe ActiveData::Model::Associations::ReferencesOne do
     specify { expect { existing_association.replace(nil) }.not_to change { existing_association.target } }
   end
 
-
   describe '#writer' do
     context 'new owner' do
       let(:new_author) { Author.new(name: 'Morty') }
@@ -106,7 +105,6 @@ describe ActiveData::Model::Associations::ReferencesOne do
         expect { association.writer(new_author) }
           .not_to change { book.author_id }.from(nil)
       end
-
     end
 
     context 'persisted owner' do
@@ -131,7 +129,6 @@ describe ActiveData::Model::Associations::ReferencesOne do
         expect { association.writer(new_author) }
           .to change { book.read_attribute(:author_id) }
       end
-
 
       specify do
         expect { existing_association.writer(stub_class(:dummy, ActiveRecord::Base).new) rescue nil }
@@ -158,7 +155,6 @@ describe ActiveData::Model::Associations::ReferencesOne do
           .to change { existing_book.read_attribute(:author_id) }
           .from(author.id).to(new_author.id)
       end
-
     end
   end
 end

@@ -40,7 +40,7 @@ describe ActiveData::Model::Dirty do
 
   specify do
     expect(Model.new(author: author, name: 'Name2').changes)
-      .to eq('author_id' => [nil, author.id], 'name' => ['Name', 'Name2'])
+      .to eq('author_id' => [nil, author.id], 'name' => %w(Name Name2))
   end
 
   specify do

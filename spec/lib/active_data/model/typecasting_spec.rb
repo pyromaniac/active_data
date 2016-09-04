@@ -96,7 +96,7 @@ describe ActiveData::Model::Attributes do
     let(:model) { stub_model { attribute :column, Array } }
 
     specify { expect(model.new(column: [1, 2, 3]).column).to eq([1, 2, 3]) }
-    specify { expect(model.new(column: 'hello, world').column).to eq(['hello', 'world']) }
+    specify { expect(model.new(column: 'hello, world').column).to eq(%w(hello world)) }
     specify { expect(model.new(column: 10).column).to be_nil }
   end
 
@@ -181,7 +181,7 @@ describe ActiveData::Model::Attributes do
 
     specify { expect(model.new(column: nil).column).to be_nil }
     specify { expect(model.new(column: Object.new).column).to be_nil }
-    specify { expect(model.new(column: uuid_tools).column).to be_a ActiveData::UUID  }
+    specify { expect(model.new(column: uuid_tools).column).to be_a ActiveData::UUID }
     specify { expect(model.new(column: uuid_tools).column).to eq(uuid_tools) }
     specify { expect(model.new(column: uuid).column).to eq(uuid) }
     specify { expect(model.new(column: uuid.to_s).column).to eq(uuid) }

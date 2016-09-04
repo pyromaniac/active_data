@@ -1,6 +1,5 @@
 module ActiveData
   module Model
-
     # == Callbacks for ActiveData::Model lifecycle
     #
     # Provides ActiveModel callbacks support for lifecycle

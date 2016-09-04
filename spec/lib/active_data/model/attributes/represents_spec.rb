@@ -54,7 +54,7 @@ describe ActiveData::Model::Attributes::Represents do
   describe '#read_before_type_cast' do
     subject { Subject.new(full_name: :hello) }
     before { allow_any_instance_of(Dummy).to receive_messages(value: 42, subject: subject) }
-    let(:field) { attribute(normalizer: ->(v){ v.strip }, default: :world, enum: ['hello', '42', 'world']) }
+    let(:field) { attribute(normalizer: ->(v){ v.strip }, default: :world, enum: %w(hello 42 world)) }
 
     specify { expect(field.read_before_type_cast).to eq(:hello) }
     specify { expect(field.tap { |r| r.write(nil) }.read_before_type_cast).to eq(:world) }
