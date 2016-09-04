@@ -91,7 +91,7 @@ module ActiveData
             owner.instance_exec(*args.first(block.arity), &block)
           else
             args = block.arity < 0 ? args : args.first(block.arity)
-            block.call(*args, owner)
+            yield(*args, owner)
           end
         end
 

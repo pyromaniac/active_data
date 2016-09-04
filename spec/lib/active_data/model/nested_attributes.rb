@@ -133,7 +133,7 @@ shared_examples 'nested attributes' do
     end
 
     context 'existing' do
-      let(:projects) { 2.times.map { |i| Project.new(title: "Project #{i.next}").tap { |pr| pr.slug = 42+i } } }
+      let(:projects) { Array.new(2) { |i| Project.new(title: "Project #{i.next}").tap { |pr| pr.slug = 42+i } } }
       let(:user) { User.new projects: projects }
 
       specify { expect { user.projects_attributes = [

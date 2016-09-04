@@ -43,9 +43,9 @@ module ActiveData
           apply_changes or raise ActiveData::AssociationChangesNotApplied
         end
 
-        def transaction &block
+        def transaction
           data = Marshal.load(Marshal.dump(read_source))
-          block.call
+          yield
         rescue StandardError => e
           write_source data
           reload

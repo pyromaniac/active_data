@@ -20,7 +20,7 @@ module ActiveData
           options = args.extract_options!
           self._primary_name = (args.first.presence || ActiveData.primary_attribute).to_s
           unless has_attribute?(_primary_name)
-            options.merge!(type: args.second) if args.second
+            options[:type] = args.second if args.second
             attribute _primary_name, options.presence || DEFAULT_PRIMARY_ATTRIBUTE_OPTIONS.call
           end
           alias_attribute :primary_attribute, _primary_name

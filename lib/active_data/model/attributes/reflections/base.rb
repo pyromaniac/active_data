@@ -7,8 +7,8 @@ module ActiveData
           class << self
             def build _target, _generated_methods, name, *args, &block
               options = args.extract_options!
-              options.merge!(type: args.first) if args.first
-              options.merge!(default: block) if block
+              options[:type] = args.first if args.first
+              options[:default] = block if block
               new(name, options)
             end
 

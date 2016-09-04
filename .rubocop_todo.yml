@@ -48,28 +48,6 @@ Metrics/ModuleLength:
 Metrics/PerceivedComplexity:
   Max: 17
 
-# Offense count: 3
-# Cop supports --auto-correct.
-Performance/RedundantBlockCall:
-  Exclude:
-    - 'lib/active_data/model/associations/base.rb'
-    - 'lib/active_data/model/attributes/base.rb'
-    - 'lib/active_data/model/lifecycle.rb'
-
-# Offense count: 3
-# Cop supports --auto-correct.
-# Configuration parameters: MaxKeyValuePairs.
-Performance/RedundantMerge:
-  Exclude:
-    - 'lib/active_data/model/attributes/reflections/base.rb'
-    - 'lib/active_data/model/primary.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Performance/TimesMap:
-  Exclude:
-    - 'spec/lib/active_data/model/nested_attributes.rb'
-
 # Offense count: 19
 # Cop supports --auto-correct.
 # Configuration parameters: SupportedStyles, IndentationWidth.

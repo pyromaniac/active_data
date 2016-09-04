@@ -297,7 +297,7 @@ module ActiveData
 
       def performer_exec &block
         if block.arity == 1
-          block.call(self)
+          yield(self)
         else
           instance_exec(&block)
         end
