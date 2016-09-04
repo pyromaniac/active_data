@@ -16,7 +16,7 @@ module ActiveData
           boolean: Boolean
         }
 
-        def write value
+        def write(value)
           pollute do
             previous = type_casted_value
             result = write_value value

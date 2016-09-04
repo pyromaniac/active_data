@@ -3,13 +3,13 @@ module ActiveData
     module Attributes
       module Reflections
         class Attribute < Base
-          def self.build target, generated_methods, name, *args, &block
+          def self.build(target, generated_methods, name, *args, &block)
             attribute = super(target, generated_methods, name, *args, &block)
             generate_methods name, generated_methods
             attribute
           end
 
-          def self.generate_methods name, target
+          def self.generate_methods(name, target)
             target.class_eval <<-RUBY, __FILE__, __LINE__ + 1
               def #{name}
                 attribute('#{name}').read

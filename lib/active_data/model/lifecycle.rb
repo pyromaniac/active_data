@@ -115,7 +115,7 @@ module ActiveData
         # Initializes new instance with attributes passed and calls +save+
         # on it. Returns instance in any case.
         #
-        def create *args
+        def create(*args)
           new(*args).tap(&:save)
         end
 
@@ -123,7 +123,7 @@ module ActiveData
         # on it. Returns instance in case of success and raises ActiveData::ValidationError
         # or ActiveData::ObjectNotSaved in case of validation or saving fail respectively.
         #
-        def create! *args
+        def create!(*args)
           new(*args).tap(&:save!)
         end
       end
@@ -156,7 +156,7 @@ module ActiveData
       #
       #   author.update(name: 'Donald') { REDIS.set(id, attributes.to_json) }
       #
-      def update attributes, &block
+      def update(attributes, &block)
         assign_attributes(attributes) && save(&block)
       end
       alias_method :update_attributes, :update
@@ -175,7 +175,7 @@ module ActiveData
       #
       #   author.update!(name: 'Donald') { REDIS.set(id, attributes.to_json) }
       #
-      def update! attributes, &block
+      def update!(attributes, &block)
         assign_attributes(attributes) && save!(&block)
       end
       alias_method :update_attributes!, :update!
@@ -194,7 +194,7 @@ module ActiveData
       #
       #   author.save { REDIS.set(id, attributes.to_json) }
       #
-      def save _options = {}, &block
+      def save(_options = {}, &block)
         raise ActiveData::UnsavableObject unless block || savable?
         valid? && save_object(&block)
       end
@@ -214,7 +214,7 @@ module ActiveData
       #
       #   author.save! { REDIS.set(id, attributes.to_json) }
       #
-      def save! _options = {}, &block
+      def save!(_options = {}, &block)
         raise ActiveData::UnsavableObject unless block || savable?
         validate!
         save_object(&block) or raise ActiveData::ObjectNotSaved
@@ -233,7 +233,7 @@ module ActiveData
       #
       #   author.destroy { REDIS.del(id) }
       #
-      def destroy &block
+      def destroy(&block)
         raise ActiveData::UndestroyableObject unless block || destroyable?
         destroy_object(&block)
         self
@@ -253,7 +253,7 @@ module ActiveData
       #
       #   author.destroy! { REDIS.del(id) }
       #
-      def destroy! &block
+      def destroy!(&block)
         raise ActiveData::UndestroyableObject unless block || destroyable?
         destroy_object(&block) or raise ActiveData::ObjectNotDestroyed
         self
@@ -265,19 +265,19 @@ module ActiveData
         !!((persisted? ? _update_performer : _create_performer) || _save_performer)
       end
 
-      def save_object &block
+      def save_object(&block)
         apply_association_changes! if respond_to?(:apply_association_changes!)
         result = persisted? ? update_object(&block) : create_object(&block)
         mark_persisted! if result
         result
       end
 
-      def create_object &block
+      def create_object(&block)
         performer = block || _create_performer || _save_performer
         !!performer_exec(&performer)
       end
 
-      def update_object &block
+      def update_object(&block)
         performer = block || _update_performer || _save_performer
         !!performer_exec(&performer)
       end
@@ -286,14 +286,14 @@ module ActiveData
         !!_destroy_performer
       end
 
-      def destroy_object &block
+      def destroy_object(&block)
         performer = block || _destroy_performer
         result = !!performer_exec(&performer)
         mark_destroyed! if result
         result
       end
 
-      def performer_exec &block
+      def performer_exec(&block)
         if block.arity == 1
           yield(self)
         else

@@ -20,7 +20,7 @@ module ActiveData
         end
 
         included do
-          def initialize source = nil, trust = false
+          def initialize(source = nil, trust = false)
             source ||= self.class.superclass.new
 
             source.each do |entity|
@@ -31,11 +31,11 @@ module ActiveData
           end
         end
 
-        def respond_to_missing? method, _
+        def respond_to_missing?(method, _)
           super || self.class._scope_model.respond_to?(method)
         end
 
-        def method_missing method, *args, &block
+        def method_missing(method, *args, &block)
           with_scope { self.class._scope_model.public_send(method, *args, &block) }
         end
 
@@ -48,7 +48,7 @@ module ActiveData
       end
 
       module ClassMethods
-        def scopify scope_base = Array
+        def scopify(scope_base = Array)
           self._scope_base = scope_base
         end
 
@@ -56,7 +56,7 @@ module ActiveData
           @scope_class ||= ActiveData::Model::Scopes::ScopeProxy.for(self)
         end
 
-        def scope *args
+        def scope(*args)
           if args.empty?
             current_scope
           else
@@ -64,7 +64,7 @@ module ActiveData
           end
         end
 
-        def current_scope= value
+        def current_scope=(value)
           @current_scope = value
         end
 

@@ -214,7 +214,7 @@ shared_examples 'nested attributes' do
             { slug: projects.first.slug.to_i, title: 'Project 3', _destroy: '1' },
             { title: 'Project 4', _destroy: '1' }
           ]
-        user.save { true }
+          user.save { true }
         end
           .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2'])
       end
@@ -237,7 +237,7 @@ shared_examples 'nested attributes' do
               { slug: projects.first.slug.to_i, title: 'Project 3', _destroy: '1' },
               { title: 'Project 4', _destroy: '1' }
             ]
-          user.save { true }
+            user.save { true }
           end
             .to change { user.projects.map(&:title) }.to(['Project 2'])
         end

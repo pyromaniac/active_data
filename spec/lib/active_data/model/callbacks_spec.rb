@@ -7,7 +7,7 @@ describe ActiveData::Model::Callbacks do
       include ActiveData::Model::Callbacks
       attribute :actions, Array, default: []
 
-      def append action
+      def append(action)
         self.actions = actions + [action]
       end
 
@@ -231,7 +231,7 @@ describe ActiveData::Model::Callbacks do
 
         validates :validated, presence: true
 
-        def append action
+        def append(action)
           self.actions = actions + [action]
         end
       end

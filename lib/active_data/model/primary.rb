@@ -2,7 +2,7 @@ module ActiveData
   module Model
     module Primary
       extend ActiveSupport::Concern
-      DEFAULT_PRIMARY_ATTRIBUTE_OPTIONS = -> do
+      DEFAULT_PRIMARY_ATTRIBUTE_OPTIONS = lambda do
         {
           type: ActiveData::UUID,
           default: -> { ActiveData::UUID.random_create }
@@ -18,7 +18,7 @@ module ActiveData
       end
 
       module ClassMethods
-        def primary *args
+        def primary(*args)
           options = args.extract_options!
           self._primary_name = (args.first.presence || ActiveData.primary_attribute).to_s
           unless has_attribute?(_primary_name)
@@ -39,7 +39,7 @@ module ActiveData
       end
 
       module PrependMethods
-        def == other
+        def ==(other)
           other.instance_of?(self.class) &&
             has_primary_attribute? ?
               primary_attribute ?

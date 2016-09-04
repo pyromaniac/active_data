@@ -14,25 +14,25 @@ module ActiveData
           end]
         end
 
-        def write_locale value, locale
+        def write_locale(value, locale)
           pollute do
             write(read.merge(locale.to_s => value))
           end
         end
 
-        def read_locale locale
+        def read_locale(locale)
           read[owner.class.fallbacks(locale).detect do |fallback|
             read[fallback.to_s]
           end.to_s]
         end
 
-        def read_locale_before_type_cast locale
+        def read_locale_before_type_cast(locale)
           read_before_type_cast[owner.class.fallbacks(locale).detect do |fallback|
             read_before_type_cast[fallback.to_s]
           end.to_s]
         end
 
-        def locale_query locale
+        def locale_query(locale)
           value = read_locale(locale)
           !(value.respond_to?(:zero?) ? value.zero? : value.blank?)
         end

@@ -13,7 +13,7 @@ describe ActiveData::Model::Attributes::Dictionary do
   describe '#read' do
     let(:field) do
       attribute(type: String,
-      normalizer: ->(val){ val.delete_if { |_, v| v == nil } },
+      normalizer: ->(val) { val.delete_if { |_, v| v == nil } },
       default: :world, enum: %w(hello 42))
     end
 
@@ -30,7 +30,7 @@ describe ActiveData::Model::Attributes::Dictionary do
     context do
       let(:field) do
         attribute(type: String,
-        normalizer: ->(val){ val.delete_if { |_, v| v == nil } },
+        normalizer: ->(val) { val.delete_if { |_, v| v == nil } },
         default: :world)
       end
 

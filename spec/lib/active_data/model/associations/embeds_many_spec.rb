@@ -145,11 +145,11 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { expect(association.create!(title: 'Swordfish')).to be_persisted }
 
     specify do
-      expect { association.create! rescue nil }
+      expect { muffle(ActiveData::ValidationError) { association.create! } }
         .not_to change { user.read_attribute(:projects) }
     end
     specify do
-      expect { association.create! rescue nil }
+      expect { muffle(ActiveData::ValidationError) { association.create! } }
         .to change { association.reader.map(&:attributes) }.from([]).to([{ 'title' => nil }])
     end
     specify do
@@ -163,11 +163,11 @@ describe ActiveData::Model::Associations::EmbedsMany do
     end
 
     specify do
-      expect { existing_association.create! rescue nil }
+      expect { muffle(ActiveData::ValidationError) { existing_association.create! } }
         .not_to change { existing_user.read_attribute(:projects) }
     end
     specify do
-      expect { existing_association.create! rescue nil }
+      expect { muffle(ActiveData::ValidationError) { existing_association.create! } }
         .to change { existing_association.reader.map(&:attributes) }
         .from([{ 'title' => 'Genesis' }]).to([{ 'title' => 'Genesis' }, { 'title' => nil }])
     end
@@ -189,31 +189,31 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify do
       expect do
         existing_association.target.first.mark_for_destruction
-        existing_association.build(title: 'Swordfish');
+        existing_association.build(title: 'Swordfish')
         existing_association.apply_changes
       end.to change { existing_association.target.map(&:title) }.to(['Swordfish']) end
     specify do
       expect do
         existing_association.target.first.mark_for_destruction
-        existing_association.build(title: 'Swordfish');
+        existing_association.build(title: 'Swordfish')
         existing_association.apply_changes
       end.not_to change { existing_association.target.map(&:persisted?) } end
     specify do
       expect do
         existing_association.target.first.mark_for_destruction
-        existing_association.build(title: 'Swordfish');
+        existing_association.build(title: 'Swordfish')
         existing_association.apply_changes
       end.to change { existing_association.destroyed.map(&:title) }.from([]).to(['Genesis']) end
     specify do
       expect do
         existing_association.target.first.destroy!
-        existing_association.build(title: 'Swordfish');
+        existing_association.build(title: 'Swordfish')
         existing_association.apply_changes
       end.to change { existing_association.target.map(&:title) }.to(['Swordfish']) end
     specify do
       expect do
         existing_association.target.first.destroy!
-        existing_association.build(title: 'Swordfish');
+        existing_association.build(title: 'Swordfish')
         existing_association.apply_changes
       end.to change { existing_association.destroyed.map(&:title) }.from([]).to(['Genesis']) end
   end
@@ -224,19 +224,19 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify do
       expect do
         existing_association.target.first.mark_for_destruction
-        existing_association.build(title: 'Swordfish');
+        existing_association.build(title: 'Swordfish')
         existing_association.apply_changes!
       end.to change { existing_association.target.map(&:title) }.to(['Swordfish']) end
     specify do
       expect do
         existing_association.target.first.mark_for_destruction
-        existing_association.build(title: 'Swordfish');
+        existing_association.build(title: 'Swordfish')
         existing_association.apply_changes!
       end.not_to change { existing_association.target.map(&:persisted?) } end
     specify do
       expect do
         existing_association.target.first.destroy!
-        existing_association.build(title: 'Swordfish');
+        existing_association.build(title: 'Swordfish')
         existing_association.apply_changes!
       end.to change { existing_association.target.map(&:title) }.to(['Swordfish']) end
   end
@@ -391,11 +391,11 @@ describe ActiveData::Model::Associations::EmbedsMany do
         .to raise_error ActiveData::AssociationChangesNotApplied
     end
     specify do
-      expect { existing_association.writer([new_project1, invalid_project]) rescue nil }
+      expect { muffle(ActiveData::AssociationChangesNotApplied) { existing_association.writer([new_project1, invalid_project]) } }
         .not_to change { existing_user.read_attribute(:projects) }
     end
     specify do
-      expect { existing_association.writer([new_project1, invalid_project]) rescue nil }
+      expect { muffle(ActiveData::AssociationChangesNotApplied) { existing_association.writer([new_project1, invalid_project]) } }
         .not_to change { existing_association.reader }
     end
 
@@ -404,21 +404,21 @@ describe ActiveData::Model::Associations::EmbedsMany do
         .to raise_error ActiveData::AssociationTypeMismatch
     end
     specify do
-      expect { existing_association.writer([new_project1, Dummy.new, new_project2]) rescue nil }
+      expect { muffle(ActiveData::AssociationTypeMismatch) { existing_association.writer([new_project1, Dummy.new, new_project2]) } }
         .not_to change { existing_user.read_attribute(:projects) }
     end
     specify do
-      expect { existing_association.writer([new_project1, Dummy.new, new_project2]) rescue nil }
+      expect { muffle(ActiveData::AssociationTypeMismatch) { existing_association.writer([new_project1, Dummy.new, new_project2]) } }
         .not_to change { existing_association.reader }
     end
 
     specify { expect { existing_association.writer(nil) }.to raise_error NoMethodError }
     specify do
-      expect { existing_association.writer(nil) rescue nil }
+      expect { muffle(NoMethodError) { existing_association.writer(nil) } }
         .not_to change { existing_user.read_attribute(:projects) }
     end
     specify do
-      expect { existing_association.writer(nil) rescue nil }
+      expect { muffle(NoMethodError) { existing_association.writer(nil) } }
         .not_to change { existing_association.reader }
     end
 
@@ -487,11 +487,11 @@ describe ActiveData::Model::Associations::EmbedsMany do
         .to raise_error ActiveData::AssociationTypeMismatch
     end
     specify do
-      expect { existing_association.concat(new_project1, Dummy.new, new_project2) rescue nil }
+      expect { muffle(ActiveData::AssociationTypeMismatch) { existing_association.concat(new_project1, Dummy.new, new_project2) } }
         .not_to change { existing_user.read_attribute(:projects) }
     end
     specify do
-      expect { existing_association.concat(new_project1, Dummy.new, new_project2) rescue nil }
+      expect { muffle(ActiveData::AssociationTypeMismatch) { existing_association.concat(new_project1, Dummy.new, new_project2) } }
         .to change { existing_association.reader.map(&:attributes) }
         .from([{ 'title' => 'Genesis' }]).to([{ 'title' => 'Genesis' }, { 'title' => 'Project 1' }])
     end

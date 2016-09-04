@@ -11,7 +11,7 @@ module ActiveData
           true
         end
 
-        def target= object
+        def target=(object)
           loaded!
           @target = object
         end
@@ -39,16 +39,16 @@ module ActiveData
           attribute.read_before_type_cast
         end
 
-        def write_source value
+        def write_source(value)
           attribute.write_value value
         end
 
-        def reader force_reload = false
+        def reader(force_reload = false)
           reset if force_reload
           target
         end
 
-        def replace object
+        def replace(object)
           unless object.nil? || object.is_a?(reflection.klass)
             raise AssociationTypeMismatch.new(reflection.klass, object.class)
           end
@@ -64,7 +64,7 @@ module ActiveData
         end
         alias_method :writer, :replace
 
-        def scope source = read_source
+        def scope(source = read_source)
           reflection.scope(owner).where(reflection.primary_key => source)
         end
 

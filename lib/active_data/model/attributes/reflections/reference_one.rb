@@ -3,13 +3,13 @@ module ActiveData
     module Attributes
       module Reflections
         class ReferenceOne < Base
-          def self.build _target, generated_methods, name, *args
+          def self.build(_target, generated_methods, name, *args)
             options = args.extract_options!
             generate_methods name, generated_methods
             new(name, options)
           end
 
-          def self.generate_methods name, target
+          def self.generate_methods(name, target)
             target.class_eval <<-RUBY, __FILE__, __LINE__ + 1
               def #{name}
                 attribute('#{name}').read

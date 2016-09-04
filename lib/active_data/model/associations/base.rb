@@ -5,7 +5,7 @@ module ActiveData
         attr_accessor :owner, :reflection
         delegate :macro, :collection?, to: :reflection
 
-        def initialize owner, reflection
+        def initialize(owner, reflection)
           @owner, @reflection = owner, reflection
           @evar_loaded = owner.persisted?
           reset
@@ -62,7 +62,7 @@ module ActiveData
           reflection.read_source owner
         end
 
-        def write_source value
+        def write_source(value)
           reflection.write_source owner, value
         end
 

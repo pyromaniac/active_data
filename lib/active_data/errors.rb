@@ -11,7 +11,7 @@ module ActiveData
 
     def initialize(model)
       @model = model
-      errors = @model.errors.full_messages.join(", ")
+      errors = @model.errors.full_messages.join(', ')
       super(I18n.t(:"#{@model.class.i18n_scope}.errors.messages.model_invalid", errors: errors, default: :'errors.messages.model_invalid'))
     end
   end
@@ -32,13 +32,13 @@ module ActiveData
   end
 
   class AssociationTypeMismatch < ActiveDataError
-    def initialize expected, got
+    def initialize(expected, got)
       super "Expected `#{expected}` (##{expected.object_id}), but got `#{got}` (##{got.object_id})"
     end
   end
 
   class ObjectNotFound < ActiveDataError
-    def initialize object, association_name, record_id
+    def initialize(object, association_name, record_id)
       message = "Couldn't find #{object.class.reflect_on_association(association_name).klass.name}" \
         "with #{object.respond_to?(:_primary_name) ? object._primary_name : 'id'} = #{record_id} for #{object.inspect}"
       super message
@@ -46,13 +46,13 @@ module ActiveData
   end
 
   class TooManyObjects < ActiveDataError
-    def initialize limit, actual_size
+    def initialize(limit, actual_size)
       super "Maximum #{limit} objects are allowed. Got #{actual_size} objects instead."
     end
   end
 
   class UndefinedPrimaryAttribute < ActiveDataError
-    def initialize klass, association_name
+    def initialize(klass, association_name)
       super <<-EOS
 Undefined primary attribute for `#{association_name}` in #{klass}.
 It is required for embeds_many nested attributes proper operation.
@@ -66,7 +66,7 @@ You can define this association as:
   end
 
   class NormalizerMissing < NoMethodError
-    def initialize name
+    def initialize(name)
       super <<-EOS
 Could not find normalizer `:#{name}`
 You can define it with:
@@ -79,7 +79,8 @@ You can define it with:
   end
 
   class TypecasterMissing < NoMethodError
-    def initialize *classes
+    def initialize(*classes)
+      classes = classes.flatten
       super <<-EOS
 Could not find typecaster for #{classes}
 You can define it with:

@@ -4,11 +4,11 @@ module ActiveData
       extend ActiveSupport::Concern
 
       module ClassMethods
-        def localized *args, &block
+        def localized(*args, &block)
           add_attribute(ActiveData::Model::Attributes::Reflections::Localized, *args, &block)
         end
 
-        def fallbacks locale
+        def fallbacks(locale)
           ::I18n.respond_to?(:fallbacks) ? ::I18n.fallbacks[locale] : [locale]
         end
 

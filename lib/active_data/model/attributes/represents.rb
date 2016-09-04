@@ -4,7 +4,7 @@ module ActiveData
       class Represents < Attribute
         delegate :reader, :reader_before_type_cast, :writer, to: :reflection
 
-        def write value
+        def write(value)
           return if readonly?
           pollute do
             reset

@@ -49,7 +49,7 @@ module ActiveData
       end
 
       module ClassMethods
-        def define_dirty method, target = self
+        def define_dirty(method, target = self)
           reflection = reflect_on_attribute(method)
           name = reflection ? reflection.name : method
 

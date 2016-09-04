@@ -54,13 +54,13 @@ module ActiveData
 
         def alias_association(alias_name, association_name)
           reflection = reflect_on_association(association_name)
-          raise ArgumentError.new("Can't alias undefined association `#{attribute_name}` on #{self}") unless reflection
+          raise ArgumentError, "Can't alias undefined association `#{attribute_name}` on #{self}" unless reflection
           reflection.class.generate_methods alias_name, generated_associations_methods
           self._association_aliases = _association_aliases.merge(alias_name.to_sym => reflection.name)
           reflection
         end
 
-        def reflect_on_association name
+        def reflect_on_association(name)
           name = name.to_sym
           _associations[_association_aliases[name] || name]
         end
@@ -83,14 +83,14 @@ module ActiveData
         end
       end
 
-      def == other
+      def ==(other)
         super && association_names.all? do |association|
           public_send(association) == other.public_send(association)
         end
       end
       alias_method :eql?, :==
 
-      def association name
+      def association(name)
         reflection = self.class.reflect_on_association(name)
         return unless reflection
         (@_associations ||= {})[reflection.name] ||= reflection.build_association(self)

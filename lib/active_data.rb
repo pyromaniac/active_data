@@ -85,13 +85,35 @@ module ActiveData
     when ::TZInfo::Timezone
       ActiveSupport::TimeZone[value.name]
     when String, Numeric, ActiveSupport::Duration
-      value = Float(value) rescue value
+      value = begin
+        Float(value)
+      rescue
+        value
+      end
       ActiveSupport::TimeZone[value]
     end
   end
-  typecaster('BigDecimal') { |value| ::BigDecimal.new Float(value).to_s rescue nil if value }
-  typecaster('Float') { |value| Float(value) rescue nil }
-  typecaster('Integer') { |value| Float(value).to_i rescue nil }
+  typecaster('BigDecimal') do |value|
+    begin
+      ::BigDecimal.new Float(value).to_s
+    rescue
+      nil
+    end if value
+  end
+  typecaster('Float') do |value|
+    begin
+      Float(value)
+    rescue
+      nil
+    end
+  end
+  typecaster('Integer') do |value|
+    begin
+      Float(value).to_i
+    rescue
+      nil
+    end
+  end
   typecaster('Boolean') { |value| BOOLEAN_MAPPING[value] }
   typecaster('ActiveData::UUID') do |value|
     case value

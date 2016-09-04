@@ -35,7 +35,13 @@ describe ActiveData::Config do
   describe '#normalizer' do
     specify do
       expect { subject.normalizer(:name) {} }
-        .to change { subject.normalizer(:name) rescue nil }.from(nil).to(an_instance_of(Proc))
+        .to change {
+          begin
+            subject.normalizer(:name)
+          rescue
+            nil
+          end
+        }.from(nil).to(an_instance_of(Proc))
     end
     specify { expect { subject.normalizer(:wrong) }.to raise_error ActiveData::NormalizerMissing }
   end
@@ -43,15 +49,18 @@ describe ActiveData::Config do
   describe '#typecaster' do
     specify do
       expect { subject.typecaster('Object') {} }
-        .to change { subject.typecaster(Time, Object) rescue nil }.from(nil).to(an_instance_of(Proc))
+        .to change { muffle(ActiveData::TypecasterMissing) { subject.typecaster(Time, Object) } }
+        .from(nil).to(an_instance_of(Proc))
     end
     specify do
       expect { subject.typecaster('Object') {} }
-        .to change { subject.typecaster('time', 'object') rescue nil }.from(nil).to(an_instance_of(Proc))
+        .to change { muffle(ActiveData::TypecasterMissing) { subject.typecaster('time', 'object') } }
+        .from(nil).to(an_instance_of(Proc))
     end
     specify do
       expect { subject.typecaster('Object') {} }
-        .to change { subject.typecaster(Object) rescue nil }.from(nil).to(an_instance_of(Proc))
+        .to change { muffle(ActiveData::TypecasterMissing) { subject.typecaster(Object) } }
+        .from(nil).to(an_instance_of(Proc))
     end
     specify { expect { subject.typecaster(Object) }.to raise_error ActiveData::TypecasterMissing }
   end

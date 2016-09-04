@@ -54,7 +54,7 @@ describe ActiveData::Model::Associations::ReferencesOne do
     specify { expect(existing_association.reload).to be_persisted }
 
     context do
-      before { existing_association.reader.name = "New" }
+      before { existing_association.reader.name = 'New' }
       specify do
         expect { existing_association.reload }
           .to change { existing_association.reader.name }
@@ -99,7 +99,8 @@ describe ActiveData::Model::Associations::ReferencesOne do
       end
       specify do
         expect { association.writer(new_author) }
-          .to change { association.reader.name rescue nil }.from(nil).to('Morty')
+          .to change { muffle(NoMethodError) { association.reader.name } }
+          .from(nil).to('Morty')
       end
       specify do
         expect { association.writer(new_author) }
@@ -130,13 +131,21 @@ describe ActiveData::Model::Associations::ReferencesOne do
           .to change { book.read_attribute(:author_id) }
       end
 
-      specify do
-        expect { existing_association.writer(stub_class(:dummy, ActiveRecord::Base).new) rescue nil }
-          .not_to change { existing_book.read_attribute(:author_id) }
-      end
-      specify do
-        expect { existing_association.writer(stub_class(:dummy, ActiveRecord::Base).new) rescue nil }
-          .not_to change { existing_association.reader }
+      context do
+        before do
+          stub_class(:dummy, ActiveRecord::Base) do
+            self.table_name = :authors
+          end
+        end
+
+        specify do
+          expect { muffle(ActiveData::AssociationTypeMismatch) { existing_association.writer(Dummy.new) } }
+            .not_to change { existing_book.read_attribute(:author_id) }
+        end
+        specify do
+          expect { muffle(ActiveData::AssociationTypeMismatch) { existing_association.writer(Dummy.new) } }
+            .not_to change { existing_association.reader }
+        end
       end
 
       specify { expect(existing_association.writer(nil)).to be_nil }

@@ -6,6 +6,7 @@ require 'active_record'
 require 'database_cleaner'
 
 require 'support/model_helpers'
+require 'support/muffle_helper'
 
 ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
 ActiveRecord::Base.logger = Logger.new('/dev/null')
@@ -29,6 +30,7 @@ RSpec.configure do |config|
   config.filter_run focus: true
 
   config.include ModelHelpers
+  config.include MuffleHelpers
 
   config.before(:suite) do
     DatabaseCleaner.clean_with :truncation

@@ -8,7 +8,7 @@ module ActiveData
       end
 
       module ClassMethods
-        def accepts_nested_attributes_for_with_active_data *attr_names
+        def accepts_nested_attributes_for_with_active_data(*attr_names)
           options = attr_names.extract_options!
           active_data_associations, active_record_association = attr_names.partition do |association_name|
             reflect_on_association(association_name).is_a?(ActiveData::Model::Associations::Reflections::Base)

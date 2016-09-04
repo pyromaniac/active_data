@@ -1,14 +1,13 @@
-unless defined?(Boolean)
-  class Boolean; end
-end
+class Boolean; end unless defined?(Boolean)
 
 begin
   require 'uuidtools'
 rescue LoadError
+  nil
 else
   module ActiveData
     class UUID < UUIDTools::UUID
-      def as_json *_
+      def as_json(*_)
         to_s
       end
 
@@ -16,7 +15,7 @@ else
         to_s
       end
 
-      def self.parse_string value
+      def self.parse_string(value)
         return nil if value.length == 0
         if value.length == 36
           parse value

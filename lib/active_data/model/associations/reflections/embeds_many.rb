@@ -3,7 +3,7 @@ module ActiveData
     module Associations
       module Reflections
         class EmbedsMany < Base
-          def self.build target, generated_methods, name, options = {}, &block
+          def self.build(target, generated_methods, name, options = {}, &block)
             if target < ActiveData::Model::Attributes
               target.add_attribute(ActiveData::Model::Attributes::Reflections::Base, name)
             end

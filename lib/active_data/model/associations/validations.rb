@@ -29,9 +29,9 @@ module ActiveData
           association_names.each do |name|
             association = association(name)
             invalid_block = if association.reflection.klass.method_defined?(:invalid_ansestry?)
-              lambda { |object| object.invalid_ansestry? }
+              ->(object) { object.invalid_ansestry? }
             else
-              lambda { |object| object.invalid? }
+              ->(object) { object.invalid? }
             end
 
             ActiveData::Model::Validations::NestedValidator

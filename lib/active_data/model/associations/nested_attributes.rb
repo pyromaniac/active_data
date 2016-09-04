@@ -103,16 +103,14 @@ module ActiveData
                   if !call_reject_if(object, association_name, attributes)
                     assign_to_or_mark_for_destruction(existing_record, attributes, options[:allow_destroy])
                   end
-                else
-                  if association.reflection.embedded?
-                    unless reject_new_object?(object, association_name, attributes)
-                      association.reflection.klass.with_sanitize(false) do
-                        association.build(attributes.except(DESTROY_ATTRIBUTE))
-                      end
+                elsif association.reflection.embedded?
+                  unless reject_new_object?(object, association_name, attributes)
+                    association.reflection.klass.with_sanitize(false) do
+                      association.build(attributes.except(DESTROY_ATTRIBUTE))
                     end
-                  else
-                    raise ActiveData::ObjectNotFound.new(object, association_name, attributes[primary_attribute_name])
                   end
+                else
+                  raise ActiveData::ObjectNotFound.new(object, association_name, attributes[primary_attribute_name])
                 end
               end
             end

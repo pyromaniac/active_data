@@ -27,11 +27,11 @@ describe ActiveData::Model::Associations::Reflections::EmbedsOne do
 
         attribute :title
         embeds_one :author,
-          read: ->(reflection, object) {
+          read: lambda { |reflection, object|
             value = object.read_attribute(reflection.name)
             JSON.parse(value) if value.present?
           },
-          write: ->(reflection, object, value) {
+          write: lambda { |reflection, object, value|
             object.write_attribute(reflection.name, value ? value.to_json : nil)
           }
       end

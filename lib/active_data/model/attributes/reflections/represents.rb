@@ -3,7 +3,7 @@ module ActiveData
     module Attributes
       module Reflections
         class Represents < Attribute
-          def self.build target, generated_methods, name, *args, &block
+          def self.build(target, generated_methods, name, *args, &block)
             options = args.extract_options!
 
             reference = target.reflect_on_association(options[:of]) if target.respond_to?(:reflect_on_association)
@@ -16,7 +16,7 @@ module ActiveData
             super(target, generated_methods, name, *args, options, &block)
           end
 
-          def initialize name, options
+          def initialize(name, options)
             super
             raise ArgumentError, "Undefined reference for `#{name}`" if reference.blank?
           end

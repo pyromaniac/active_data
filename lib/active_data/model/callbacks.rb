@@ -44,24 +44,24 @@ module ActiveData
       end
 
       module PrependMethods
-        def initialize *_
+        def initialize(*_)
           super
           run_callbacks :initialize
         end
 
-        def save_object &block
+        def save_object(&block)
           run_callbacks(:save) { super(&block) }
         end
 
-        def create_object &block
+        def create_object(&block)
           run_callbacks(:create) { super(&block) }
         end
 
-        def update_object &block
+        def update_object(&block)
           run_callbacks(:update) { super(&block) }
         end
 
-        def destroy_object &block
+        def destroy_object(&block)
           run_callbacks(:destroy) { super(&block) }
         end
       end

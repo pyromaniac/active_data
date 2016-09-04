@@ -18,22 +18,22 @@ module ActiveData
       @_typecasters = {}
     end
 
-    def normalizer name, &block
+    def normalizer(name, &block)
       if block
         _normalizers[name.to_sym] = block
       else
-        _normalizers[name.to_sym] or raise NormalizerMissing.new(name)
+        _normalizers[name.to_sym] or raise NormalizerMissing, name
       end
     end
 
-    def typecaster *classes, &block
+    def typecaster(*classes, &block)
       classes = classes.flatten
       if block
         _typecasters[classes.first.to_s.camelize] = block
       else
         _typecasters[classes.detect do |klass|
           _typecasters[klass.to_s.camelize]
-        end.to_s.camelize] or raise TypecasterMissing.new(*classes)
+        end.to_s.camelize] or raise TypecasterMissing, classes
       end
     end
   end

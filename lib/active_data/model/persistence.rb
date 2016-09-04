@@ -4,7 +4,7 @@ module ActiveData
       extend ActiveSupport::Concern
 
       module ClassMethods
-        def instantiate data
+        def instantiate(data)
           data = data.stringify_keys
           instance = allocate
 
@@ -14,7 +14,7 @@ module ActiveData
           instance
         end
 
-        def instantiate_collection data
+        def instantiate_collection(data)
           collection = Array.wrap(data).map { |attrs| instantiate attrs }
           collection = scope(collection, true) if respond_to?(:scope)
           collection

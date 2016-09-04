@@ -4,7 +4,7 @@ module ActiveData
       class Attribute < Base
         delegate :defaultizer, :enumerizer, :normalizers, to: :reflection
 
-        def write value
+        def write(value)
           return if readonly?
           pollute do
             write_value value
@@ -27,7 +27,7 @@ module ActiveData
           defaultizer.is_a?(Proc) ? evaluate(&defaultizer) : defaultizer
         end
 
-        def defaultize value, default_value = nil
+        def defaultize(value, default_value = nil)
           defaultizer && value.nil? ? default_value || default : value
         end
 
@@ -44,12 +44,12 @@ module ActiveData
           end.to_set
         end
 
-        def enumerize value
+        def enumerize(value)
           set = enum if enumerizer
           value if !set || (set.none? || set.include?(value))
         end
 
-        def normalize value
+        def normalize(value)
           if normalizers.none?
             value
           else

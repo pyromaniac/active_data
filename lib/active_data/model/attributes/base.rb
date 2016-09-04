@@ -5,7 +5,7 @@ module ActiveData
         attr_reader :name, :owner
         delegate :type, :typecaster, :readonly, to: :reflection
 
-        def initialize name, owner
+        def initialize(name, owner)
           @name, @owner = name, owner
         end
 
@@ -13,12 +13,12 @@ module ActiveData
           @owner.class._attributes[name]
         end
 
-        def write_value value
+        def write_value(value)
           reset
           @value_cache = value
         end
 
-        def write value
+        def write(value)
           return if readonly?
           write_value value
         end
@@ -43,7 +43,7 @@ module ActiveData
           !(read.respond_to?(:zero?) ? read.zero? : read.blank?)
         end
 
-        def typecast value
+        def typecast(value)
           if value.instance_of?(type)
             value
           else
@@ -86,7 +86,7 @@ module ActiveData
 
       private
 
-        def evaluate *args, &block
+        def evaluate(*args, &block)
           if block.arity >= 0 && block.arity <= args.length
             owner.instance_exec(*args.first(block.arity), &block)
           else

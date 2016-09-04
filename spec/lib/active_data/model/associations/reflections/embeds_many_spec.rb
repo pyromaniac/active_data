@@ -24,11 +24,11 @@ describe ActiveData::Model::Associations::Reflections::EmbedsMany do
 
         attribute :name
         embeds_many :projects,
-          read: ->(reflection, object) {
+          read: lambda { |reflection, object|
             value = object.read_attribute(reflection.name)
             JSON.parse(value) if value.present?
           },
-          write: ->(reflection, object, value) {
+          write: lambda { |reflection, object, value|
             object.write_attribute(reflection.name, value.to_json)
           }
       end

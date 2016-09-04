@@ -78,11 +78,11 @@ describe ActiveData::Model::Associations::EmbedsOne do
     specify { expect(association.create!(name: 'Fred')).to be_persisted }
 
     specify do
-      expect { association.create! rescue nil }
+      expect { muffle(ActiveData::ValidationError) { association.create! } }
         .not_to change { book.read_attribute(:author) }
     end
     specify do
-      expect { association.create! rescue nil }
+      expect { muffle(ActiveData::ValidationError) { association.create! } }
         .to change { association.reader.try(:attributes) }.from(nil).to('name' => nil)
     end
     specify do
@@ -91,11 +91,11 @@ describe ActiveData::Model::Associations::EmbedsOne do
     end
 
     specify do
-      expect { existing_association.create! rescue nil }
+      expect { muffle(ActiveData::ValidationError) { existing_association.create! } }
         .not_to change { existing_book.read_attribute(:author) }
     end
     specify do
-      expect { existing_association.create! rescue nil }
+      expect { muffle(ActiveData::ValidationError) { existing_association.create! } }
         .to change { existing_association.reader.try(:attributes) }.from('name' => 'Johny').to('name' => nil)
     end
     specify do
@@ -270,11 +270,11 @@ describe ActiveData::Model::Associations::EmbedsOne do
           .to raise_error ActiveData::AssociationChangesNotApplied
       end
       specify do
-        expect { association.writer(invalid_author) rescue nil }
+        expect { muffle(ActiveData::AssociationChangesNotApplied) { association.writer(invalid_author) } }
           .not_to change { association.reader }
       end
       specify do
-        expect { association.writer(invalid_author) rescue nil }
+        expect { muffle(ActiveData::AssociationChangesNotApplied) { association.writer(invalid_author) } }
           .not_to change { book.read_attribute(:author) }
       end
     end
@@ -310,11 +310,11 @@ describe ActiveData::Model::Associations::EmbedsOne do
       end
 
       specify do
-        expect { existing_association.writer(stub_model(:dummy).new) rescue nil }
+        expect { muffle(ActiveData::AssociationTypeMismatch) { existing_association.writer(stub_model(:dummy).new) } }
           .not_to change { existing_book.read_attribute(:author) }
       end
       specify do
-        expect { existing_association.writer(stub_model(:dummy).new) rescue nil }
+        expect { muffle(ActiveData::AssociationTypeMismatch) { existing_association.writer(stub_model(:dummy).new) } }
           .not_to change { existing_association.reader }
       end
 
@@ -340,11 +340,11 @@ describe ActiveData::Model::Associations::EmbedsOne do
           .to raise_error ActiveData::AssociationChangesNotApplied
       end
       specify do
-        expect { existing_association.writer(invalid_author) rescue nil }
+        expect { muffle(ActiveData::AssociationChangesNotApplied) { existing_association.writer(invalid_author) } }
           .not_to change { existing_association.reader }
       end
       specify do
-        expect { existing_association.writer(invalid_author) rescue nil }
+        expect { muffle(ActiveData::AssociationChangesNotApplied) { existing_association.writer(invalid_author) } }
           .not_to change { existing_book.read_attribute(:author) }
       end
     end

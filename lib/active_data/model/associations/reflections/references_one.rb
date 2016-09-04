@@ -3,7 +3,7 @@ module ActiveData
     module Associations
       module Reflections
         class ReferencesOne < ReferenceReflection
-          def self.build target, generated_methods, name, *args, &block
+          def self.build(target, generated_methods, name, *args, &block)
             reflection = super
 
             target.add_attribute(

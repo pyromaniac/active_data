@@ -3,7 +3,7 @@ module ActiveData
     module Associations
       module Reflections
         class EmbedsOne < Base
-          def self.build target, generated_methods, name, options = {}, &block
+          def self.build(target, generated_methods, name, options = {}, &block)
             if target < ActiveData::Model::Attributes
               target.add_attribute(ActiveData::Model::Attributes::Reflections::Base, name)
             end
@@ -11,7 +11,7 @@ module ActiveData
             super
           end
 
-          def self.generate_methods name, target
+          def self.generate_methods(name, target)
             target.class_eval <<-RUBY, __FILE__, __LINE__ + 1
               def #{name} force_reload = false
                 association(:#{name}).reader(force_reload)

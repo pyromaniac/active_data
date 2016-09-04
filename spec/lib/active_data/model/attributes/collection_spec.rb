@@ -11,7 +11,7 @@ describe ActiveData::Model::Attributes::Collection do
   end
 
   describe '#read' do
-    let(:field) { attribute(type: String, normalizer: ->(v){ v.uniq }, default: :world, enum: %w(hello 42)) }
+    let(:field) { attribute(type: String, normalizer: ->(v) { v.uniq }, default: :world, enum: %w(hello 42)) }
 
     specify { expect(field.tap { |r| r.write(nil) }.read).to eq([]) }
     specify { expect(field.tap { |r| r.write([nil]) }.read).to eq([nil]) }
@@ -24,7 +24,7 @@ describe ActiveData::Model::Attributes::Collection do
     specify { expect(field.tap { |r| r.write(['hello', false]) }.read).to eq(['hello', nil]) }
 
     context do
-      let(:field) { attribute(type: String, normalizer: ->(v){ v.uniq }, default: :world) }
+      let(:field) { attribute(type: String, normalizer: ->(v) { v.uniq }, default: :world) }
 
       specify { expect(field.tap { |r| r.write(nil) }.read).to eq([]) }
       specify { expect(field.tap { |r| r.write([nil, nil]) }.read).to eq(['world']) }

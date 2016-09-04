@@ -11,7 +11,7 @@ module ActiveData
           attr_accessor :parent_reflection
           delegate :association_class, to: 'self.class'
 
-          def self.build target, generated_methods, name, options = {}, &block
+          def self.build(target, generated_methods, name, options = {}, &block)
             if block
               options[:class] = proc do |reflection|
                 superclass = reflection.options[:class_name].to_s.presence.try(:constantize)
@@ -31,7 +31,7 @@ module ActiveData
             new(name, options)
           end
 
-          def self.generate_methods name, target
+          def self.generate_methods(name, target)
             target.class_eval <<-RUBY, __FILE__, __LINE__ + 1
               def #{name} force_reload = false
                 association(:#{name}).reader(force_reload)
@@ -47,7 +47,7 @@ module ActiveData
             @association_class ||= "ActiveData::Model::Associations::#{name.demodulize}".constantize
           end
 
-          def initialize name, options = {}
+          def initialize(name, options = {})
             @name, @options = name.to_sym, options
           end
 
@@ -66,19 +66,19 @@ module ActiveData
             false
           end
 
-          def build_association object
+          def build_association(object)
             self.class.association_class.new object, self
           end
 
-          def read_source object
+          def read_source(object)
             (options[:read] || READ).call(self, object)
           end
 
-          def write_source object, value
+          def write_source(object, value)
             (options[:write] || WRITE).call(self, object, value)
           end
 
-          def default object
+          def default(object)
             defaultizer = options[:default]
             if defaultizer.is_a?(Proc)
               if defaultizer.arity != 0

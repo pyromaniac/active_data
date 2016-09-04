@@ -87,7 +87,7 @@ describe ActiveData::Model::Lifecycle do
 
             attribute :actions, Array, default: []
 
-            def append action
+            def append(action)
               self.actions = actions + [action]
             end
 
@@ -238,7 +238,10 @@ describe ActiveData::Model::Lifecycle do
         specify { expect { subject.save! }.to raise_error ActiveData::ValidationError }
 
         specify { expect { subject.save }.not_to change { subject.persisted? } }
-        specify { expect { subject.save! rescue nil }.not_to change { subject.persisted? } }
+        specify do
+          expect { muffle(ActiveData::ValidationError) { subject.save! } }
+            .not_to change { subject.persisted? }
+        end
       end
 
       context 'create' do
@@ -265,7 +268,10 @@ describe ActiveData::Model::Lifecycle do
           specify { expect { subject.save! }.to raise_error ActiveData::ObjectNotSaved }
 
           specify { expect { subject.save }.not_to change { subject.persisted? } }
-          specify { expect { subject.save! rescue nil }.not_to change { subject.persisted? } }
+          specify do
+            expect { muffle(ActiveData::ObjectNotSaved) { subject.save! } }
+              .not_to change { subject.persisted? }
+          end
         end
       end
 
@@ -299,7 +305,10 @@ describe ActiveData::Model::Lifecycle do
           specify { expect { subject.save! }.to raise_error ActiveData::ObjectNotSaved }
 
           specify { expect { subject.save }.not_to change { subject.persisted? } }
-          specify { expect { subject.save! rescue nil }.not_to change { subject.persisted? } }
+          specify do
+            expect { muffle(ActiveData::ObjectNotSaved) { subject.save! } }
+              .not_to change { subject.persisted? }
+          end
         end
       end
     end
@@ -332,10 +341,16 @@ describe ActiveData::Model::Lifecycle do
         specify { expect { subject.destroy! }.to raise_error ActiveData::ObjectNotDestroyed }
 
         specify { expect { subject.destroy }.not_to change { subject.persisted? } }
-        specify { expect { subject.destroy! rescue nil }.not_to change { subject.persisted? } }
+        specify do
+          expect { muffle(ActiveData::ObjectNotDestroyed) { subject.destroy! } }
+            .not_to change { subject.persisted? }
+        end
 
         specify { expect { subject.destroy }.not_to change { subject.destroyed? } }
-        specify { expect { subject.destroy! rescue nil }.not_to change { subject.destroyed? } }
+        specify do
+          expect { muffle(ActiveData::ObjectNotDestroyed) { subject.destroy! } }
+            .not_to change { subject.destroyed? }
+        end
       end
     end
   end

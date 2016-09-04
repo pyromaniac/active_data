@@ -8,7 +8,7 @@ module ActiveData
           true
         end
 
-        def target= object
+        def target=(object)
           loaded!
           @target = object.to_a
         end
@@ -20,14 +20,14 @@ module ActiveData
 
         def default
           unless evar_loaded?
-            default = Array.wrap(reflection.default(owner))
+            default = Array.wrap(reflection.default(owner)) or return []
             if default.all? { |object| object.is_a?(reflection.klass) }
               default
             elsif default.all? { |object| object.is_a?(Hash) }
               default.map { |attributes| reflection.klass.new(attributes) }
             else
               scope(default).to_a
-            end if default.present?
+            end
           end || []
         end
 
@@ -35,16 +35,16 @@ module ActiveData
           attribute.read_before_type_cast
         end
 
-        def write_source value
+        def write_source(value)
           attribute.write_value value
         end
 
-        def reader force_reload = false
+        def reader(force_reload = false)
           reload if force_reload
           @proxy ||= Collection::Referenced.new self
         end
 
-        def replace objects
+        def replace(objects)
           loaded!
           transaction do
             clear
@@ -65,7 +65,7 @@ module ActiveData
           reload.empty?
         end
 
-        def scope source = read_source
+        def scope(source = read_source)
           reflection.scope(owner).where(reflection.primary_key => source)
         end
 
@@ -75,7 +75,7 @@ module ActiveData
 
       private
 
-        def append objects
+        def append(objects)
           attribute.pollute do
             objects.each do |object|
               next if target.include?(object)

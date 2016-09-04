@@ -2,15 +2,15 @@ module ActiveData
   module Model
     module Associations
       class EmbedsOne < Base
-        def build attributes = {}
+        def build(attributes = {})
           self.target = reflection.klass.new(attributes)
         end
 
-        def create attributes = {}
+        def create(attributes = {})
           build(attributes).tap(&:save)
         end
 
-        def create! attributes = {}
+        def create!(attributes = {})
           build(attributes).tap(&:save!)
         end
 
@@ -31,7 +31,7 @@ module ActiveData
           end
         end
 
-        def target= object
+        def target=(object)
           setup_performers! object if object
           loaded!
           @target = object
@@ -64,12 +64,12 @@ module ActiveData
           reload.nil?
         end
 
-        def reader force_reload = false
+        def reader(force_reload = false)
           reload if force_reload
           target
         end
 
-        def replace object
+        def replace(object)
           if object
             raise AssociationTypeMismatch.new(reflection.klass, object.class) unless object.is_a?(reflection.klass)
             transaction do
@@ -87,7 +87,7 @@ module ActiveData
 
       private
 
-        def setup_performers! object
+        def setup_performers!(object)
           association = self
 
           object.define_save do

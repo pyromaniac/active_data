@@ -5,14 +5,14 @@ module ActiveData
         class Base
           attr_reader :name, :options
           class << self
-            def build _target, _generated_methods, name, *args, &block
+            def build(_target, _generated_methods, name, *args, &block)
               options = args.extract_options!
               options[:type] = args.first if args.first
               options[:default] = block if block
               new(name, options)
             end
 
-            def generate_methods name, target
+            def generate_methods(name, target)
             end
 
             def attribute_class
@@ -20,12 +20,12 @@ module ActiveData
             end
           end
 
-          def initialize name, options = {}
+          def initialize(name, options = {})
             @name = name.to_s
             @options = options
           end
 
-          def build_attribute owner, raw_value = nil
+          def build_attribute(owner, raw_value = nil)
             attribute = self.class.attribute_class.new(name, owner)
             attribute.write_value(raw_value) if raw_value
             attribute

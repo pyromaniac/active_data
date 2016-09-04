@@ -6,6 +6,6 @@ describe ActiveData::Model do
   specify { expect { model.blablabla }.to raise_error NoMethodError }
 
   context 'Fault tolerance' do
-    specify{ expect { model.new(foo: 'bar') }.not_to raise_error }
+    specify { expect { model.new(foo: 'bar') }.not_to raise_error }
   end
 end

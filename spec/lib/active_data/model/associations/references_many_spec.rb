@@ -140,21 +140,21 @@ describe ActiveData::Model::Associations::ReferencesMany do
         .to raise_error ActiveData::AssociationTypeMismatch
     end
     specify do
-      expect { existing_association.writer([new_author1, Dummy.new, new_author2]) rescue nil }
+      expect { muffle(ActiveData::AssociationTypeMismatch) { existing_association.writer([new_author1, Dummy.new, new_author2]) } }
         .not_to change { existing_book.read_attribute(:author_ids) }
     end
     specify do
-      expect { existing_association.writer([new_author1, Dummy.new, new_author2]) rescue nil }
+      expect { muffle(ActiveData::AssociationTypeMismatch) { existing_association.writer([new_author1, Dummy.new, new_author2]) } }
         .not_to change { existing_association.reader }
     end
 
     specify { expect { existing_association.writer(nil) }.to raise_error NoMethodError }
     specify do
-      expect { existing_association.writer(nil) rescue nil }
+      expect { muffle(NoMethodError) { existing_association.writer(nil) } }
         .not_to change { existing_book.read_attribute(:author_ids) }
     end
     specify do
-      expect { existing_association.writer(nil) rescue nil }
+      expect { muffle(NoMethodError) { existing_association.writer(nil) } }
         .not_to change { existing_association.reader }
     end
 
@@ -220,12 +220,12 @@ describe ActiveData::Model::Associations::ReferencesMany do
         .to raise_error ActiveData::AssociationTypeMismatch
     end
     specify do
-      expect { existing_association.concat(new_author1, Dummy.new, new_author2) rescue nil }
+      expect { muffle(ActiveData::AssociationTypeMismatch) { existing_association.concat(new_author1, Dummy.new, new_author2) } }
         .to change { existing_book.read_attribute(:author_ids) }
         .from([author.id]).to([author.id, new_author1.id])
     end
     specify do
-      expect { existing_association.concat(new_author1, Dummy.new, new_author2) rescue nil }
+      expect { muffle(ActiveData::AssociationTypeMismatch) { existing_association.concat(new_author1, Dummy.new, new_author2) } }
         .to change { existing_association.reader.map(&:name) }
         .from(['Rick']).to(%w(Rick John))
     end

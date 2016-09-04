@@ -55,13 +55,11 @@ module ActiveData
 
         def alias_attribute(alias_name, attribute_name)
           reflection = reflect_on_attribute(attribute_name)
-          raise ArgumentError.new("Unable to alias undefined attribute `#{attribute_name}` on #{self}") unless reflection
-          raise ArgumentError.new("Unable to alias base attribute `#{attribute_name}`") if reflection.class == ActiveData::Model::Attributes::Reflections::Base
+          raise ArgumentError, "Unable to alias undefined attribute `#{attribute_name}` on #{self}" unless reflection
+          raise ArgumentError, "Unable to alias base attribute `#{attribute_name}`" if reflection.class == ActiveData::Model::Attributes::Reflections::Base
           reflection.class.generate_methods alias_name, generated_attributes_methods
           self._attribute_aliases = _attribute_aliases.merge(alias_name.to_s => reflection.name)
-          if dirty?
-            define_dirty alias_name, generated_attributes_methods
-          end
+          define_dirty alias_name, generated_attributes_methods if dirty?
           reflection
         end
 
@@ -70,7 +68,7 @@ module ActiveData
           _attributes[_attribute_aliases[name] || name]
         end
 
-        def has_attribute? name
+        def has_attribute?(name)
           name = name.to_s
           _attributes.key?(_attribute_aliases[name] || name)
         end
@@ -139,11 +137,11 @@ module ActiveData
         end
       end
 
-      def initialize attrs = {}
+      def initialize(attrs = {})
         assign_attributes attrs
       end
 
-      def == other
+      def ==(other)
         super || other.instance_of?(self.class) && other.attributes(false) == attributes(false)
       end
       alias_method :eql?, :==
@@ -155,21 +153,21 @@ module ActiveData
           .build_attribute(self, @initial_attributes.try(:[], reflection.name))
       end
 
-      def write_attribute name, value
+      def write_attribute(name, value)
         attribute(name).write(value)
       end
       alias_method :[]=, :write_attribute
 
-      def read_attribute name
+      def read_attribute(name)
         attribute(name).read
       end
       alias_method :[], :read_attribute
 
-      def read_attribute_before_type_cast name
+      def read_attribute_before_type_cast(name)
         attribute(name).read_before_type_cast
       end
 
-      def attribute_present? name
+      def attribute_present?(name)
         attribute(name).value_present?
       end
 
@@ -177,12 +175,12 @@ module ActiveData
         Hash[attribute_names(include_associations).map { |name| [name, read_attribute(name)] }]
       end
 
-      def update attrs
+      def update(attrs)
         assign_attributes(attrs)
       end
       alias_method :update_attributes, :update
 
-      def assign_attributes attrs
+      def assign_attributes(attrs)
         if self.class.represented_attributes.present? ||
             (self.class.is_a?(ActiveData::Model::Associations::NestedAttributes) &&
             self.class.nested_attributes_options.present?)
@@ -213,7 +211,7 @@ module ActiveData
         "#<#{self.class.send(:original_inspect)} #{attributes_for_inspect.presence || '(no attributes)'}>"
       end
 
-      def initialize_copy _
+      def initialize_copy(_)
         @initial_attributes = Hash[attribute_names.map do |name|
           [name, read_attribute_before_type_cast(name)]
         end]
@@ -223,7 +221,7 @@ module ActiveData
 
     private
 
-      def _assign_attributes attrs
+      def _assign_attributes(attrs)
         attrs.each do |name, value|
           name = name.to_s
           sanitize_value = self.class._sanitize && name == self.class.primary_name
