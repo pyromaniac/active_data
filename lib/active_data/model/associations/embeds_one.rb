@@ -30,9 +30,14 @@ module ActiveData
         end
 
         def target=(object)
-          setup_performers! object if object
+          if object
+            callback(:before_add, object)
+            setup_performers! object
+          end
           loaded!
           @target = object
+          callback(:after_add, object) if object
+          object
         end
 
         def load_target
@@ -41,20 +46,20 @@ module ActiveData
         end
 
         def default
-          unless evar_loaded?
-            default = reflection.default(owner)
-            if default
-              object = if default.is_a?(reflection.klass)
-                default
-              else
-                reflection.klass.with_sanitize(false) do
-                  reflection.klass.new(default)
-                end
-              end
-              object.send(:clear_changes_information) if reflection.klass.dirty?
-              object
+          return if evar_loaded?
+
+          default = reflection.default(owner)
+          return unless default
+
+          object = if default.is_a?(reflection.klass)
+            default
+          else
+            reflection.klass.with_sanitize(false) do
+              reflection.klass.new(default)
             end
           end
+          object.send(:clear_changes_information) if reflection.klass.dirty?
+          object
         end
 
         def clear

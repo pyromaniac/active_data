@@ -44,6 +44,21 @@ module ActiveData
           apply_changes or raise ActiveData::AssociationChangesNotApplied
         end
 
+        def callback(name, object)
+          evaluator = reflection.options[name]
+          return true unless evaluator
+
+          if evaluator.is_a?(Proc)
+            if evaluator.arity == 1
+              owner.instance_exec(object, &evaluator)
+            else
+              evaluator.call(owner, object)
+            end
+          else
+            owner.send(evaluator, object)
+          end
+        end
+
         def transaction
           data = Marshal.load(Marshal.dump(read_source))
           yield

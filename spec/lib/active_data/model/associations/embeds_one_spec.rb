@@ -25,6 +25,91 @@ describe ActiveData::Model::Associations::EmbedsOne do
   let(:existing_book) { Book.instantiate title: 'My Life', author: { 'name' => 'Johny' } }
   let(:existing_association) { existing_book.association(:author) }
 
+  context 'callbacks' do
+    before do
+      Book.class_eval do
+        embeds_one :author, before_add: :before_add, after_add: :after_add
+
+        def before_add(object)
+          callbacks.push([:before_add, object])
+        end
+
+        def after_add(object)
+          callbacks.push([:after_add, object])
+        end
+
+        collection :callbacks, Array
+      end
+    end
+    let(:author1) { Author.new(name: 'Author1') }
+    let(:author2) { Author.new(name: 'Author2') }
+
+    specify do
+      expect { association.build(name: 'Author1') }
+        .to change { book.callbacks }
+        .to([[:before_add, author1], [:after_add, author1]])
+    end
+
+    specify do
+      expect do
+        association.build(name: 'Author1')
+        association.build(name: 'Author2')
+      end
+        .to change { book.callbacks }
+        .to([
+          [:before_add, author1], [:after_add, author1],
+          [:before_add, author2], [:after_add, author2]
+        ])
+    end
+
+    specify do
+      expect { association.create(name: 'Author1') }
+        .to change { book.callbacks }
+        .to([[:before_add, author1], [:after_add, author1]])
+    end
+
+    specify do
+      expect { association.writer(author1) }
+        .to change { book.callbacks }
+        .to([[:before_add, author1], [:after_add, author1]])
+    end
+
+    specify do
+      expect do
+        association.writer(author1)
+        association.writer(nil)
+        association.writer(author1)
+      end
+        .to change { book.callbacks }
+        .to([
+          [:before_add, author1], [:after_add, author1],
+          [:before_add, author1], [:after_add, author1]
+        ])
+    end
+
+    context 'default' do
+      before do
+        Book.class_eval do
+          embeds_one :author,
+            before_add: ->(object) { callbacks.push([:before_add, object]) },
+            after_add: ->(object) { callbacks.push([:after_add, object]) },
+            default: -> { { name: 'Author1' } }
+
+          collection :callbacks, Array
+        end
+      end
+
+      specify do
+        expect { association.writer(author2) }
+          .to change { book.callbacks }
+          .to([
+            [:before_add, author1], [:after_add, author1],
+            [:before_add, author2], [:after_add, author2]
+          ])
+      end
+    end
+  end
+
   describe 'book#association' do
     specify { expect(association).to be_a described_class }
     specify { expect(association).to eq(book.association(:author)) }

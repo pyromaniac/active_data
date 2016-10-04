@@ -76,6 +76,121 @@ describe ActiveData::Model::Associations::EmbedsMany do
     end
   end
 
+  context 'callbacks' do
+    before do
+      User.class_eval do
+        embeds_many :projects,
+          before_add: ->(object) { callbacks.push([:before_add, object]) },
+          after_add: ->(object) { callbacks.push([:after_add, object]) }
+
+        collection :callbacks, Array
+      end
+    end
+    let(:project1) { Project.new(title: 'Project1') }
+    let(:project2) { Project.new(title: 'Project2') }
+
+    specify do
+      expect { association.build(title: 'Project1') }
+        .to change { user.callbacks }
+        .to([[:before_add, project1], [:after_add, project1]])
+    end
+
+    specify do
+      expect do
+        association.build(title: 'Project1')
+        association.build(title: 'Project2')
+      end
+        .to change { user.callbacks }
+        .to([
+          [:before_add, project1], [:after_add, project1],
+          [:before_add, project2], [:after_add, project2]
+        ])
+    end
+
+    specify do
+      expect { association.create(title: 'Project1') }
+        .to change { user.callbacks }
+        .to([[:before_add, project1], [:after_add, project1]])
+    end
+
+    specify do
+      expect do
+        association.create(title: 'Project1')
+        association.create(title: 'Project2')
+      end
+        .to change { user.callbacks }
+        .to([
+          [:before_add, project1], [:after_add, project1],
+          [:before_add, project2], [:after_add, project2]
+        ])
+    end
+
+    specify do
+      expect { association.concat(project1, project2) }
+        .to change { user.callbacks }
+        .to([
+          [:before_add, project1], [:after_add, project1],
+          [:before_add, project2], [:after_add, project2]
+        ])
+    end
+
+    specify do
+      expect do
+        association.concat(project1)
+        association.concat(project2)
+      end
+        .to change { user.callbacks }
+        .to([
+          [:before_add, project1], [:after_add, project1],
+          [:before_add, project2], [:after_add, project2]
+        ])
+    end
+
+    specify do
+      expect { association.writer([project2, project1]) }
+        .to change { user.callbacks }
+        .to([
+          [:before_add, project2], [:after_add, project2],
+          [:before_add, project1], [:after_add, project1]
+        ])
+    end
+
+    specify do
+      expect do
+        association.writer([project1])
+        association.writer([])
+        association.writer([project2])
+      end
+        .to change { user.callbacks }
+        .to([
+          [:before_add, project1], [:after_add, project1],
+          [:before_add, project2], [:after_add, project2]
+        ])
+    end
+
+    context 'default' do
+      before do
+        User.class_eval do
+          embeds_many :projects,
+            before_add: ->(owner, object) { owner.callbacks.push([:before_add, object]) },
+            after_add: ->(owner, object) { owner.callbacks.push([:after_add, object]) },
+            default: -> { { title: 'Project1' } }
+
+          collection :callbacks, Array
+        end
+      end
+
+      specify do
+        expect { association.concat(project2) }
+          .to change { user.callbacks }
+          .to([
+            [:before_add, project2], [:after_add, project2],
+            [:before_add, project1], [:after_add, project1]
+          ])
+      end
+    end
+  end
+
   describe '#build' do
     specify { expect(association.build).to be_a Project }
     specify { expect(association.build).not_to be_persisted }

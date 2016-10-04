@@ -106,9 +106,12 @@ module ActiveData
         def push_object(object)
           setup_performers! object
           target[target.size] = object
+          object
         end
 
         def setup_performers!(object)
+          callback(:before_add, object)
+
           association = self
 
           object.define_create do
@@ -136,6 +139,8 @@ module ActiveData
             source.delete_at(index) if index
             association.send(:write_source, source)
           end
+
+          callback(:after_add, object)
         end
       end
     end
