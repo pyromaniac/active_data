@@ -275,7 +275,7 @@ describe ActiveData::Model::Associations::Reflections::ReferencesMany do
         before { book.authors = [author, other] }
         specify do
           expect { author.save! }.to change { book.author_ids }.from([nil, other.id])
-            .to(match([an_instance_of(Fixnum), other.id]))
+            .to(match([be_a(Integer), other.id]))
         end
         specify { expect { author.save! }.not_to change { book.authors } }
       end

@@ -48,8 +48,7 @@ module ActiveData
         def default
           return if evar_loaded?
 
-          default = reflection.default(owner)
-          return unless default
+          default = reflection.default(owner) or return
 
           object = if default.is_a?(reflection.klass)
             default

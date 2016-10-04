@@ -22,16 +22,16 @@ module ActiveData
         end
 
         def default
-          unless evar_loaded?
-            default = reflection.default(owner)
-            case default
-            when reflection.klass
-              default
-            when Hash
-              reflection.klass.new(default)
-            else
-              scope(default).first
-            end if default
+          return if evar_loaded?
+          default = reflection.default(owner) or return
+
+          case default
+          when reflection.klass
+            default
+          when Hash
+            reflection.klass.new(default)
+          else
+            scope(default).first
           end
         end
 

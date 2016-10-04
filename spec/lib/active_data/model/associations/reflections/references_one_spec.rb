@@ -240,7 +240,7 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
 
       context do
         before { book.author = author }
-        specify { expect { author.save! }.to change { book.author_id }.from(nil).to(an_instance_of(Fixnum)) }
+        specify { expect { author.save! }.to change { book.author_id }.from(nil).to(be_a(Integer)) }
         specify { expect { author.save! }.not_to change { book.author } }
       end
     end
