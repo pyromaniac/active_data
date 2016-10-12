@@ -3,7 +3,9 @@ require 'spec_helper'
 
 describe ActiveData::Model::Associations::ReferencesOne do
   before do
-    stub_class(:author, ActiveRecord::Base) {}
+    stub_class(:author, ActiveRecord::Base) do
+      validates :name, presence: true
+    end
 
     stub_model(:book) do
       include ActiveData::Model::Persistence
@@ -29,6 +31,94 @@ describe ActiveData::Model::Associations::ReferencesOne do
 
   describe 'book#inspect' do
     specify { expect(existing_book.inspect).to eq('#<Book author: #<ReferencesOne #<Author id: 1, name: "Johny">>, title: "My Life", author_id: 1>') }
+  end
+
+  describe '#build' do
+    specify { expect(association.build).to be_a Author }
+    specify { expect(association.build).not_to be_persisted }
+
+    specify do
+      expect { association.build(name: 'Fred') }
+        .not_to change { book.author_id }
+    end
+
+    specify do
+      expect { existing_association.build(name: 'Fred') }
+        .to change { existing_book.author_id }
+        .from(author.id).to(nil)
+    end
+  end
+
+  describe '#create' do
+    specify { expect(association.create).to be_a Author }
+    specify { expect(association.create).not_to be_persisted }
+
+    specify { expect(association.create(name: 'Fred')).to be_a Author }
+    specify { expect(association.create(name: 'Fred')).to be_persisted }
+
+    specify do
+      expect { association.create }
+        .not_to change { book.author_id }
+    end
+    specify do
+      expect { association.create(name: 'Fred') }
+        .to change { book.author_id }
+        .from(nil).to(be_a(Integer))
+    end
+
+    specify do
+      expect { existing_association.create }
+        .to change { existing_book.author_id }
+        .from(author.id).to(nil)
+    end
+    specify do
+      expect { existing_association.create(name: 'Fred') }
+        .to change { existing_book.author_id }
+        .from(author.id).to(be_a(Integer))
+    end
+  end
+
+  describe '#create!' do
+    specify { expect { association.create! }.to raise_error ActiveRecord::RecordInvalid }
+    specify do
+      expect { muffle(ActiveRecord::RecordInvalid) { association.create! } }
+        .to change { association.target }
+        .from(nil).to(an_instance_of(Author))
+    end
+
+    specify { expect(association.create!(name: 'Fred')).to be_a Author }
+    specify { expect(association.create!(name: 'Fred')).to be_persisted }
+
+    specify do
+      expect { muffle(ActiveRecord::RecordInvalid) { association.create! } }
+        .not_to change { book.author_id }
+    end
+    specify do
+      expect { muffle(ActiveRecord::RecordInvalid) { association.create! } }
+        .to change { association.reader.try(:attributes).try(:slice, 'name') }
+        .from(nil).to('name' => nil)
+    end
+    specify do
+      expect { association.create(name: 'Fred') }
+        .to change { book.author_id }
+        .from(nil).to(be_a(Integer))
+    end
+
+    specify do
+      expect { muffle(ActiveRecord::RecordInvalid) { existing_association.create! } }
+        .to change { existing_book.author_id }
+        .from(author.id).to(nil)
+    end
+    specify do
+      expect { muffle(ActiveRecord::RecordInvalid) { existing_association.create! } }
+        .to change { existing_association.reader.try(:attributes).try(:slice, 'name') }
+        .from('name' => 'Johny').to('name' => nil)
+    end
+    specify do
+      expect { existing_association.create!(name: 'Fred') }
+        .to change { existing_book.author_id }
+        .from(author.id).to(be_a(Integer))
+    end
   end
 
   describe '#target' do
