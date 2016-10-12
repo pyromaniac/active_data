@@ -1,9 +1,9 @@
 module ActiveData
   module Model
     module Associations
-      class EmbedsMany < Base
+      class EmbedsMany < EmbedAssociation
         def build(attributes = {})
-          push_object(reflection.klass.new(attributes))
+          push_object(build_object(attributes))
         end
 
         def create(attributes = {})
@@ -47,7 +47,7 @@ module ActiveData
               else
                 default.map do |attributes|
                   reflection.klass.with_sanitize(false) do
-                    reflection.klass.new(attributes)
+                    build_object(attributes)
                   end
                 end
               end
@@ -110,6 +110,7 @@ module ActiveData
         end
 
         def setup_performers!(object)
+          embed_object(object)
           callback(:before_add, object)
 
           association = self

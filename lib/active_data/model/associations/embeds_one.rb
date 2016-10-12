@@ -1,11 +1,11 @@
 module ActiveData
   module Model
     module Associations
-      class EmbedsOne < Base
+      class EmbedsOne < EmbedAssociation
         attr_reader :destroyed
 
         def build(attributes = {})
-          self.target = reflection.klass.new(attributes)
+          self.target = build_object(attributes)
         end
 
         def create(attributes = {})
@@ -54,7 +54,7 @@ module ActiveData
             default
           else
             reflection.klass.with_sanitize(false) do
-              reflection.klass.new(default)
+              build_object(default)
             end
           end
           object.send(:clear_changes_information) if reflection.klass.dirty?
@@ -90,6 +90,7 @@ module ActiveData
       private
 
         def setup_performers!(object)
+          embed_object(object)
           association = self
 
           object.define_save do

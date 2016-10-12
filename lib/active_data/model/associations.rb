@@ -10,6 +10,7 @@ require 'active_data/model/associations/reflections/references_one'
 require 'active_data/model/associations/reflections/references_many'
 
 require 'active_data/model/associations/base'
+require 'active_data/model/associations/embed_association'
 require 'active_data/model/associations/embeds_one'
 require 'active_data/model/associations/embeds_many'
 require 'active_data/model/associations/references_one'

@@ -22,16 +22,11 @@ describe ActiveData::Model::Associations::EmbedsMany do
     end
   end
 
-  let(:user) { User.new }
+  let(:user) { User.new(name: 'User') }
   let(:association) { user.association(:projects) }
 
   let(:existing_user) { User.instantiate name: 'Rick', projects: [{ title: 'Genesis' }] }
   let(:existing_association) { existing_user.association(:projects) }
-
-  describe 'user#association' do
-    specify { expect(association).to be_a described_class }
-    specify { expect(association).to eq(user.association(:projects)) }
-  end
 
   context 'performers' do
     let(:user) { User.new(projects: [Project.new(title: 'Project 1')]) }
@@ -188,6 +183,61 @@ describe ActiveData::Model::Associations::EmbedsMany do
             [:before_add, project1], [:after_add, project1]
           ])
       end
+    end
+  end
+
+  describe 'user#association' do
+    specify { expect(association).to be_a described_class }
+    specify { expect(association).to eq(user.association(:projects)) }
+  end
+
+  describe 'project#embedder' do
+    let(:project) { Project.new(title: 'Project') }
+
+    specify { expect(association.build.embedder).to eq(user) }
+    specify { expect(association.create.embedder).to eq(user) }
+    specify do
+      expect { association.writer([project]) }
+        .to change { project.embedder }.from(nil).to(user)
+    end
+    specify do
+      expect { association.concat(project) }
+        .to change { project.embedder }.from(nil).to(user)
+    end
+    specify do
+      expect { association.target = [project] }
+        .to change { project.embedder }.from(nil).to(user)
+    end
+
+    context 'default' do
+      before do
+        User.class_eval do
+          embeds_many :projects, default: -> { { title: 'Project1' } }
+        end
+      end
+
+      specify { expect(association.target.first.embedder).to eq(user) }
+
+      context do
+        before do
+          User.class_eval do
+            embeds_many :projects, default: -> { Project.new(title: 'Project1') }
+          end
+        end
+
+        specify { expect(association.target.first.embedder).to eq(user) }
+      end
+    end
+
+    context 'embedding goes before attributes' do
+      before do
+        Project.class_eval do
+          attribute :title, String, normalize: ->(value) { "#{value}#{embedder.name}" }
+        end
+      end
+
+      specify { expect(association.build(title: 'Project').title).to eq('ProjectUser') }
+      specify { expect(association.create(title: 'Project').title).to eq('ProjectUser') }
     end
   end
 

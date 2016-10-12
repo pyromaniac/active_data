@@ -19,7 +19,7 @@ describe ActiveData::Model::Associations::EmbedsOne do
     end
   end
 
-  let(:book) { Book.new }
+  let(:book) { Book.new(title: 'Book') }
   let(:association) { book.association(:author) }
 
   let(:existing_book) { Book.instantiate title: 'My Life', author: { 'name' => 'Johny' } }
@@ -113,6 +113,52 @@ describe ActiveData::Model::Associations::EmbedsOne do
   describe 'book#association' do
     specify { expect(association).to be_a described_class }
     specify { expect(association).to eq(book.association(:author)) }
+  end
+
+  describe 'author#embedder' do
+    let(:author) { Author.new(name: 'Author') }
+
+    specify { expect(association.build.embedder).to eq(book) }
+    specify { expect(association.create.embedder).to eq(book) }
+    specify do
+      expect { association.writer(author) }
+        .to change { author.embedder }.from(nil).to(book)
+    end
+    specify do
+      expect { association.target = author }
+        .to change { author.embedder }.from(nil).to(book)
+    end
+
+    context 'default' do
+      before do
+        Book.class_eval do
+          embeds_one :author, default: -> { { name: 'Author1' } }
+        end
+      end
+
+      specify { expect(association.target.embedder).to eq(book) }
+
+      context do
+        before do
+          Book.class_eval do
+            embeds_one :author, default: -> { Author.new(name: 'Author1') }
+          end
+        end
+
+        specify { expect(association.target.embedder).to eq(book) }
+      end
+    end
+
+    context 'embedding goes before attributes' do
+      before do
+        Author.class_eval do
+          attribute :name, String, normalize: ->(value) { "#{value}#{embedder.title}" }
+        end
+      end
+
+      specify { expect(association.build(name: 'Author').name).to eq('AuthorBook') }
+      specify { expect(association.create(name: 'Author').name).to eq('AuthorBook') }
+    end
   end
 
   describe '#build' do
