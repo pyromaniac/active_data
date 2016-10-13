@@ -9,7 +9,7 @@ module ActiveData
       private
 
         def build_object(attributes)
-          reflection.klass.new(attributes)
+          reflection.persistence_adapter.build(attributes)
         end
       end
     end

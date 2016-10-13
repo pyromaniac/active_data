@@ -248,67 +248,57 @@ describe ActiveData::Model::Associations::EmbedsOne do
 
   describe '#apply_changes' do
     specify do
-      expect do
-        association.build
-        association.apply_changes
-      end.to change { association.target.try(:persisted?) }.to(false)
+      association.build
+      expect { association.apply_changes }
+        .not_to change { association.target.persisted? }.from(false)
     end
     specify do
-      expect do
-        association.build(name: 'Fred')
-        association.apply_changes
-      end.to change { association.target.try(:persisted?) }.to(true)
+      association.build(name: 'Fred')
+      expect { association.apply_changes }
+        .to change { association.target.persisted? }.to(true)
     end
     specify do
-      expect do
-        existing_association.target.mark_for_destruction
-        existing_association.apply_changes
-      end.to change { existing_association.target }.to(nil)
+      existing_association.target.mark_for_destruction
+      expect { existing_association.apply_changes }
+        .to change { existing_association.target }.to(nil)
     end
     specify do
-      expect do
-        existing_association.target.destroy!
-        existing_association.apply_changes
-      end.to change { existing_association.target }.to(nil)
+      existing_association.target.destroy!
+      expect { existing_association.apply_changes }
+        .to change { existing_association.target }.to(nil)
     end
     specify do
-      expect do
-        existing_association.target.mark_for_destruction
-        existing_association.apply_changes
-      end.to change { existing_association.destroyed.try(:name) }.from(nil).to('Johny')
+      existing_association.target.mark_for_destruction
+      expect { existing_association.apply_changes }
+        .to change { existing_association.destroyed.try(:name) }.from(nil).to('Johny')
     end
     specify do
-      expect do
-        existing_association.target.destroy!
-        existing_association.apply_changes
-      end.to change { existing_association.destroyed.try(:name) }.from(nil).to('Johny')
+      existing_association.target.destroy!
+      expect { existing_association.apply_changes }
+        .to change { existing_association.destroyed.try(:name) }.from(nil).to('Johny')
     end
   end
 
   describe '#apply_changes!' do
     specify do
-      expect do
-        association.build
-        association.apply_changes!
-      end.to raise_error ActiveData::AssociationChangesNotApplied
+      association.build
+      expect { association.apply_changes! }
+        .to raise_error ActiveData::AssociationChangesNotApplied
     end
     specify do
-      expect do
-        association.build(name: 'Fred')
-        association.apply_changes!
-      end.to change { association.target.try(:persisted?) }.to(true)
+      association.build(name: 'Fred')
+      expect { association.apply_changes! }
+        .to change { association.target.persisted? }.to(true)
     end
     specify do
-      expect do
-        existing_association.target.mark_for_destruction
-        existing_association.apply_changes!
-      end.to change { existing_association.target }.to(nil)
+      existing_association.target.mark_for_destruction
+      expect { existing_association.apply_changes! }
+        .to change { existing_association.target }.to(nil)
     end
     specify do
-      expect do
-        existing_association.target.destroy!
-        existing_association.apply_changes!
-      end.to change { existing_association.target }.to(nil)
+      existing_association.target.destroy!
+      expect { existing_association.apply_changes! }
+        .to change { existing_association.target }.to(nil)
     end
   end
 

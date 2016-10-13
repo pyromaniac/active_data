@@ -121,6 +121,151 @@ describe ActiveData::Model::Associations::ReferencesOne do
     end
   end
 
+  context do
+    shared_examples 'apply_changes' do |method|
+      specify do
+        association.build(name: 'Fred')
+        expect(association.send(method)).to eq(true)
+      end
+      specify do
+        association.build(name: 'Fred')
+        expect { association.send(method) }
+          .to change { association.target.persisted? }.to(true)
+      end
+      specify do
+        existing_association.target.name = 'Fred'
+        expect { existing_association.send(method) }
+          .not_to change { author.reload.name }
+      end
+      specify do
+        existing_association.target.mark_for_destruction
+        expect { existing_association.send(method) }
+          .not_to change { existing_association.target.destroyed? }
+      end
+      specify do
+        existing_association.target.mark_for_destruction
+        expect { existing_association.send(method) }
+          .not_to change { existing_book.author_id }
+      end
+      specify do
+        existing_association.target.destroy!
+        expect { existing_association.send(method) }
+          .not_to change { existing_association.target.destroyed? }
+      end
+      specify do
+        existing_association.target.destroy!
+        expect { existing_association.send(method) }
+          .not_to change { existing_book.author_id }
+      end
+
+      context ':autosave' do
+        before do
+          Book.references_one :author, autosave: true
+        end
+
+        specify do
+          association.build(name: 'Fred')
+          expect(association.send(method)).to eq(true)
+        end
+        specify do
+          association.build(name: 'Fred')
+          expect { association.send(method) }
+            .to change { association.target.persisted? }.to(true)
+        end
+        specify do
+          existing_association.target.name = 'Fred'
+          expect { existing_association.send(method) }
+            .to change { author.reload.name }.from('Johny').to('Fred')
+        end
+        specify do
+          existing_association.target.mark_for_destruction
+          expect { existing_association.send(method) }
+            .to change { existing_association.target.destroyed? }
+            .from(false).to(true)
+        end
+        specify do
+          existing_association.target.mark_for_destruction
+          expect { existing_association.send(method) }
+            .not_to change { existing_book.author_id }
+            .from(author.id)
+        end
+        specify do
+          existing_association.target.destroy!
+          expect { existing_association.send(method) }
+            .not_to change { existing_association.target.destroyed? }
+        end
+        specify do
+          existing_association.target.destroy!
+          expect { existing_association.send(method) }
+            .not_to change { existing_book.author_id }
+            .from(author.id)
+        end
+      end
+    end
+
+    describe '#apply_changes' do
+      include_examples 'apply_changes', :apply_changes
+
+      specify do
+        association.build
+        expect(association.apply_changes).to eq(false)
+      end
+      specify do
+        association.build
+        expect { association.apply_changes }
+          .not_to change { association.target.persisted? }.from(false)
+      end
+
+      context ':autosave' do
+        before do
+          Book.references_one :author, autosave: true
+        end
+
+        specify do
+          association.build
+          expect(association.apply_changes).to eq(false)
+        end
+        specify do
+          association.build
+          expect { association.apply_changes }
+            .not_to change { association.target.persisted? }.from(false)
+        end
+      end
+    end
+
+    describe '#apply_changes!' do
+      include_examples 'apply_changes', :apply_changes!
+
+      specify do
+        association.build
+        expect { association.apply_changes! }
+          .to raise_error(ActiveData::AssociationChangesNotApplied)
+      end
+      specify do
+        association.build
+        expect { muffle(ActiveData::AssociationChangesNotApplied) { association.apply_changes! } }
+          .not_to change { association.target.persisted? }.from(false)
+      end
+
+      context ':autosave' do
+        before do
+          Book.references_one :author, autosave: true
+        end
+
+        specify do
+          association.build
+          expect { association.apply_changes! }
+            .to raise_error(ActiveData::AssociationChangesNotApplied)
+        end
+        specify do
+          association.build
+          expect { muffle(ActiveData::AssociationChangesNotApplied) { association.apply_changes! } }
+            .not_to change { association.target.persisted? }.from(false)
+        end
+      end
+    end
+  end
+
   describe '#target' do
     specify { expect(association.target).to be_nil }
     specify { expect(existing_association.target).to eq(existing_book.author) }
@@ -242,7 +387,8 @@ describe ActiveData::Model::Associations::ReferencesOne do
       specify { expect(existing_association.writer(new_author)).to eq(new_author) }
       specify do
         expect { existing_association.writer(nil) }
-          .to change { existing_book.read_attribute(:author_id) }.from(author.id).to(nil)
+          .to change { existing_book.read_attribute(:author_id) }
+          .from(author.id).to(nil)
       end
       specify do
         expect { existing_association.writer(new_author) }

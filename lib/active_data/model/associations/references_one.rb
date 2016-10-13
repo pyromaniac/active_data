@@ -15,12 +15,17 @@ module ActiveData
         end
 
         def apply_changes
-          if target && !target.marked_for_destruction?
-            write_source identify
+          if target
+            if target.marked_for_destruction? && reflection.autosave?
+              target.destroy
+            elsif target.new_record? || (reflection.autosave? && target.changed?)
+              target.save
+            else
+              true
+            end
           else
-            write_source nil
+            true
           end
-          true
         end
 
         def target=(object)
@@ -44,7 +49,7 @@ module ActiveData
           when reflection.persistence_adapter.data_type
             default
           when Hash
-            reflection.persistence_adapter.build(default)
+            build_object(default)
           else
             reflection.persistence_adapter.find_one(owner, default)
           end
@@ -71,7 +76,7 @@ module ActiveData
           transaction do
             attribute.pollute do
               self.target = object
-              apply_changes!
+              write_source identify
             end
           end
 
