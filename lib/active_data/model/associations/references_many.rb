@@ -1,9 +1,11 @@
 module ActiveData
   module Model
     module Associations
-      class ReferencesMany < Base
+      class ReferencesMany < ReferenceAssociation
         def apply_changes
-          present_keys = target.reject(&:marked_for_destruction?).map(&reflection.primary_key).compact
+          present_keys = target.reject(&:marked_for_destruction?).map do |obj|
+            reflection.persistence_adapter.identify(obj)
+          end
           write_source(present_keys)
           true
         end
@@ -15,19 +17,22 @@ module ActiveData
 
         def load_target
           source = read_source
-          source.present? ? scope(source).to_a : default
+          source.present? ? reflection.persistence_adapter.find_all(owner, source) : default
         end
 
         def default
-          unless evar_loaded?
-            default = Array.wrap(reflection.default(owner)) or return []
-            if default.all? { |object| object.is_a?(reflection.klass) }
-              default
-            elsif default.all? { |object| object.is_a?(Hash) }
-              default.map { |attributes| reflection.klass.new(attributes) }
-            else
-              scope(default).to_a
-            end
+          return [] if evar_loaded?
+
+          default = Array.wrap(reflection.default(owner))
+
+          return [] unless default
+
+          if default.all? { |object| object.is_a?(reflection.persistence_adapter.data_type) }
+            default
+          elsif default.all? { |object| object.is_a?(Hash) }
+            default.map { |attributes| reflection.persistence_adapter.build(attributes) }
+          else
+            reflection.persistence_adapter.find_all(owner, default)
           end || []
         end
 
@@ -41,7 +46,7 @@ module ActiveData
 
         def reader(force_reload = false)
           reload if force_reload
-          @proxy ||= Collection::Referenced.new self
+          @proxy ||= reflection.persistence_adapter.referenced_proxy(self)
         end
 
         def replace(objects)
@@ -65,12 +70,8 @@ module ActiveData
           reload.empty?
         end
 
-        def scope(source = read_source)
-          reflection.scope(owner).where(reflection.primary_key => source)
-        end
-
         def identify
-          target.map(&reflection.primary_key)
+          target.map { |obj| reflection.persistence_adapter.identify(obj) }
         end
 
       private
@@ -79,7 +80,9 @@ module ActiveData
           attribute.pollute do
             objects.each do |object|
               next if target.include?(object)
-              raise AssociationTypeMismatch.new(reflection.klass, object.class) unless object.is_a?(reflection.klass)
+              unless object.is_a?(reflection.persistence_adapter.data_type)
+                raise AssociationTypeMismatch.new(reflection.persistence_adapter.data_type, object.class)
+              end
               target.push(object)
               apply_changes!
             end

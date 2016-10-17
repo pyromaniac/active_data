@@ -1,7 +1,7 @@
 module ActiveData
   module Model
     module Associations
-      class ReferencesOne < Base
+      class ReferencesOne < ReferenceAssociation
         def apply_changes
           if target && !target.marked_for_destruction?
             write_source identify
@@ -18,20 +18,23 @@ module ActiveData
 
         def load_target
           source = read_source
-          source ? scope(source).first : default
+          source ? reflection.persistence_adapter.find_one(owner, source) : default
         end
 
         def default
           return if evar_loaded?
-          default = reflection.default(owner) or return
+
+          default = reflection.default(owner)
+
+          return unless default
 
           case default
-          when reflection.klass
+          when reflection.persistence_adapter.data_type
             default
           when Hash
-            reflection.klass.new(default)
+            reflection.persistence_adapter.build(default)
           else
-            scope(default).first
+            reflection.persistence_adapter.find_one(owner, default)
           end
         end
 
@@ -49,8 +52,8 @@ module ActiveData
         end
 
         def replace(object)
-          unless object.nil? || object.is_a?(reflection.klass)
-            raise AssociationTypeMismatch.new(reflection.klass, object.class)
+          unless object.nil? || object.is_a?(reflection.persistence_adapter.data_type)
+            raise AssociationTypeMismatch.new(reflection.persistence_adapter.data_type, object.class)
           end
 
           transaction do
@@ -64,12 +67,8 @@ module ActiveData
         end
         alias_method :writer, :replace
 
-        def scope(source = read_source)
-          reflection.scope(owner).where(reflection.primary_key => source)
-        end
-
         def identify
-          target.try(reflection.primary_key)
+          reflection.persistence_adapter.identify(target)
         end
 
       private

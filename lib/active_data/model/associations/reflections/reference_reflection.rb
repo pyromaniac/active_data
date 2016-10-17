@@ -9,10 +9,26 @@ module ActiveData
             reflection
           end
 
+          delegate :primary_key, to: :persistence_adapter
+
           def initialize(name, *args)
             @options = args.extract_options!
             @scope_proc = args.first
             @name = name.to_sym
+          end
+
+          def klass
+            @klass ||= if options[:data_source].present?
+              options[:data_source].to_s.constantize
+            else
+              super
+            end
+          end
+          alias_method :data_source, :klass
+
+          def persistence_adapter
+            @persistence_adapter ||= ActiveData.persistence_adapter(data_source)
+              .call(data_source, options[:primary_key], @scope_proc)
           end
 
           def read_source(object)
@@ -23,22 +39,12 @@ module ActiveData
             object.write_attribute(reference_key, value)
           end
 
-          def primary_key
-            @primary_key ||= options[:primary_key].presence.try(:to_sym) || :id
-          end
-
-          def scope(owner)
-            scope = klass.unscoped
-            return scope unless @scope_proc
-            if @scope_proc.arity.zero?
-              scope.instance_exec(&@scope_proc)
-            else
-              scope.instance_exec(owner, &@scope_proc)
-            end
-          end
-
           def embedded?
             false
+          end
+
+          def inspect
+            "#{self.class.name.demodulize}(#{persistence_adapter.data_type})"
           end
         end
       end

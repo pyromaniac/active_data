@@ -1,8 +1,8 @@
 require 'active_data/model/associations/collection/proxy'
 require 'active_data/model/associations/collection/embedded'
-require 'active_data/model/associations/collection/referenced'
 
 require 'active_data/model/associations/reflections/base'
+require 'active_data/model/associations/reflections/embed_reflection'
 require 'active_data/model/associations/reflections/embeds_one'
 require 'active_data/model/associations/reflections/embeds_many'
 require 'active_data/model/associations/reflections/reference_reflection'
@@ -13,6 +13,7 @@ require 'active_data/model/associations/base'
 require 'active_data/model/associations/embed_association'
 require 'active_data/model/associations/embeds_one'
 require 'active_data/model/associations/embeds_many'
+require 'active_data/model/associations/reference_association'
 require 'active_data/model/associations/references_one'
 require 'active_data/model/associations/references_many'
 

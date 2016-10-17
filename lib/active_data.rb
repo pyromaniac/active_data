@@ -12,6 +12,8 @@ require 'active_data/errors'
 require 'active_data/extensions'
 require 'active_data/config'
 require 'active_data/railtie' if defined? Rails
+require 'active_data/model'
+require 'active_data/persistence_adapters'
 
 module ActiveData
   BOOLEAN_MAPPING = {
@@ -127,9 +129,11 @@ module ActiveData
       ActiveData::UUID.parse_int value
     end
   end
-end
 
-require 'active_data/model'
+  persistence_adapter('ActiveRecord::Base') do |data_source, primary_key, scope_proc|
+    ActiveData::Model::Associations::PersistenceAdapters::ActiveRecord.new(data_source, primary_key, scope_proc)
+  end
+end
 
 ActiveSupport.on_load :active_record do
   require 'active_data/active_record/associations'
