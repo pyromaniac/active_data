@@ -35,6 +35,10 @@ Metrics/MethodLength:
 Metrics/ModuleLength:
   Max: 114
 
+# Offense count: 2
+Metrics/BlockLength:
+  Max: 27
+
 # Offense count: 3
 Metrics/PerceivedComplexity:
   Max: 16

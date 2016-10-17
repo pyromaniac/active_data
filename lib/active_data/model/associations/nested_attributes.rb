@@ -117,20 +117,20 @@ module ActiveData
           end
 
           def self.check_record_limit!(limit, attributes_collection)
-            if limit
-              limit = case limit
-              when Symbol
-                send(limit)
-              when Proc
-                limit.call
-              else
-                limit
-              end
+            return unless limit
 
-              if limit && attributes_collection.size > limit
-                raise ActiveData::TooManyObjects.new(limit, attributes_collection.size)
-              end
+            limit = case limit
+            when Symbol
+              send(limit)
+            when Proc
+              limit.call
+            else
+              limit
             end
+
+            return unless limit && attributes_collection.size > limit
+
+            raise ActiveData::TooManyObjects.new(limit, attributes_collection.size)
           end
 
           def self.assign_to_or_mark_for_destruction(object, attributes, allow_destroy)
