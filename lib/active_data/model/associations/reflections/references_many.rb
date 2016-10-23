@@ -2,7 +2,7 @@ module ActiveData
   module Model
     module Associations
       module Reflections
-        class ReferencesMany < ReferenceReflection
+        class ReferencesMany < ReferencesAny
           def self.build(target, generated_methods, name, *args, &block)
             reflection = super
 
@@ -12,10 +12,6 @@ module ActiveData
             )
 
             reflection
-          end
-
-          def collection?
-            true
           end
 
           def reference_key

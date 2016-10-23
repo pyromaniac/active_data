@@ -1,7 +1,7 @@
 module ActiveData
   module Model
     module Associations
-      class EmbedsMany < EmbedAssociation
+      class EmbedsMany < EmbedsAny
         def build(attributes = {})
           push_object(build_object(attributes))
         end

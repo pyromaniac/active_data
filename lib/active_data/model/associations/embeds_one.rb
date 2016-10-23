@@ -1,7 +1,7 @@
 module ActiveData
   module Model
     module Associations
-      class EmbedsOne < EmbedAssociation
+      class EmbedsOne < EmbedsAny
         attr_reader :destroyed
 
         def build(attributes = {})

@@ -1,7 +1,7 @@
 module ActiveData
   module Model
     module Associations
-      class EmbedAssociation < Base
+      class EmbedsAny < Base
       private
 
         def build_object(attributes)
