@@ -12,15 +12,9 @@ module ActiveData
           end
 
           def self.generate_methods(name, target)
+            super
+
             target.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-              def #{name} force_reload = false
-                association(:#{name}).reader(force_reload)
-              end
-
-              def #{name}= value
-                association(:#{name}).writer(value)
-              end
-
               def build_#{name} attributes = {}
                 association(:#{name}).build(attributes)
               end

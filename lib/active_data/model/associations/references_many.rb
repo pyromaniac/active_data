@@ -30,7 +30,7 @@ module ActiveData
           if default.all? { |object| object.is_a?(reflection.persistence_adapter.data_type) }
             default
           elsif default.all? { |object| object.is_a?(Hash) }
-            default.map { |attributes| reflection.persistence_adapter.build(attributes) }
+            default.map { |attributes| build_object(attributes) }
           else
             reflection.persistence_adapter.find_all(owner, default)
           end || []

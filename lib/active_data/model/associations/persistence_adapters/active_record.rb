@@ -40,7 +40,7 @@ module ActiveData
           end
 
           def identify(object)
-            object[primary_key]
+            object[primary_key] if object
           end
 
           def primary_key

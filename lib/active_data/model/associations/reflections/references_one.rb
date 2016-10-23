@@ -14,6 +14,24 @@ module ActiveData
             reflection
           end
 
+          def self.generate_methods(name, target)
+            super
+
+            target.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+              def build_#{name} attributes = {}
+                association(:#{name}).build(attributes)
+              end
+
+              def create_#{name} attributes = {}
+                association(:#{name}).create(attributes)
+              end
+
+              def create_#{name}! attributes = {}
+                association(:#{name}).create!(attributes)
+              end
+            RUBY
+          end
+
           def collection?
             false
           end

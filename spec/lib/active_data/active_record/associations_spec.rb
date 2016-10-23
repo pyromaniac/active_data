@@ -28,6 +28,18 @@ describe ActiveData::ActiveRecord::Associations do
       embeds_many :projects
       embeds_one :profile
 
+      # Simulating JSON attribute
+      serialize :projects, JSON
+
+      def read_attribute(name)
+        if name.to_s == 'projects'
+          value = super
+          JSON.parse(value) if value
+        else
+          super
+        end
+      end
+
       validates :projects, associated: true
     end
   end
@@ -101,16 +113,16 @@ describe ActiveData::ActiveRecord::Associations do
 
         specify do
           expect { user.projects << project }
-            .to change { user.attributes['projects'] }.from(nil)
-            .to([{ title: 'First', author: { name: 'Author' } }].to_json)
+            .to change { user.read_attribute(:projects) }.from(nil)
+            .to([{ 'title' => 'First', 'author' => { 'name' => 'Author' } }])
         end
         specify do
           expect do
             user.projects << project
             user.save
           end
-            .to change { user.reload.attributes['projects'] }.from(nil)
-            .to([{ title: 'First', author: { name: 'Author' } }].to_json)
+            .to change { user.reload.read_attribute(:projects) }.from(nil)
+            .to([{ 'title' => 'First', 'author' => { 'name' => 'Author' } }])
         end
       end
     end
@@ -127,7 +139,7 @@ describe ActiveData::ActiveRecord::Associations do
       end
       specify do
         expect { user.profile = Profile.new(first_name: 'google.com') }
-          .to change { user.attributes['profile'] }.from(nil)
+          .to change { user.read_attribute(:profile) }.from(nil)
           .to({ first_name: 'google.com', last_name: nil }.to_json)
       end
       specify do
@@ -135,7 +147,7 @@ describe ActiveData::ActiveRecord::Associations do
           user.profile = Profile.new(first_name: 'google.com')
           user.save
         end
-          .to change { user.reload.attributes['profile'] }.from(nil)
+          .to change { user.reload.read_attribute(:profile) }.from(nil)
           .to({ first_name: 'google.com', last_name: nil }.to_json)
       end
     end

@@ -263,4 +263,25 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
       specify { expect { book.author_id = nil }.to change { book.author }.from(other).to(nil) }
     end
   end
+
+  describe '#build_author' do
+    specify { expect(book.build_author(name: 'Author')).to be_a(Author) }
+    specify { expect(book.build_author(name: 'Author')).not_to be_persisted }
+    specify { expect { book.build_author(name: 'Author') }.to change { book.author }.from(nil).to(an_instance_of(Author)) }
+    specify { expect { book.build_author(name: 'Author') }.not_to change { book.author_id }.from(nil) }
+  end
+
+  describe '#create_author' do
+    specify { expect(book.create_author(name: 'Author')).to be_a(Author) }
+    specify { expect(book.create_author(name: 'Author')).to be_persisted }
+    specify { expect { book.create_author(name: 'Author') }.to change { book.author }.from(nil).to(an_instance_of(Author)) }
+    specify { expect { book.create_author(name: 'Author') }.to change { book.author_id }.from(nil).to(be_a(Integer)) }
+  end
+
+  describe '#create_author!' do
+    specify { expect(book.create_author!(name: 'Author')).to be_a(Author) }
+    specify { expect(book.create_author!(name: 'Author')).to be_persisted }
+    specify { expect { book.create_author!(name: 'Author') }.to change { book.author }.from(nil).to(an_instance_of(Author)) }
+    specify { expect { book.create_author!(name: 'Author') }.to change { book.author_id }.from(nil).to(be_a(Integer)) }
+  end
 end
