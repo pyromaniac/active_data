@@ -75,6 +75,10 @@ module ActiveData
               defaultizer
             end
           end
+
+          def collection?
+            true
+          end
         end
       end
     end

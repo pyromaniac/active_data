@@ -14,10 +14,6 @@ module ActiveData
             reflection
           end
 
-          def collection?
-            true
-          end
-
           def reference_key
             @reference_key ||= options[:reference_key].presence.try(:to_sym) ||
               :"#{name.to_s.singularize}_#{primary_key.to_s.pluralize}"

@@ -2,6 +2,7 @@ require 'active_data/model/associations/collection/proxy'
 require 'active_data/model/associations/collection/embedded'
 
 require 'active_data/model/associations/reflections/base'
+require 'active_data/model/associations/reflections/singular'
 require 'active_data/model/associations/reflections/embeds_any'
 require 'active_data/model/associations/reflections/embeds_one'
 require 'active_data/model/associations/reflections/embeds_many'

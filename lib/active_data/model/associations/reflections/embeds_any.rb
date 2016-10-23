@@ -32,6 +32,10 @@ module ActiveData
           def inspect
             "#{self.class.name.demodulize}(#{klass})"
           end
+
+          def embedded?
+            true
+          end
         end
       end
     end

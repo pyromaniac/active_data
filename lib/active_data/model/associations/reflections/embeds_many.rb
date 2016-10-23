@@ -10,14 +10,6 @@ module ActiveData
             options[:validate] = true unless options.key?(:validate)
             super
           end
-
-          def collection?
-            true
-          end
-
-          def embedded?
-            true
-          end
         end
       end
     end
