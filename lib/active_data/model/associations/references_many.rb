@@ -1,7 +1,7 @@
 module ActiveData
   module Model
     module Associations
-      class ReferencesMany < ReferenceAssociation
+      class ReferencesMany < ReferencesAny
         def apply_changes
           present_keys = target.reject(&:marked_for_destruction?).map do |obj|
             reflection.persistence_adapter.identify(obj)

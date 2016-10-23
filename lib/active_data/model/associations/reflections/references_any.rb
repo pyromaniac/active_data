@@ -2,7 +2,7 @@ module ActiveData
   module Model
     module Associations
       module Reflections
-        class ReferenceReflection < Base
+        class ReferencesAny < Base
           def self.build(_target, generated_methods, name, *args)
             reflection = new(name, *args)
             generate_methods name, generated_methods

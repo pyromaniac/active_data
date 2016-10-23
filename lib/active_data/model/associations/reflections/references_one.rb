@@ -2,7 +2,7 @@ module ActiveData
   module Model
     module Associations
       module Reflections
-        class ReferencesOne < ReferenceReflection
+        class ReferencesOne < ReferencesAny
           def self.build(target, generated_methods, name, *args, &block)
             reflection = super
 

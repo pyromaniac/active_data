@@ -1,7 +1,7 @@
 module ActiveData
   module Model
     module Associations
-      class ReferencesOne < ReferenceAssociation
+      class ReferencesOne < ReferencesAny
         def build(attributes = {})
           self.target = build_object(attributes)
         end

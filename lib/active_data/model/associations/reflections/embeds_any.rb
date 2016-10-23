@@ -2,7 +2,7 @@ module ActiveData
   module Model
     module Associations
       module Reflections
-        class EmbedReflection < Base
+        class EmbedsAny < Base
           def self.build(target, generated_methods, name, options = {}, &block)
             if block
               options[:class] = proc do |reflection|

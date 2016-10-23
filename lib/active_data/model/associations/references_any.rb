@@ -1,7 +1,7 @@
 module ActiveData
   module Model
     module Associations
-      class ReferenceAssociation < Base
+      class ReferencesAny < Base
         def scope(source = read_source)
           reflection.persistence_adapter.scope(owner, source)
         end
