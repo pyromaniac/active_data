@@ -7,11 +7,13 @@ module ActiveData
         end
 
         def create(attributes = {})
-          build(attributes).tap(&:save)
+          persist_object(build(attributes))
+          target
         end
 
         def create!(attributes = {})
-          build(attributes).tap(&:save!)
+          persist_object(build(attributes), raise_error: true)
+          target
         end
 
         def apply_changes
@@ -19,7 +21,7 @@ module ActiveData
             if target.marked_for_destruction? && reflection.autosave?
               target.destroy
             elsif target.new_record? || (reflection.autosave? && target.changed?)
-              target.save
+              persist_object(target)
             else
               true
             end
