@@ -257,6 +257,30 @@ shared_examples 'nested attributes' do
             .to change { user.projects.map(&:title) }.to(['Project 2'])
         end
       end
+
+      context ':update_only' do
+        before { User.accepts_nested_attributes_for :projects, update_only: true }
+
+        specify do
+          expect do
+            user.projects_attributes = [
+              { slug: projects.first.slug.to_i, title: 'Project 3' },
+              { title: 'Project 4' }
+            ]
+          end
+            .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2'])
+        end
+
+        specify do
+          expect do
+            user.projects_attributes = [
+              { slug: projects.last.slug.to_i, title: 'Project 3' },
+              { slug: projects.first.slug.to_i.pred, title: 'Project 0' }
+            ]
+          end
+            .to change { user.projects.map(&:title) }.to(['Project 1', 'Project 3'])
+        end
+      end
     end
 
     context 'primary absence causes exception' do
