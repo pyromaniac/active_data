@@ -52,7 +52,7 @@ module ActiveData
               assign_to_or_mark_for_destruction(existing_record, attributes, options[:allow_destroy]) unless call_reject_if(object, association_name, attributes)
             elsif attributes[primary_attribute_name].present?
               raise ActiveData::ObjectNotFound.new(object, association_name, attributes[primary_attribute_name])
-            elsif !reject_new_object?(object, association_name, attributes)
+            elsif !reject_new_object?(object, association_name, attributes, options)
               assignable_attributes = attributes.except(*unassignable_keys(object))
 
               if existing_record && !existing_record.persisted?
@@ -90,7 +90,7 @@ module ActiveData
               attributes = attributes.with_indifferent_access
 
               if attributes[primary_attribute_name].blank?
-                unless reject_new_object?(object, association_name, attributes)
+                unless reject_new_object?(object, association_name, attributes, options)
                   association.build(attributes.except(*unassignable_keys(object)))
                 end
               else
@@ -104,7 +104,7 @@ module ActiveData
                     assign_to_or_mark_for_destruction(existing_record, attributes, options[:allow_destroy])
                   end
                 elsif association.reflection.embedded?
-                  unless reject_new_object?(object, association_name, attributes)
+                  unless reject_new_object?(object, association_name, attributes, options)
                     association.reflection.klass.with_sanitize(false) do
                       association.build(attributes.except(DESTROY_ATTRIBUTE))
                     end
@@ -142,8 +142,8 @@ module ActiveData
             ActiveData.typecaster(Boolean).call(hash[DESTROY_ATTRIBUTE])
           end
 
-          def self.reject_new_object?(object, association_name, attributes)
-            destroy_flag?(attributes) || call_reject_if(object, association_name, attributes)
+          def self.reject_new_object?(object, association_name, attributes, options)
+            options[:update_only] || destroy_flag?(attributes) || call_reject_if(object, association_name, attributes)
           end
 
           def self.call_reject_if(object, association_name, attributes)

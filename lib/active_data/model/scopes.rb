@@ -23,9 +23,11 @@ module ActiveData
           def initialize(source = nil, trust = false)
             source ||= self.class.superclass.new
 
-            source.each do |entity|
-              raise AssociationTypeMismatch.new(self.class._scope_model, entity.class) unless entity.is_a?(self.class._scope_model)
-            end unless trust && source.is_a?(self.class)
+            unless trust && source.is_a?(self.class)
+              source.each do |entity|
+                raise AssociationTypeMismatch.new(self.class._scope_model, entity.class) unless entity.is_a?(self.class._scope_model)
+              end
+            end
 
             super source
           end
