@@ -96,11 +96,12 @@ module ActiveData
     end
   end
   typecaster('BigDecimal') do |value|
+    next unless value
     begin
       ::BigDecimal.new Float(value).to_s
     rescue
       nil
-    end if value
+    end
   end
   typecaster('Float') do |value|
     begin
