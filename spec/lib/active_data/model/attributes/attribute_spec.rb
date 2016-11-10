@@ -54,6 +54,7 @@ describe ActiveData::Model::Attributes::Attribute do
     specify { expect(attribute.defaultize(nil)).to be_nil }
     specify { expect(attribute(default: 'hello').defaultize(nil)).to eq('hello') }
     specify { expect(attribute(default: 'hello').defaultize('world')).to eq('world') }
+    specify { expect(attribute(default: false, type: Boolean).defaultize(nil)).to eq(false) }
   end
 
   describe '#typecast' do

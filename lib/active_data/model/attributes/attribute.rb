@@ -28,7 +28,7 @@ module ActiveData
         end
 
         def defaultize(value, default_value = nil)
-          defaultizer && value.nil? ? default_value || default : value
+          !defaultizer.nil? && value.nil? ? default_value || default : value
         end
 
         def enum
