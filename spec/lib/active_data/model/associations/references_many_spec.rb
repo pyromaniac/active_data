@@ -6,6 +6,8 @@ describe ActiveData::Model::Associations::ReferencesMany do
     stub_model(:dummy)
     stub_class(:author, ActiveRecord::Base) do
       scope :name_starts_with_a, -> { where('name LIKE "a%"') }
+
+      validates :name, presence: true
     end
 
     stub_model(:book) do
@@ -33,6 +35,329 @@ describe ActiveData::Model::Associations::ReferencesMany do
 
   describe 'book#inspect' do
     specify { expect(existing_book.inspect).to eq('#<Book authors: #<ReferencesMany [#<Author id: 1, name: "Rick">]>, title: "Genesis", author_ids: [1]>') }
+  end
+
+  describe '#build' do
+    specify { expect(association.build).to be_a Author }
+    specify { expect(association.build).not_to be_persisted }
+
+    specify do
+      expect { association.build(name: 'Morty') }
+        .to change { book.author_ids }
+        .from([]).to([nil])
+    end
+    specify do
+      expect { association.build(name: 'Morty') }
+        .to change { association.reader }.from([])
+        .to([an_instance_of(Author).and(have_attributes(name: 'Morty'))])
+    end
+
+    specify do
+      expect { existing_association.build(name: 'Morty') }
+        .to change { existing_book.author_ids }
+        .from([author.id]).to([author.id, nil])
+    end
+    specify do
+      expect { existing_association.build(name: 'Morty') }
+        .to change { existing_association.reader }.from([author])
+        .to([author, an_instance_of(Author).and(have_attributes(name: 'Morty'))])
+    end
+
+    context 'dirty' do
+      before do
+        Book.include ActiveData::Model::Dirty
+      end
+
+      specify do
+        expect { existing_association.build(name: 'Morty') }
+          .to change { existing_book.changes }
+          .from({}).to('author_ids' => [[author.id], [author.id, nil]])
+      end
+    end
+  end
+
+  describe '#create' do
+    specify { expect(association.create).to be_a Author }
+    specify { expect(association.create).not_to be_persisted }
+
+    specify { expect(association.create(name: 'Morty')).to be_a Author }
+    specify { expect(association.create(name: 'Morty')).to be_persisted }
+
+    specify do
+      expect { association.create }
+        .to change { book.author_ids }
+        .from([]).to([nil])
+    end
+    specify do
+      expect { association.create }
+        .to change { association.target }
+        .from([]).to([an_instance_of(Author).and(be_new_record)])
+    end
+
+    specify do
+      expect { association.create(name: 'Morty') }
+        .to change { book.author_ids }
+        .from([]).to([be_a(Integer)])
+    end
+    specify do
+      expect { association.create(name: 'Morty') }
+        .to change { association.target }.from([])
+        .to([an_instance_of(Author)
+          .and(have_attributes(name: 'Morty'))
+          .and(be_persisted)])
+    end
+
+    specify do
+      expect { existing_association.create }
+        .to change { existing_book.author_ids }
+        .from([author.id]).to([author.id, nil])
+    end
+    specify do
+      expect { existing_association.create }
+        .to change { existing_association.reader }.from([author])
+        .to([author, an_instance_of(Author).and(be_new_record)])
+    end
+
+    specify do
+      expect { existing_association.create(name: 'Morty') }
+        .to change { existing_book.author_ids }
+        .from([author.id]).to([author.id, be_a(Integer)])
+    end
+    specify do
+      expect { existing_association.create(name: 'Morty') }
+        .to change { existing_association.reader }.from([author])
+        .to([author, an_instance_of(Author)
+          .and(have_attributes(name: 'Morty'))
+          .and(be_persisted)])
+    end
+
+    context 'dirty' do
+      before do
+        Book.include ActiveData::Model::Dirty
+      end
+
+      specify do
+        expect { existing_association.create(name: 'Morty') }
+          .to change { existing_book.changes }
+          .from({}).to('author_ids' => [[author.id], [author.id, be_a(Integer)]])
+      end
+    end
+  end
+
+  describe '#create!' do
+    specify { expect { association.create! }.to raise_error ActiveRecord::RecordInvalid }
+
+    specify { expect(association.create!(name: 'Morty')).to be_a Author }
+    specify { expect(association.create!(name: 'Morty')).to be_persisted }
+
+    specify do
+      expect { muffle(ActiveRecord::RecordInvalid) { association.create! } }
+        .to change { book.author_ids }
+        .from([]).to([nil])
+    end
+    specify do
+      expect { muffle(ActiveRecord::RecordInvalid) { association.create! } }
+        .to change { association.target }
+        .from([]).to([an_instance_of(Author).and(be_new_record)])
+    end
+
+    specify do
+      expect { association.create!(name: 'Morty') }
+        .to change { book.author_ids }
+        .from([]).to([be_a(Integer)])
+    end
+    specify do
+      expect { association.create!(name: 'Morty') }
+        .to change { association.target }.from([])
+        .to([an_instance_of(Author)
+          .and(have_attributes(name: 'Morty'))
+          .and(be_persisted)])
+    end
+
+    specify do
+      expect { muffle(ActiveRecord::RecordInvalid) { existing_association.create! } }
+        .to change { existing_book.author_ids }
+        .from([author.id]).to([author.id, nil])
+    end
+    specify do
+      expect { muffle(ActiveRecord::RecordInvalid) { existing_association.create! } }
+        .to change { existing_association.reader }.from([author])
+        .to([author, an_instance_of(Author).and(be_new_record)])
+    end
+
+    specify do
+      expect { existing_association.create!(name: 'Morty') }
+        .to change { existing_book.author_ids }
+        .from([author.id]).to([author.id, be_a(Integer)])
+    end
+    specify do
+      expect { existing_association.create!(name: 'Morty') }
+        .to change { existing_association.reader }.from([author])
+        .to([author, an_instance_of(Author)
+          .and(have_attributes(name: 'Morty'))
+          .and(be_persisted)])
+    end
+  end
+
+  describe '#apply_changes' do
+    specify do
+      association.build
+      expect(association.apply_changes).to eq(false)
+    end
+    specify do
+      association.build
+      expect { association.apply_changes }
+        .not_to change { association.target.map(&:persisted?) }
+        .from([false])
+    end
+    specify do
+      association.build(name: 'Rick')
+      expect(association.apply_changes).to eq(true)
+    end
+    specify do
+      association.build(name: 'Rick')
+      expect { association.apply_changes }
+        .to change { association.target.map(&:persisted?) }
+        .from([false]).to([true])
+    end
+    specify do
+      association.build(name: 'Rick')
+      expect { association.apply_changes }
+        .to change { book.author_ids }
+        .from([nil]).to([be_a(Integer)])
+    end
+    specify do
+      existing_association.target.first.name = 'Morty'
+      expect { existing_association.apply_changes }
+        .not_to change { author.reload.name }
+    end
+    specify do
+      existing_association.target.first.mark_for_destruction
+      existing_association.build(name: 'Morty')
+      expect { existing_association.apply_changes }
+        .to change { existing_book.author_ids }
+        .from([author.id, nil]).to([author.id, be_a(Integer)])
+    end
+    specify do
+      existing_association.target.first.mark_for_destruction
+      existing_association.build(name: 'Morty')
+      expect { existing_association.apply_changes }
+        .to change { existing_association.target.map(&:persisted?) }
+        .from([true, false]).to([true, true])
+    end
+    specify do
+      existing_association.target.first.destroy!
+      existing_association.build(name: 'Morty')
+      expect { existing_association.apply_changes }
+        .to change { existing_book.author_ids }
+        .from([author.id, nil]).to([author.id, be_a(Integer)])
+    end
+    specify do
+      existing_association.target.first.destroy!
+      existing_association.build(name: 'Morty')
+      expect { existing_association.apply_changes }
+        .to change { existing_association.target.map(&:persisted?) }
+        .from([false, false]).to([false, true])
+    end
+
+    context ':autosave' do
+      before do
+        Book.references_many :authors, autosave: true
+      end
+
+      specify do
+        association.build
+        expect(association.apply_changes).to eq(false)
+      end
+      specify do
+        association.build
+        expect { association.apply_changes }
+          .not_to change { association.target.map(&:persisted?) }
+          .from([false])
+      end
+      specify do
+        association.build(name: 'Rick')
+        expect(association.apply_changes).to eq(true)
+      end
+      specify do
+        association.build(name: 'Rick')
+        expect { association.apply_changes }
+          .to change { association.target.map(&:persisted?) }
+          .from([false]).to([true])
+      end
+      specify do
+        association.build(name: 'Rick')
+        expect { association.apply_changes }
+          .to change { book.author_ids }
+          .from([nil]).to([be_a(Integer)])
+      end
+      specify do
+        existing_association.target.first.name = 'Morty'
+        expect { existing_association.apply_changes }
+          .to change { author.reload.name }
+          .from('Rick').to('Morty')
+      end
+      specify do
+        existing_association.target.first.mark_for_destruction
+        existing_association.build(name: 'Morty')
+        expect { existing_association.apply_changes }
+          .to change { existing_book.author_ids }
+          .from([author.id, nil]).to([author.id, be_a(Integer)])
+      end
+      specify do
+        existing_association.target.first.mark_for_destruction
+        existing_association.build(name: 'Morty')
+        expect { existing_association.apply_changes }
+          .to change { existing_association.target.map(&:persisted?) }
+          .from([true, false]).to([false, true])
+      end
+      specify do
+        existing_association.target.first.destroy!
+        existing_association.build(name: 'Morty')
+        expect { existing_association.apply_changes }
+          .to change { existing_book.author_ids }
+          .from([author.id, nil]).to([author.id, be_a(Integer)])
+      end
+      specify do
+        existing_association.target.first.destroy!
+        existing_association.build(name: 'Morty')
+        expect { existing_association.apply_changes }
+          .to change { existing_association.target.map(&:persisted?) }
+          .from([false, false]).to([false, true])
+      end
+    end
+  end
+
+  describe '#apply_changes!' do
+    specify do
+      association.build
+      expect { association.apply_changes! }
+        .to raise_error(ActiveData::AssociationChangesNotApplied)
+    end
+    specify do
+      association.build
+      expect { muffle(ActiveData::AssociationChangesNotApplied) { association.apply_changes! } }
+        .not_to change { association.target.map(&:persisted?) }
+        .from([false])
+    end
+
+    context ':autosave' do
+      before do
+        Book.references_many :authors, autosave: true
+      end
+
+      specify do
+        association.build
+        expect { association.apply_changes! }
+          .to raise_error(ActiveData::AssociationChangesNotApplied)
+      end
+      specify do
+        association.build
+        expect { muffle(ActiveData::AssociationChangesNotApplied) { association.apply_changes! } }
+          .not_to change { association.target.map(&:persisted?) }
+          .from([false])
+      end
+    end
   end
 
   describe '#scope' do

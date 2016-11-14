@@ -3,7 +3,7 @@ module ActiveData
     module Associations
       class ReferencesOne < ReferencesAny
         def build(attributes = {})
-          self.target = build_object(attributes)
+          replace(build_object(attributes))
         end
 
         def create(attributes = {})

@@ -279,7 +279,8 @@ describe ActiveData::Model::Associations::EmbedsMany do
     end
     specify do
       expect { association.create(title: 'Swordfish') }
-        .to change { user.read_attribute(:projects) }.from(nil).to([{ 'title' => 'Swordfish' }])
+        .to change { user.read_attribute(:projects) }
+        .from(nil).to([{ 'title' => 'Swordfish' }])
     end
     specify do
       expect { association.create(title: 'Swordfish') }
@@ -350,80 +351,87 @@ describe ActiveData::Model::Associations::EmbedsMany do
 
   describe '#apply_changes' do
     specify do
-      expect do
-        association.build
-        association.apply_changes
-      end.to change { association.target.map(&:persisted?) }.to([false])
+      association.build
+      expect { association.apply_changes }
+        .not_to change { association.target.map(&:persisted?) }
+        .from([false])
     end
     specify do
-      expect do
-        association.build(title: 'Genesis')
-        association.apply_changes
-      end.to change { association.target.map(&:persisted?) }.to([true])
+      association.build(title: 'Genesis')
+      expect { association.apply_changes }
+        .to change { association.target.map(&:persisted?) }
+        .from([false]).to([true])
     end
     specify do
-      expect do
-        existing_association.target.first.mark_for_destruction
-        existing_association.build(title: 'Swordfish')
-        existing_association.apply_changes
-      end.to change { existing_association.target.map(&:title) }.to(['Swordfish']) end
+      existing_association.target.first.mark_for_destruction
+      existing_association.build(title: 'Swordfish')
+      expect { existing_association.apply_changes }
+        .to change { existing_association.target.map(&:title) }
+        .to(['Swordfish'])
+    end
     specify do
-      expect do
-        existing_association.target.first.mark_for_destruction
-        existing_association.build(title: 'Swordfish')
-        existing_association.apply_changes
-      end.not_to change { existing_association.target.map(&:persisted?) } end
+      existing_association.target.first.mark_for_destruction
+      existing_association.build(title: 'Swordfish')
+      expect { existing_association.apply_changes }
+        .to change { existing_association.target.map(&:persisted?) }
+        .from([true, false]).to([true])
+    end
     specify do
-      expect do
-        existing_association.target.first.mark_for_destruction
-        existing_association.build(title: 'Swordfish')
-        existing_association.apply_changes
-      end.to change { existing_association.destroyed.map(&:title) }.from([]).to(['Genesis']) end
+      existing_association.target.first.mark_for_destruction
+      existing_association.build(title: 'Swordfish')
+      expect { existing_association.apply_changes }
+        .to change { existing_association.destroyed.map(&:title) }
+        .from([]).to(['Genesis'])
+    end
     specify do
-      expect do
-        existing_association.target.first.destroy!
-        existing_association.build(title: 'Swordfish')
-        existing_association.apply_changes
-      end.to change { existing_association.target.map(&:title) }.to(['Swordfish']) end
+      existing_association.target.first.destroy!
+      existing_association.build(title: 'Swordfish')
+      expect { existing_association.apply_changes }
+        .to change { existing_association.target.map(&:title) }
+        .to(['Swordfish'])
+    end
     specify do
-      expect do
-        existing_association.target.first.destroy!
-        existing_association.build(title: 'Swordfish')
-        existing_association.apply_changes
-      end.to change { existing_association.destroyed.map(&:title) }.from([]).to(['Genesis']) end
+      existing_association.target.first.destroy!
+      existing_association.build(title: 'Swordfish')
+      expect { existing_association.apply_changes }
+        .to change { existing_association.destroyed.map(&:title) }
+        .from([]).to(['Genesis'])
+    end
   end
 
   describe '#apply_changes!' do
     specify do
-      expect do
-        association.build
-        association.apply_changes!
-      end.to raise_error ActiveData::AssociationChangesNotApplied
+      association.build
+      expect { association.apply_changes! }
+        .to raise_error ActiveData::AssociationChangesNotApplied
     end
     specify do
-      expect do
-        association.build(title: 'Genesis')
-        association.apply_changes!
-      end.to change { association.target.map(&:persisted?) }.to([true])
+      association.build(title: 'Genesis')
+      expect { association.apply_changes! }
+        .to change { association.target.map(&:persisted?) }
+        .to([true])
     end
     specify do
-      expect do
-        existing_association.target.first.mark_for_destruction
-        existing_association.build(title: 'Swordfish')
-        existing_association.apply_changes!
-      end.to change { existing_association.target.map(&:title) }.to(['Swordfish']) end
+      existing_association.target.first.mark_for_destruction
+      existing_association.build(title: 'Swordfish')
+      expect { existing_association.apply_changes! }
+        .to change { existing_association.target.map(&:title) }
+        .to(['Swordfish'])
+    end
     specify do
-      expect do
-        existing_association.target.first.mark_for_destruction
-        existing_association.build(title: 'Swordfish')
-        existing_association.apply_changes!
-      end.not_to change { existing_association.target.map(&:persisted?) } end
+      existing_association.target.first.mark_for_destruction
+      existing_association.build(title: 'Swordfish')
+      expect { existing_association.apply_changes! }
+        .to change { existing_association.target.map(&:persisted?) }
+        .from([true, false]).to([true])
+    end
     specify do
-      expect do
-        existing_association.target.first.destroy!
-        existing_association.build(title: 'Swordfish')
-        existing_association.apply_changes!
-      end.to change { existing_association.target.map(&:title) }.to(['Swordfish']) end
+      existing_association.target.first.destroy!
+      existing_association.build(title: 'Swordfish')
+      expect { existing_association.apply_changes! }
+        .to change { existing_association.target.map(&:title) }
+        .to(['Swordfish'])
+    end
   end
 
   describe '#target' do
