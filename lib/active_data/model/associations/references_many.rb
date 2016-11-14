@@ -2,12 +2,36 @@ module ActiveData
   module Model
     module Associations
       class ReferencesMany < ReferencesAny
+        def build(attributes = {})
+          append([build_object(attributes)]).last
+        end
+
+        def create(attributes = {})
+          object = build(attributes)
+          persist_object(object)
+          object
+        end
+
+        def create!(attributes = {})
+          object = build(attributes)
+          persist_object(object, raise_error: true)
+          object
+        end
+
         def apply_changes
-          present_keys = target.reject(&:marked_for_destruction?).map do |obj|
-            reflection.persistence_adapter.identify(obj)
+          target.all? do |object|
+            if object
+              if object.marked_for_destruction? && reflection.autosave?
+                object.destroy
+              elsif object.new_record? || (reflection.autosave? && object.changed?)
+                persist_object(object)
+              else
+                true
+              end
+            else
+              true
+            end
           end
-          write_source(present_keys)
-          true
         end
 
         def target=(object)
@@ -84,7 +108,7 @@ module ActiveData
                 raise AssociationTypeMismatch.new(reflection.persistence_adapter.data_type, object.class)
               end
               target.push(object)
-              apply_changes!
+              write_source(identify)
             end
           end
           target

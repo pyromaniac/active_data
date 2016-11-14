@@ -38,14 +38,36 @@ describe ActiveData::Model::Associations::ReferencesOne do
     specify { expect(association.build).not_to be_persisted }
 
     specify do
-      expect { association.build(name: 'Fred') }
+      expect { association.build(name: 'Morty') }
         .not_to change { book.author_id }
+    end
+    specify do
+      expect { association.build(name: 'Morty') }
+        .to change { book.author }.from(nil)
+        .to(an_instance_of(Author).and(have_attributes(name: 'Morty')))
     end
 
     specify do
-      expect { existing_association.build(name: 'Fred') }
+      expect { existing_association.build(name: 'Morty') }
         .to change { existing_book.author_id }
         .from(author.id).to(nil)
+    end
+    specify do
+      expect { existing_association.build(name: 'Morty') }
+        .to change { existing_book.author }.from(author)
+        .to(an_instance_of(Author).and(have_attributes(name: 'Morty')))
+    end
+
+    context 'dirty' do
+      before do
+        Book.include ActiveData::Model::Dirty
+      end
+
+      specify do
+        expect { existing_association.build(name: 'Morty') }
+          .to change { existing_book.changes }
+          .from({}).to('author_id' => [author.id, nil])
+      end
     end
   end
 
@@ -75,6 +97,18 @@ describe ActiveData::Model::Associations::ReferencesOne do
       expect { existing_association.create(name: 'Fred') }
         .to change { existing_book.author_id }
         .from(author.id).to(be_a(Integer))
+    end
+
+    context 'dirty' do
+      before do
+        Book.include ActiveData::Model::Dirty
+      end
+
+      specify do
+        expect { existing_association.create(name: 'Fred') }
+          .to change { existing_book.changes }
+          .from({}).to('author_id' => [author.id, be_a(Integer)])
+      end
     end
   end
 
@@ -131,6 +165,12 @@ describe ActiveData::Model::Associations::ReferencesOne do
         association.build(name: 'Fred')
         expect { association.send(method) }
           .to change { association.target.persisted? }.to(true)
+      end
+      specify do
+        association.build(name: 'Fred')
+        expect { association.send(method) }
+          .to change { book.author_id }
+          .from(nil).to(be_a(Integer))
       end
       specify do
         existing_association.target.name = 'Fred'
@@ -193,6 +233,7 @@ describe ActiveData::Model::Associations::ReferencesOne do
           existing_association.target.destroy!
           expect { existing_association.send(method) }
             .not_to change { existing_association.target.destroyed? }
+            .from(true)
         end
         specify do
           existing_association.target.destroy!
