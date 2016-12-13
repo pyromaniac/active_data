@@ -10,6 +10,7 @@ require 'active_model'
 require 'active_data/version'
 require 'active_data/errors'
 require 'active_data/extensions'
+require 'active_data/undefined_class'
 require 'active_data/config'
 require 'active_data/railtie' if defined? Rails
 require 'active_data/model'

@@ -150,8 +150,9 @@ module ActiveData
       def attribute(name)
         reflection = self.class.reflect_on_attribute(name)
         return unless reflection
-        (@_attributes ||= {})[reflection.name] ||= reflection
-          .build_attribute(self, @initial_attributes.try(:[], reflection.name))
+        initial_value = @initial_attributes.to_h.fetch(reflection.name, ActiveData::UNDEFINED)
+        @_attributes ||= {}
+        @_attributes[reflection.name] ||= reflection.build_attribute(self, initial_value)
       end
 
       def write_attribute(name, value)

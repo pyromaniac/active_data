@@ -25,9 +25,9 @@ module ActiveData
             @options = options
           end
 
-          def build_attribute(owner, raw_value = nil)
+          def build_attribute(owner, raw_value = ActiveData::UNDEFINED)
             attribute = self.class.attribute_class.new(name, owner)
-            attribute.write_value(raw_value) if raw_value
+            attribute.write_value(raw_value) unless raw_value == ActiveData::UNDEFINED
             attribute
           end
 
