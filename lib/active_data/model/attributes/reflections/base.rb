@@ -12,8 +12,7 @@ module ActiveData
               new(name, options)
             end
 
-            def generate_methods(name, target)
-            end
+            def generate_methods(name, target) end
 
             def attribute_class
               @attribute_class ||= "ActiveData::Model::Attributes::#{name.demodulize}".constantize

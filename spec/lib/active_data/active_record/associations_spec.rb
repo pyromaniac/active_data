@@ -203,6 +203,9 @@ describe ActiveData::ActiveRecord::Associations do
     specify { expect(User.reflect_on_association(:profile).klass).to be < Profile }
     specify { expect(User.new.profile).to be_nil }
     specify { expect(User.new.tap { |u| u.create_profile(first_name: 'Profile') }.profile).to be_a(User::Profile) }
-    specify { expect(User.new.tap { |u| u.create_profile(first_name: 'Profile') }.read_attribute(:profile)).to eq({ first_name: 'Profile', last_name: nil, admin: nil, age: nil }.to_json) }
+    specify do
+      expect(User.new.tap { |u| u.create_profile(first_name: 'Profile') }.read_attribute(:profile))
+        .to eq({ first_name: 'Profile', last_name: nil, admin: nil, age: nil }.to_json)
+    end
   end
 end
