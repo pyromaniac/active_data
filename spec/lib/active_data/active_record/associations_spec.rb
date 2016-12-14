@@ -22,6 +22,7 @@ describe ActiveData::ActiveRecord::Associations do
 
       attribute :first_name, String
       attribute :last_name, String
+      attribute :admin, Boolean
     end
 
     stub_class(:user, ActiveRecord::Base) do
@@ -86,6 +87,16 @@ describe ActiveData::ActiveRecord::Associations do
         user.save
         expect(user.reload.profile.first_name).to eq('google.com')
       end
+
+      context 'with profile already set' do
+        before { user.create_profile(admin: true) }
+
+        specify do
+          user.profile.admin = false
+          user.save
+          expect(user.reload.profile.admin).to eq(false)
+        end
+      end
     end
   end
 
@@ -140,7 +151,7 @@ describe ActiveData::ActiveRecord::Associations do
       specify do
         expect { user.profile = Profile.new(first_name: 'google.com') }
           .to change { user.read_attribute(:profile) }.from(nil)
-          .to({ first_name: 'google.com', last_name: nil }.to_json)
+          .to({ first_name: 'google.com', last_name: nil, admin: nil }.to_json)
       end
       specify do
         expect do
@@ -148,7 +159,7 @@ describe ActiveData::ActiveRecord::Associations do
           user.save
         end
           .to change { user.reload.read_attribute(:profile) }.from(nil)
-          .to({ first_name: 'google.com', last_name: nil }.to_json)
+          .to({ first_name: 'google.com', last_name: nil, admin: nil }.to_json)
       end
     end
   end
@@ -192,6 +203,9 @@ describe ActiveData::ActiveRecord::Associations do
     specify { expect(User.reflect_on_association(:profile).klass).to be < Profile }
     specify { expect(User.new.profile).to be_nil }
     specify { expect(User.new.tap { |u| u.create_profile(first_name: 'Profile') }.profile).to be_a(User::Profile) }
-    specify { expect(User.new.tap { |u| u.create_profile(first_name: 'Profile') }.read_attribute(:profile)).to eq({ first_name: 'Profile', last_name: nil, age: nil }.to_json) }
+    specify do
+      expect(User.new.tap { |u| u.create_profile(first_name: 'Profile') }.read_attribute(:profile))
+        .to eq({ first_name: 'Profile', last_name: nil, admin: nil, age: nil }.to_json)
+    end
   end
 end

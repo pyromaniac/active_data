@@ -12,8 +12,7 @@ module ActiveData
               new(name, options)
             end
 
-            def generate_methods(name, target)
-            end
+            def generate_methods(name, target) end
 
             def attribute_class
               @attribute_class ||= "ActiveData::Model::Attributes::#{name.demodulize}".constantize
@@ -25,9 +24,9 @@ module ActiveData
             @options = options
           end
 
-          def build_attribute(owner, raw_value = nil)
+          def build_attribute(owner, raw_value = ActiveData::UNDEFINED)
             attribute = self.class.attribute_class.new(name, owner)
-            attribute.write_value(raw_value) if raw_value
+            attribute.write_value(raw_value) unless raw_value == ActiveData::UNDEFINED
             attribute
           end
 

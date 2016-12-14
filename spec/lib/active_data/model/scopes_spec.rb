@@ -19,8 +19,7 @@ describe ActiveData::Model::Scopes do
 
       private
 
-        def hidden_method
-        end
+        def hidden_method() end
       end
     end
   end
