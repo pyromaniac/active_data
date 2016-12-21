@@ -20,7 +20,7 @@ module ActiveData
           end
 
           def type
-            Object
+            type_class { Object }
           end
 
           def reference
