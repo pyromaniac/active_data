@@ -20,7 +20,7 @@ describe ActiveData::Model::Associations::NestedAttributes do
   end
 
   context do
-    before do 
+    before do
       stub_model :project do
         include ActiveData::Model::Primary
         include ActiveData::Model::Lifecycle
@@ -55,6 +55,18 @@ describe ActiveData::Model::Associations::NestedAttributes do
       expect(user.errors.messages).to eq({'projects.2.title' => ["Can't be blank"]})
     end
 
+    context 'item with invalid attributes marked for destruction' do
+      let(:attributes) do
+        {
+          projects_attributes: {
+            1 => { title: 'Project 1' },
+            2 => { title: '', _destroy: '' },
+          }
+        }
+      end
+
+      specify { expect(user).to be_valid }
+    end
   end
 
   include_examples 'nested attributes'
