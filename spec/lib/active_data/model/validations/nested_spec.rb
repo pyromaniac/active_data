@@ -5,7 +5,9 @@ describe ActiveData::Model::Validations::NestedValidator do
     stub_model(:validated_assoc) do
       include ActiveData::Model
       include ActiveData::Model::Lifecycle
+      include ActiveData::Model::Primary
 
+      primary :id, Integer
       attribute :name, String
 
       validates_presence_of :name
@@ -87,6 +89,26 @@ describe ActiveData::Model::Validations::NestedValidator do
     specify do
       expect { instance.validate }.to change { instance.errors.messages }
         .to(:'validated_one.name' => ["can't be blank"])
+    end
+  end
+
+  context 'accepts nested attributes for one' do
+    before { Main.accepts_nested_attributes_for :validated_one, allow_destroy: true }
+    subject(:instance) { Main.instantiate name: 'hello', validated_one: { id: 1, name: 'name' } }
+
+    specify do
+      instance.validated_one_attributes = { id: 1, name: '', _destroy: true }
+      is_expected.to be_valid
+    end
+  end
+
+  context 'accepts nested attributes for many' do
+    before { Main.accepts_nested_attributes_for :validated_many, allow_destroy: true }
+    subject(:instance) { Main.instantiate name: 'hello', validated_many: [{ id: 1, name: 'name' }] }
+
+    specify do
+      instance.validated_many_attributes = [{ id: 1, name: '', _destroy: true }]
+      is_expected.to be_valid
     end
   end
 
