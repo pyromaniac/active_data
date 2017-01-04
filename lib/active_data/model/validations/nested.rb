@@ -24,7 +24,7 @@ module ActiveData
 
         def validate_each(record, attribute, value)
           self.class.validate_nested(record, attribute, value) do |object|
-            object.invalid? && !object.marked_for_destruction?
+            object.invalid? && !(object.respond_to?(:marked_for_destruction?) && object.marked_for_destruction?)
           end
         end
       end

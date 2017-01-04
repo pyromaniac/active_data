@@ -112,6 +112,41 @@ describe ActiveData::Model::Validations::NestedValidator do
     end
   end
 
+  context 'represented field is invalid and represented object does not include AutosaveAssociation' do
+    before do
+      stub_class(:validated_represented) do
+        include ActiveData::Model::Validations
+        include ActiveData::Model::Attributes
+        include ActiveData::Model::Primary
+
+        primary :id
+        attribute :title, String
+        validates_presence_of :title
+      end
+
+      Main.class_eval do
+        include ActiveData::Model::Associations
+        attribute :represented, Object
+        validates :represented, nested: true
+      end
+    end
+
+    subject(:instance) { Main.instantiate name: 'hello', represented: represented, validated_one: { name: 'name' } }
+
+    context do
+      let(:represented) { ValidatedRepresented.new(title: 'Mr.') }
+      it { is_expected.to be_valid }
+    end
+
+    context do
+      let(:represented) { ValidatedRepresented.new }
+      it do
+        expect { subject.valid? }.not_to raise_error(NoMethodError)
+        expect(subject).not_to be_valid
+      end
+    end
+  end
+
   context do
     subject(:instance) { Main.instantiate name: 'hello', validated_many: [{}], validated_one: { name: 'name' } }
     it { is_expected.not_to be_valid }
