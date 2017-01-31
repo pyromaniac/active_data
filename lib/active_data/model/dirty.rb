@@ -13,8 +13,7 @@ module ActiveData
           unconcerned_append_features(base)
         end
 
-        def self.included(_base)
-        end
+        def self.included(_base); end
       end
 
       included do

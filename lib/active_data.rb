@@ -142,5 +142,5 @@ ActiveSupport.on_load :active_record do
   require 'active_data/active_record/nested_attributes'
 
   include ActiveData::ActiveRecord::Associations
-  include ActiveData::ActiveRecord::NestedAttributes
+  singleton_class.prepend ActiveData::ActiveRecord::NestedAttributes
 end

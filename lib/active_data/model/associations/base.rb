@@ -60,7 +60,7 @@ module ActiveData
         end
 
         def transaction
-          data = Marshal.load(Marshal.dump(read_source))
+          data = read_source.deep_dup
           yield
         rescue StandardError => e
           write_source data
