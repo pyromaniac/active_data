@@ -141,7 +141,7 @@ describe ActiveData::Model::Validations::NestedValidator do
     context do
       let(:represented) { ValidatedRepresented.new }
       it do
-        expect { subject.valid? }.not_to raise_error(NoMethodError)
+        expect { subject.valid? }.not_to raise_error
         expect(subject).not_to be_valid
       end
     end
