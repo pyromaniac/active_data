@@ -9,6 +9,8 @@ module ActiveData
         included do
           class_attribute :nested_attributes_options, instance_writer: false
           self.nested_attributes_options = {}
+
+          extend NestedAttributesMethodsExtension
         end
 
         class NestedAttributesMethods
@@ -20,6 +22,8 @@ module ActiveData
             options.assert_valid_keys(:allow_destroy, :reject_if, :limit, :update_only)
             options[:reject_if] = REJECT_ALL_BLANK_PROC if options[:reject_if] == :all_blank
 
+            NestedAttributesMethodsExtension.ensure_extended!(klass)
+
             attr_names.each do |association_name|
               reflection = klass.reflect_on_association(association_name)
               raise ArgumentError, "No association found for name `#{association_name}'. Has it been defined yet?" unless reflection
@@ -27,7 +31,7 @@ module ActiveData
 
               klass.validates_nested association_name if klass.respond_to?(:validates_nested)
               type = (reflection.collection? ? :collection : :one_to_one)
-              klass.class_eval <<-METHOD, __FILE__, __LINE__ + 1
+              klass.nested_attributes_methods_module.class_eval <<-METHOD, __FILE__, __LINE__ + 1
                 def #{association_name}_attributes=(attributes)
                   ActiveData::Model::Associations::NestedAttributes::NestedAttributesMethods
                     .assign_nested_attributes_for_#{type}_association(self, :#{association_name}, attributes)
@@ -168,6 +172,21 @@ module ActiveData
         module ClassMethods
           def accepts_nested_attributes_for(*attr_names)
             NestedAttributesMethods.accepts_nested_attributes_for self, *attr_names
+          end
+        end
+
+        module NestedAttributesMethodsExtension
+          def self.ensure_extended!(klass)
+            return if klass.singleton_class.ancestors.include?(self)
+            klass.extend(self)
+          end
+
+          def nested_attributes_methods_module
+            @nested_attributes_methods_module ||= begin
+              mod = const_set(:NestedAttributesMethods, Module.new)
+              include(mod)
+              mod
+            end
           end
         end
       end
