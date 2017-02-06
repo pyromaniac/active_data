@@ -121,8 +121,6 @@ module ActiveData
           end
 
           def self.check_record_limit!(limit, attributes_collection)
-            return unless limit
-
             limit = case limit
             when Symbol
               send(limit)
