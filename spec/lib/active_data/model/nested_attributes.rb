@@ -112,6 +112,22 @@ shared_examples 'nested attributes' do
         end
       end
     end
+
+    context 'generated method overwrites' do
+      before do
+        User.class_eval <<-RUBY
+          def profile_attributes=(args)
+            args.reverse_merge!(first_name: 'Default Profile Name')
+            super
+          end
+        RUBY
+      end
+
+      it 'allows generated method overwritting' do
+        expect { user.profile_attributes = {} }
+          .to change { user.profile.try(:first_name) }.to('Default Profile Name')
+      end
+    end
   end
 
   context 'embeds_many' do
@@ -295,6 +311,22 @@ shared_examples 'nested attributes' do
       end
 
       specify { expect { user.projects_attributes = {} }.to raise_error ActiveData::UndefinedPrimaryAttribute }
+    end
+
+    context 'generated method overwrites' do
+      before do
+        User.class_eval <<-RUBY
+          def projects_attributes=(args)
+            args << {title: 'Default Project'}
+            super
+          end
+        RUBY
+      end
+
+      it 'allows generated method overwritting' do
+        expect { user.projects_attributes = [] }
+          .to change { user.projects.map(&:title) }.to(['Default Project'])
+      end
     end
   end
 end
