@@ -186,7 +186,7 @@ module ActiveData
         if self.class.represented_attributes.present? ||
             (self.class.is_a?(ActiveData::Model::Associations::NestedAttributes) &&
             self.class.nested_attributes_options.present?)
-          attrs.stringify_keys!
+          attrs = attrs.stringify_keys
           represented_attrs = self.class.represented_names_and_aliases
             .each_with_object({}) do |name, result|
               result[name] = attrs.delete(name) if attrs.key?(name)
