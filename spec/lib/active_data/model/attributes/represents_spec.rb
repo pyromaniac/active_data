@@ -16,6 +16,13 @@ describe ActiveData::Model::Attributes::Represents do
     end
   end
 
+  describe '#new' do
+    before { attribute(:full_name) }
+    let(:attributes) { { foo: 'bar' } }
+
+    specify { expect { Dummy.new(attributes) }.to_not change { attributes } }
+  end
+
   describe '#write' do
     subject { Subject.new }
     before { allow_any_instance_of(Dummy).to receive_messages(value: 42, subject: subject) }
