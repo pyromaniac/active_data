@@ -183,6 +183,7 @@ module ActiveData
       alias_method :update_attributes, :update
 
       def assign_attributes(attrs)
+        attrs = attrs.to_unsafe_hash if attrs.respond_to?(:to_unsafe_hash)
         if self.class.represented_attributes.present? ||
             (self.class.is_a?(ActiveData::Model::Associations::NestedAttributes) &&
             self.class.nested_attributes_options.present?)
