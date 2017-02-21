@@ -155,4 +155,10 @@ describe ActiveData::Model::Validations::NestedValidator do
         .to(:'validated_many.0.name' => ["can't be blank"])
     end
   end
+
+  describe '.validates_nested?' do
+    specify { expect(Main).to be_validates_nested(:validated_one) }
+    specify { expect(Main).to be_validates_nested(:unvalidated_one) }
+    specify { expect(Main).not_to be_validates_nested(:something_else) }
+  end
 end
