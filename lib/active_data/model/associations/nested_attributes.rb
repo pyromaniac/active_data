@@ -29,7 +29,10 @@ module ActiveData
               raise ArgumentError, "No association found for name `#{association_name}'. Has it been defined yet?" unless reflection
               klass.nested_attributes_options = klass.nested_attributes_options.merge(association_name.to_sym => options)
 
-              klass.validates_nested association_name if klass.respond_to?(:validates_nested)
+              if klass.respond_to?(:validates_nested) && !klass.validates_nested?(association_name)
+                klass.validates_nested association_name
+              end
+
               type = (reflection.collection? ? :collection : :one_to_one)
               klass.nested_attributes_methods_module.class_eval <<-METHOD, __FILE__, __LINE__ + 1
                 def #{association_name}_attributes=(attributes)

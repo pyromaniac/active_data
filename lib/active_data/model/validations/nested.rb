@@ -33,6 +33,11 @@ module ActiveData
         def validates_nested(*attr_names)
           validates_with NestedValidator, _merge_attributes(attr_names)
         end
+
+        def validates_nested?(attr)
+          _validators[attr.to_sym]
+            .grep(ActiveData::Model::Validations::NestedValidator).present?
+        end
       end
     end
   end
