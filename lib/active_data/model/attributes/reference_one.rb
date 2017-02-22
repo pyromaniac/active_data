@@ -14,7 +14,7 @@ module ActiveData
         end
 
         def read
-          if association.target
+          if association.loaded? && association.target
             association.identify
           else
             type_casted_value
