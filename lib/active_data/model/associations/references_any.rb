@@ -8,6 +8,18 @@ module ActiveData
 
       private
 
+        def read_source
+          attribute.type_casted_value
+        end
+
+        def write_source(value)
+          attribute.write_value value
+        end
+
+        def attribute
+          @attribute ||= owner.attribute(reflection.reference_key)
+        end
+
         def build_object(attributes)
           reflection.persistence_adapter.build(attributes)
         end

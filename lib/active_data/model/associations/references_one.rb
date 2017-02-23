@@ -57,14 +57,6 @@ module ActiveData
           end
         end
 
-        def read_source
-          attribute.read_before_type_cast
-        end
-
-        def write_source(value)
-          attribute.write_value value
-        end
-
         def reader(force_reload = false)
           reset if force_reload
           target
@@ -88,12 +80,6 @@ module ActiveData
 
         def identify
           reflection.persistence_adapter.identify(target)
-        end
-
-      private
-
-        def attribute
-          @attribute ||= owner.attribute(reflection.reference_key)
         end
       end
     end

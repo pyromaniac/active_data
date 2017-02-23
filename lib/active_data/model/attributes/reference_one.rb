@@ -21,6 +21,12 @@ module ActiveData
           end
         end
 
+        def type_casted_value
+          variable_cache(:value) do
+            typecast(read_before_type_cast)
+          end
+        end
+
         def read_before_type_cast
           @value_cache
         end
@@ -34,12 +40,6 @@ module ActiveData
         end
 
       private
-
-        def type_casted_value
-          variable_cache(:value) do
-            typecast(read_before_type_cast)
-          end
-        end
 
         def association
           @association ||= owner.association(reflection.association)
