@@ -37,7 +37,7 @@ Metrics/BlockLength:
   Exclude:
     - '**/*_spec.rb'
     - '**/*.rake'
-    - spec/lib/active_data/model/nested_attributes.rb
+    - spec/shared/**/*.rb
 
 Metrics/ModuleLength:
   Exclude:

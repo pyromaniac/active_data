@@ -12,26 +12,15 @@ module ActiveData
 
       module PrependMethods
         def assign_attributes(attrs)
-          if self.class.represented_attributes.present? ||
-              (self.class.is_a?(ActiveData::Model::Associations::NestedAttributes) &&
-              self.class.nested_attributes_options.present?)
+          if self.class.represented_attributes.present?
             attrs = attrs.to_unsafe_hash if attrs.respond_to?(:to_unsafe_hash)
             attrs = attrs.stringify_keys
             represented_attrs = self.class.represented_names_and_aliases
               .each_with_object({}) do |name, result|
                 result[name] = attrs.delete(name) if attrs.key?(name)
               end
-            if self.class.is_a?(ActiveData::Model::Associations::NestedAttributes)
-              nested_attrs = self.class.nested_attributes_options.keys
-                .each_with_object({}) do |association_name, result|
-                  name = "#{association_name}_attributes"
-                  result[name] = attrs.delete(name) if attrs.key?(name)
-                end
-            end
 
-            super(attrs)
-            super(represented_attrs)
-            super(nested_attrs) if nested_attrs
+            super(attrs.merge!(represented_attrs))
           else
             super(attrs)
           end
