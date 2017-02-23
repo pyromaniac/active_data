@@ -129,11 +129,6 @@ describe ActiveData::Model::Attributes do
 
     specify { expect { subject.assign_attributes(attributes) }.to change { subject.id }.to(42) }
     specify { expect { subject.assign_attributes(attributes) }.to change { subject.full_name }.to('Name') }
-
-    context 'ActionController::Parameters' do
-      let(:params) { instance_double('ActionController::Parameters', to_unsafe_hash: attributes) }
-      specify { subject.assign_attributes(params) }
-    end
   end
 
   describe '#inspect' do

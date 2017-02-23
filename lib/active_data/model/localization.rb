@@ -1,3 +1,6 @@
+require 'active_data/model/attributes/reflections/localized'
+require 'active_data/model/attributes/localized'
+
 module ActiveData
   module Model
     module Localization

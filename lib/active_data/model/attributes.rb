@@ -1,20 +1,12 @@
 require 'active_data/model/attributes/reflections/base'
-require 'active_data/model/attributes/reflections/reference_one'
-require 'active_data/model/attributes/reflections/reference_many'
 require 'active_data/model/attributes/reflections/attribute'
 require 'active_data/model/attributes/reflections/collection'
 require 'active_data/model/attributes/reflections/dictionary'
-require 'active_data/model/attributes/reflections/localized'
-require 'active_data/model/attributes/reflections/represents'
 
 require 'active_data/model/attributes/base'
-require 'active_data/model/attributes/reference_one'
-require 'active_data/model/attributes/reference_many'
 require 'active_data/model/attributes/attribute'
 require 'active_data/model/attributes/collection'
 require 'active_data/model/attributes/dictionary'
-require 'active_data/model/attributes/localized'
-require 'active_data/model/attributes/represents'
 
 module ActiveData
   module Model
@@ -37,13 +29,6 @@ module ActiveData
       end
 
       module ClassMethods
-        def represents(*names, &block)
-          options = names.extract_options!
-          names.each do |name|
-            add_attribute(Reflections::Represents, name, options, &block)
-          end
-        end
-
         def add_attribute(reflection_class, *args, &block)
           reflection = reflection_class.build(self, generated_attributes_methods, *args, &block)
           self._attributes = _attributes.merge(reflection.name => reflection)
@@ -85,18 +70,6 @@ module ActiveData
 
         def inspect
           "#{original_inspect}(#{attributes_for_inspect.presence || 'no attributes'})"
-        end
-
-        def represented_attributes
-          @represented_attributes ||= _attributes.values.select do |attribute|
-            attribute.is_a? ActiveData::Model::Attributes::Reflections::Represents
-          end
-        end
-
-        def represented_names_and_aliases
-          @represented_names_and_aliases ||= represented_attributes.flat_map do |attribute|
-            [attribute.name, *inverted_attribute_aliases[attribute.name]]
-          end
         end
 
         def dirty?
@@ -183,30 +156,16 @@ module ActiveData
       alias_method :update_attributes, :update
 
       def assign_attributes(attrs)
-        attrs = attrs.to_unsafe_hash if attrs.respond_to?(:to_unsafe_hash)
-        if self.class.represented_attributes.present? ||
-            (self.class.is_a?(ActiveData::Model::Associations::NestedAttributes) &&
-            self.class.nested_attributes_options.present?)
-          attrs = attrs.stringify_keys
-          represented_attrs = self.class.represented_names_and_aliases
-            .each_with_object({}) do |name, result|
-              result[name] = attrs.delete(name) if attrs.key?(name)
-            end
-          if self.class.is_a?(ActiveData::Model::Associations::NestedAttributes)
-            nested_attrs = self.class.nested_attributes_options.keys
-              .each_with_object({}) do |association_name, result|
-                name = "#{association_name}_attributes"
-                result[name] = attrs.delete(name) if attrs.key?(name)
-              end
-          end
+        attrs.each do |name, value|
+          name = name.to_s
+          sanitize_value = self.class._sanitize && name == self.class.primary_name
 
-          _assign_attributes(attrs)
-          _assign_attributes(represented_attrs)
-          _assign_attributes(nested_attrs) if nested_attrs
-        else
-          _assign_attributes(attrs)
+          if respond_to?("#{name}=") && !sanitize_value
+            public_send("#{name}=", value)
+          else
+            logger.info("Ignoring #{sanitize_value ? 'primary' : 'undefined'} `#{name}` attribute value for #{self} during mass-assignment")
+          end
         end
-        true
       end
       alias_method :attributes=, :assign_attributes
 
@@ -223,19 +182,6 @@ module ActiveData
       end
 
     private
-
-      def _assign_attributes(attrs)
-        attrs.each do |name, value|
-          name = name.to_s
-          sanitize_value = self.class._sanitize && name == self.class.primary_name
-
-          if respond_to?("#{name}=") && !sanitize_value
-            public_send("#{name}=", value)
-          else
-            logger.info("Ignoring #{sanitize_value ? 'primary' : 'undefined'} `#{name}` attribute value for #{self} during mass-assignment")
-          end
-        end
-      end
 
       def attributes_for_inspect
         attribute_names(false).map do |name|

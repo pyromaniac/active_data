@@ -5,6 +5,7 @@ describe ActiveData::Model::Associations::Validations do
     stub_model(:project) do
       include ActiveData::Model::Lifecycle
       include ActiveData::Model::Associations
+      include ActiveData::Model::Associations::Validations
 
       attribute :title, String
       validates :title, presence: true
@@ -25,6 +26,7 @@ describe ActiveData::Model::Associations::Validations do
 
     stub_model(:user) do
       include ActiveData::Model::Associations
+      include ActiveData::Model::Associations::Validations
 
       attribute :login, String
       validates :login, presence: true
@@ -130,40 +132,6 @@ describe ActiveData::Model::Associations::Validations do
             .to(:'projects.1.title' => ["can't be blank"], login: ["can't be blank"])
         end
       end
-    end
-  end
-
-  context 'represent attributes' do
-    before do
-      stub_class(:author, ActiveRecord::Base) do
-        validates :name, presence: true
-
-        # Emulate Active Record association auto save error.
-        def errors
-          super.tap do |errors|
-            errors.add(:'user.email', 'is invalid') if errors[:'user.email'].empty?
-          end
-        end
-      end
-
-      stub_model(:post) do
-        include ActiveData::Model::Associations
-
-        references_one :author
-        represents :name, of: :author
-        represents :email, of: :author
-      end
-    end
-
-    let(:post) { Post.new(author: Author.new) }
-
-    specify do
-      expect { post.validate_ancestry }.to change { post.errors.messages }
-        .to(hash_including(:'author.user.email' => ['is invalid'], name: ["can't be blank"]))
-    end
-    specify do
-      expect { post.validate }.to change { post.errors.messages }
-        .to(hash_including(:'author.user.email' => ['is invalid'], name: ["can't be blank"]))
     end
   end
 end

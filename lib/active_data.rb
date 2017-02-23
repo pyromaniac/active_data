@@ -14,7 +14,8 @@ require 'active_data/undefined_class'
 require 'active_data/config'
 require 'active_data/railtie' if defined? Rails
 require 'active_data/model'
-require 'active_data/persistence_adapters'
+require 'active_data/model/associations/persistence_adapters/base'
+require 'active_data/model/associations/persistence_adapters/active_record'
 
 module ActiveData
   BOOLEAN_MAPPING = {
