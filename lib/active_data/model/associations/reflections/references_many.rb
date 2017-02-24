@@ -1,3 +1,6 @@
+require 'active_data/model/attributes/reflections/reference_many'
+require 'active_data/model/attributes/reference_many'
+
 module ActiveData
   module Model
     module Associations

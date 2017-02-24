@@ -20,7 +20,7 @@ describe ActiveData::Model::Dirty do
       embeds_one :something do
         attribute :value, String
       end
-      represents :name, of: :author
+      attribute :name, String
       alias_attribute :n, :name
       collection :numbers, Integer
       localized :title, String
@@ -40,7 +40,7 @@ describe ActiveData::Model::Dirty do
 
   specify do
     expect(Model.new(author: author, name: 'Name2').changes)
-      .to eq('author_id' => [nil, author.id], 'name' => %w(Name Name2))
+      .to eq('author_id' => [nil, author.id], 'name' => [nil, 'Name2'])
   end
 
   specify do

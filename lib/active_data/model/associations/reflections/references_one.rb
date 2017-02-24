@@ -1,3 +1,6 @@
+require 'active_data/model/attributes/reflections/reference_one'
+require 'active_data/model/attributes/reference_one'
+
 module ActiveData
   module Model
     module Associations

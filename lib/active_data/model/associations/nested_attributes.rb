@@ -11,6 +11,27 @@ module ActiveData
           self.nested_attributes_options = {}
 
           extend NestedAttributesMethodsExtension
+          prepend PrependMethods
+        end
+
+        module PrependMethods
+          def assign_attributes(attrs)
+            if self.class.nested_attributes_options.present?
+              attrs = attrs.to_unsafe_hash if attrs.respond_to?(:to_unsafe_hash)
+              attrs = attrs.stringify_keys
+
+              nested_attrs = self.class.nested_attributes_options.keys
+                .each_with_object({}) do |association_name, result|
+                  name = "#{association_name}_attributes"
+                  result[name] = attrs.delete(name) if attrs.key?(name)
+                end
+
+              super(attrs.merge!(nested_attrs))
+            else
+              super(attrs)
+            end
+          end
+          alias_method :attributes=, :assign_attributes
         end
 
         class NestedAttributesMethods
