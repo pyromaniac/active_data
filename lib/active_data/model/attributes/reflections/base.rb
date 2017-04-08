@@ -31,15 +31,21 @@ module ActiveData
           end
 
           def type
-            @type ||= case options[:type]
+            @type ||= type_class { raise "Type is not specified for `#{name}`" }
+          end
+
+          # block
+          def type_class
+            case options[:type]
             when Class, Module
               options[:type]
             when nil
-              raise "Type is not specified for `#{name}`"
+              yield
             else
               options[:type].to_s.camelize.constantize
             end
           end
+
 
           def typecaster
             @typecaster ||= ActiveData.typecaster(type.ancestors.grep(Class))
