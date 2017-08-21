@@ -1,4 +1,5 @@
 # encoding: UTF-8
+
 require 'spec_helper'
 
 describe ActiveData::Model::Representation do
@@ -35,7 +36,7 @@ describe ActiveData::Model::Representation do
     specify { expect { Post.new(rate: '33') }.to raise_error(NoMethodError) }
 
     context 'ActionController::Parameters' do
-      let(:params) { instance_double('ActionController::Parameters', to_unsafe_hash: { rate: '33', author: author }) }
+      let(:params) { instance_double('ActionController::Parameters', to_unsafe_hash: {rate: '33', author: author}) }
       specify { expect { Post.new(params) }.not_to raise_error }
     end
 

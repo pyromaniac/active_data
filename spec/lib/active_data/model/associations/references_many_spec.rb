@@ -1,4 +1,5 @@
 # encoding: UTF-8
+
 require 'spec_helper'
 
 describe ActiveData::Model::Associations::ReferencesMany do
@@ -497,7 +498,7 @@ describe ActiveData::Model::Associations::ReferencesMany do
     specify do
       expect { existing_association.writer([new_author1, new_author2]) }
         .to change { existing_association.reader.map(&:name) }
-        .from(['Rick']).to(%w(John Adam))
+        .from(['Rick']).to(%w[John Adam])
     end
     specify do
       expect { existing_association.writer([new_author1, new_author2]) }
@@ -552,7 +553,7 @@ describe ActiveData::Model::Associations::ReferencesMany do
     specify do
       expect { muffle(ActiveData::AssociationTypeMismatch) { existing_association.concat(new_author1, Dummy.new, new_author2) } }
         .to change { existing_association.reader.map(&:name) }
-        .from(['Rick']).to(%w(Rick John))
+        .from(['Rick']).to(%w[Rick John])
     end
 
     specify do
@@ -562,7 +563,7 @@ describe ActiveData::Model::Associations::ReferencesMany do
     specify do
       expect { existing_association.concat([new_author1, new_author2]) }
         .to change { existing_association.reader.map(&:name) }
-        .from(['Rick']).to(%w(Rick John Adam))
+        .from(['Rick']).to(%w[Rick John Adam])
     end
     specify do
       expect { existing_association.concat([new_author1, new_author2]) }

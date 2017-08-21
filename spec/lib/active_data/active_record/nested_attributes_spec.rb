@@ -1,6 +1,7 @@
 # encoding: UTF-8
+
 require 'spec_helper'
-require 'shared/nested_attributes'
+require 'shared/nested_attribute_examples'
 
 describe ActiveData::ActiveRecord::NestedAttributes do
   before do

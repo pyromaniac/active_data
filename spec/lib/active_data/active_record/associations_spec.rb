@@ -125,7 +125,7 @@ describe ActiveData::ActiveRecord::Associations do
         specify do
           expect { user.projects << project }
             .to change { user.read_attribute(:projects) }.from(nil)
-            .to([{ 'title' => 'First', 'author' => { 'name' => 'Author' } }])
+            .to([{'title' => 'First', 'author' => {'name' => 'Author'}}])
         end
         specify do
           expect do
@@ -133,7 +133,7 @@ describe ActiveData::ActiveRecord::Associations do
             user.save
           end
             .to change { user.reload.read_attribute(:projects) }.from(nil)
-            .to([{ 'title' => 'First', 'author' => { 'name' => 'Author' } }])
+            .to([{'title' => 'First', 'author' => {'name' => 'Author'}}])
         end
       end
     end
@@ -151,7 +151,7 @@ describe ActiveData::ActiveRecord::Associations do
       specify do
         expect { user.profile = Profile.new(first_name: 'google.com') }
           .to change { user.read_attribute(:profile) }.from(nil)
-          .to({ first_name: 'google.com', last_name: nil, admin: nil }.to_json)
+          .to({first_name: 'google.com', last_name: nil, admin: nil}.to_json)
       end
       specify do
         expect do
@@ -159,7 +159,7 @@ describe ActiveData::ActiveRecord::Associations do
           user.save
         end
           .to change { user.reload.read_attribute(:profile) }.from(nil)
-          .to({ first_name: 'google.com', last_name: nil, admin: nil }.to_json)
+          .to({first_name: 'google.com', last_name: nil, admin: nil}.to_json)
       end
     end
   end
@@ -197,7 +197,7 @@ describe ActiveData::ActiveRecord::Associations do
     specify { expect(User.reflect_on_association(:projects).klass).to eq(User::Project) }
     specify { expect(User.new.projects).to eq([]) }
     specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.projects).to be_a(ActiveData::Model::Associations::Collection::Embedded) }
-    specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.read_attribute(:projects)).to eq([{ title: 'Project' }].to_json) }
+    specify { expect(User.new.tap { |u| u.projects.create(title: 'Project') }.read_attribute(:projects)).to eq([{title: 'Project'}].to_json) }
 
     specify { expect(User.reflect_on_association(:profile).klass).to eq(User::Profile) }
     specify { expect(User.reflect_on_association(:profile).klass).to be < Profile }
@@ -205,7 +205,7 @@ describe ActiveData::ActiveRecord::Associations do
     specify { expect(User.new.tap { |u| u.create_profile(first_name: 'Profile') }.profile).to be_a(User::Profile) }
     specify do
       expect(User.new.tap { |u| u.create_profile(first_name: 'Profile') }.read_attribute(:profile))
-        .to eq({ first_name: 'Profile', last_name: nil, admin: nil, age: nil }.to_json)
+        .to eq({first_name: 'Profile', last_name: nil, admin: nil, age: nil}.to_json)
     end
   end
 end

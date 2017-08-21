@@ -21,7 +21,7 @@ module ActiveData
 
         delegate :attribute_names, :has_attribute?, to: 'self.class'
 
-        %w(attribute collection dictionary).each do |kind|
+        %w[attribute collection dictionary].each do |kind|
           define_singleton_method kind do |*args, &block|
             add_attribute("ActiveData::Model::Attributes::Reflections::#{kind.camelize}".constantize, *args, &block)
           end

@@ -6,43 +6,34 @@ Lint/AmbiguousBlockAssociation:
 Lint/EndAlignment:
   EnforcedStyleAlignWith: variable
 
-Style/AccessModifierIndentation:
+Layout/AccessModifierIndentation:
   EnforcedStyle: outdent
 
-Style/Alias:
-  EnforcedStyle: prefer_alias_method
-
-Style/AlignHash:
+Layout/AlignHash:
   EnforcedLastArgumentHashStyle: always_ignore
 
-Style/AlignParameters:
+Layout/AlignParameters:
   EnforcedStyle: with_fixed_indentation
 
-Style/AndOr:
-  EnforcedStyle: conditionals
-
-Style/CaseIndentation:
+Layout/CaseIndentation:
   EnforcedStyle: end
 
-Style/DoubleNegation:
-  Enabled: false
-
-Style/IndentArray:
+Layout/IndentArray:
   EnforcedStyle: consistent
 
-Style/IndentHash:
+Layout/IndentHash:
   EnforcedStyle: consistent
 
-Style/IndentHeredoc:
+Layout/IndentHeredoc:
   Enabled: false
 
-Style/MultilineMethodCallIndentation:
+Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented
 
-Style/MultilineOperationIndentation:
+Layout/MultilineOperationIndentation:
   EnforcedStyle: indented
 
-Style/SpaceInsideHashLiteralBraces:
+Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
 
 Metrics/BlockLength:
@@ -54,3 +45,12 @@ Metrics/BlockLength:
 Metrics/ModuleLength:
   Exclude:
     - '**/*_spec.rb'
+
+Style/Alias:
+  EnforcedStyle: prefer_alias_method
+
+Style/AndOr:
+  EnforcedStyle: conditionals
+
+Style/DoubleNegation:
+  Enabled: false

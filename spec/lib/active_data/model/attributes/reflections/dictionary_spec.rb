@@ -37,7 +37,7 @@ describe ActiveData::Model::Attributes::Reflections::Dictionary do
 
   describe '#keys' do
     specify { expect(reflection.keys).to eq([]) }
-    specify { expect(reflection(keys: ['a', :b]).keys).to eq(%w(a b)) }
-    specify { expect(reflection(keys: :c).keys).to eq(%w(c)) }
+    specify { expect(reflection(keys: ['a', :b]).keys).to eq(%w[a b]) }
+    specify { expect(reflection(keys: :c).keys).to eq(%w[c]) }
   end
 end
