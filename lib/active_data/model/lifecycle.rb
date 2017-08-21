@@ -63,8 +63,8 @@ module ActiveData
       included do
         include Persistence
 
-        class_attribute(*[:save, :create, :update, :destroy].map { |action| "_#{action}_performer" })
-        private(*[:save, :create, :update, :destroy].map { |action| "_#{action}_performer=" })
+        class_attribute(*%i[save create update destroy].map { |action| "_#{action}_performer" })
+        private(*%i[save create update destroy].map { |action| "_#{action}_performer=" })
       end
 
       module ClassMethods
@@ -106,7 +106,7 @@ module ActiveData
         #   author = Author.create # using define_save performer
         #   author.update_attributes(...) # using define_update performer
         #
-        [:save, :create, :update, :destroy].each do |action|
+        %i[save create update destroy].each do |action|
           define_method "define_#{action}" do |&block|
             send("_#{action}_performer=", block)
           end
@@ -137,7 +137,7 @@ module ActiveData
       #   end
       #   user.save! # => will use instance-level performer
       #
-      [:save, :create, :update, :destroy].each do |action|
+      %i[save create update destroy].each do |action|
         define_method "define_#{action}" do |&block|
           send("_#{action}_performer=", block)
         end

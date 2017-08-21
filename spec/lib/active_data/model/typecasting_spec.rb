@@ -1,4 +1,5 @@
 # encoding: UTF-8
+
 require 'spec_helper'
 
 describe ActiveData::Model::Attributes do
@@ -96,7 +97,7 @@ describe ActiveData::Model::Attributes do
     let(:model) { stub_model { attribute :column, Array } }
 
     specify { expect(model.new(column: [1, 2, 3]).column).to eq([1, 2, 3]) }
-    specify { expect(model.new(column: 'hello, world').column).to eq(%w(hello world)) }
+    specify { expect(model.new(column: 'hello, world').column).to eq(%w[hello world]) }
     specify { expect(model.new(column: 10).column).to be_nil }
   end
 

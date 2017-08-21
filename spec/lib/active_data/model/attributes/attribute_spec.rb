@@ -5,12 +5,12 @@ describe ActiveData::Model::Attributes::Attribute do
 
   def attribute(*args)
     options = args.extract_options!
-    Dummy.add_attribute(ActiveData::Model::Attributes::Reflections::Attribute, :field, { type: Object }.merge(options))
+    Dummy.add_attribute(ActiveData::Model::Attributes::Reflections::Attribute, :field, {type: Object}.merge(options))
     Dummy.new.attribute(:field)
   end
 
   describe '#read' do
-    let(:field) { attribute(type: String, normalizer: ->(v) { v ? v.strip : v }, default: :world, enum: %w(hello 42 world)) }
+    let(:field) { attribute(type: String, normalizer: ->(v) { v ? v.strip : v }, default: :world, enum: %w[hello 42 world]) }
 
     specify { expect(field.tap { |r| r.write(nil) }.read).to eq('world') }
     specify { expect(field.tap { |r| r.write(:world) }.read).to eq('world') }
@@ -26,7 +26,7 @@ describe ActiveData::Model::Attributes::Attribute do
   end
 
   describe '#read_before_type_cast' do
-    let(:field) { attribute(type: String, normalizer: ->(v) { v.strip }, default: :world, enum: %w(hello 42 world)) }
+    let(:field) { attribute(type: String, normalizer: ->(v) { v.strip }, default: :world, enum: %w[hello 42 world]) }
 
     specify { expect(field.tap { |r| r.write(nil) }.read_before_type_cast).to eq(:world) }
     specify { expect(field.tap { |r| r.write(:world) }.read_before_type_cast).to eq(:world) }
@@ -69,7 +69,7 @@ describe ActiveData::Model::Attributes::Attribute do
     specify { expect(attribute.enum).to eq([].to_set) }
     specify { expect(attribute(enum: []).enum).to eq([].to_set) }
     specify { expect(attribute(enum: 'hello').enum).to eq(['hello'].to_set) }
-    specify { expect(attribute(enum: %w(hello world)).enum).to eq(%w(hello world).to_set) }
+    specify { expect(attribute(enum: %w[hello world]).enum).to eq(%w[hello world].to_set) }
     specify { expect(attribute(enum: [1..5]).enum).to eq([1..5].to_set) }
     specify { expect(attribute(enum: 1..5).enum).to eq((1..5).to_a.to_set) }
     specify { expect(attribute(enum: -> { 1..5 }).enum).to eq((1..5).to_a.to_set) }
@@ -119,26 +119,26 @@ describe ActiveData::Model::Attributes::Attribute do
       let(:length) { nil }
 
       specify { expect(attribute(normalizer: :strip).normalize(' hello ')).to eq('hello') }
-      specify { expect(attribute(normalizer: [:strip, :trim]).normalize(' hello ')).to eq('he') }
-      specify { expect(attribute(normalizer: [:trim, :strip]).normalize(' hello ')).to eq('h') }
-      specify { expect(attribute(normalizer: [:strip, { trim: { length: 4 } }]).normalize(' hello ')).to eq('hell') }
-      specify { expect(attribute(normalizer: { strip: {}, trim: { length: 4 } }).normalize(' hello ')).to eq('hell') }
+      specify { expect(attribute(normalizer: %i[strip trim]).normalize(' hello ')).to eq('he') }
+      specify { expect(attribute(normalizer: %i[trim strip]).normalize(' hello ')).to eq('h') }
+      specify { expect(attribute(normalizer: [:strip, {trim: {length: 4}}]).normalize(' hello ')).to eq('hell') }
+      specify { expect(attribute(normalizer: {strip: {}, trim: {length: 4}}).normalize(' hello ')).to eq('hell') }
       specify do
-        expect(attribute(normalizer: [:strip, { trim: { length: 4 } }, ->(v) { v.last(2) }])
+        expect(attribute(normalizer: [:strip, {trim: {length: 4}}, ->(v) { v.last(2) }])
         .normalize(' hello ')).to eq('ll')
       end
       specify { expect(attribute(normalizer: :reset).normalize('')).to eq(nil) }
-      specify { expect(attribute(normalizer: [:strip, :reset]).normalize('   ')).to eq(nil) }
+      specify { expect(attribute(normalizer: %i[strip reset]).normalize('   ')).to eq(nil) }
       specify { expect(attribute(normalizer: :reset, default: '!!!').normalize(nil)).to eq('!!!') }
       specify { expect(attribute(normalizer: :reset, default: '!!!').normalize('')).to eq('!!!') }
 
       context do
         let(:length) { 3 }
 
-        specify { expect(attribute(normalizer: [:strip, { trim: { length: 4 } }]).normalize(' hello ')).to eq('hel') }
-        specify { expect(attribute(normalizer: { strip: {}, trim: { length: 4 } }).normalize(' hello ')).to eq('hel') }
+        specify { expect(attribute(normalizer: [:strip, {trim: {length: 4}}]).normalize(' hello ')).to eq('hel') }
+        specify { expect(attribute(normalizer: {strip: {}, trim: {length: 4}}).normalize(' hello ')).to eq('hel') }
         specify do
-          expect(attribute(normalizer: [:strip, { trim: { length: 4 } }, ->(v) { v.last(2) }])
+          expect(attribute(normalizer: [:strip, {trim: {length: 4}}, ->(v) { v.last(2) }])
           .normalize(' hello ')).to eq('el')
         end
       end

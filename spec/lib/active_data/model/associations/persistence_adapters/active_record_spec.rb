@@ -1,4 +1,5 @@
 # encoding: UTF-8
+
 require 'spec_helper'
 
 describe ActiveData::Model::Associations::PersistenceAdapters::ActiveRecord do

@@ -29,7 +29,7 @@ module ActiveData
       extend ActiveSupport::Concern
 
       included do
-        { embeds_many: Reflections::EmbedsMany, embeds_one: Reflections::EmbedsOne }.each do |(method, reflection_class)|
+        {embeds_many: Reflections::EmbedsMany, embeds_one: Reflections::EmbedsOne}.each do |(method, reflection_class)|
           define_singleton_method method do |name, options = {}, &block|
             reflection = reflection_class.build(self, self, name,
               options.reverse_merge(read: READER, write: WRITER),

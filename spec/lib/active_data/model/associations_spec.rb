@@ -1,4 +1,5 @@
 # encoding: UTF-8
+
 require 'spec_helper'
 
 describe ActiveData::Model::Associations do
@@ -30,7 +31,7 @@ describe ActiveData::Model::Associations do
       specify { expect(Nobody.reflections.keys).to eq([]) }
       specify { expect(User.reflections.keys).to eq([:projects]) }
       specify { expect(Manager.reflections.keys).to eq([:managed_project]) }
-      specify { expect(Admin.reflections.keys).to eq([:projects, :admin_projects]) }
+      specify { expect(Admin.reflections.keys).to eq(%i[projects admin_projects]) }
     end
 
     describe '#reflect_on_association' do
@@ -113,7 +114,7 @@ describe ActiveData::Model::Associations do
     end
 
     describe '.association_names' do
-      specify { expect(User.association_names).to eq([:profile, :projects]) }
+      specify { expect(User.association_names).to eq(%i[profile projects]) }
     end
 
     describe '#inspect' do
@@ -158,7 +159,7 @@ describe ActiveData::Model::Associations do
     end
 
     describe '#association_names' do
-      specify { expect(user.association_names).to eq([:profile, :projects]) }
+      specify { expect(user.association_names).to eq(%i[profile projects]) }
     end
 
     describe '#apply_association_changes!' do
@@ -173,7 +174,7 @@ describe ActiveData::Model::Associations do
       end
       specify do
         expect { user.apply_association_changes! }.to change { user.attributes['projects'] }
-          .from(nil).to([{ 'title' => 'Project', 'author' => { 'name' => 'Author' } }])
+          .from(nil).to([{'title' => 'Project', 'author' => {'name' => 'Author'}}])
       end
 
       context do

@@ -1,4 +1,5 @@
 # encoding: UTF-8
+
 require 'spec_helper'
 
 describe ActiveData::Model::Associations::EmbedsOne do
@@ -22,7 +23,7 @@ describe ActiveData::Model::Associations::EmbedsOne do
   let(:book) { Book.new(title: 'Book') }
   let(:association) { book.association(:author) }
 
-  let(:existing_book) { Book.instantiate title: 'My Life', author: { 'name' => 'Johny' } }
+  let(:existing_book) { Book.instantiate title: 'My Life', author: {'name' => 'Johny'} }
   let(:existing_association) { existing_book.association(:author) }
 
   context 'callbacks' do
@@ -93,7 +94,7 @@ describe ActiveData::Model::Associations::EmbedsOne do
           embeds_one :author,
             before_add: ->(object) { callbacks.push([:before_add, object]) },
             after_add: ->(object) { callbacks.push([:after_add, object]) },
-            default: -> { { name: 'Author1' } }
+            default: -> { {name: 'Author1'} }
 
           collection :callbacks, Array
         end
@@ -132,7 +133,7 @@ describe ActiveData::Model::Associations::EmbedsOne do
     context 'default' do
       before do
         Book.class_eval do
-          embeds_one :author, default: -> { { name: 'Author1' } }
+          embeds_one :author, default: -> { {name: 'Author1'} }
         end
       end
 
@@ -309,7 +310,7 @@ describe ActiveData::Model::Associations::EmbedsOne do
   end
 
   describe '#default' do
-    before { Book.embeds_one :author, default: -> { { name: 'Default' } } }
+    before { Book.embeds_one :author, default: -> { {name: 'Default'} } }
     before do
       Author.class_eval do
         include ActiveData::Model::Primary

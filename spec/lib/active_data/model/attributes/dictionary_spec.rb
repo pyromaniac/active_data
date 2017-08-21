@@ -1,4 +1,5 @@
 # encoding: UTF-8
+
 require 'spec_helper'
 
 describe ActiveData::Model::Attributes::Dictionary do
@@ -14,7 +15,7 @@ describe ActiveData::Model::Attributes::Dictionary do
     let(:field) do
       attribute(type: String,
       normalizer: ->(val) { val.delete_if { |_, v| v.nil? } },
-      default: :world, enum: %w(hello 42))
+      default: :world, enum: %w[hello 42])
     end
 
     specify { expect(field.tap { |r| r.write(nil) }.read).to eq({}) }
@@ -52,7 +53,7 @@ describe ActiveData::Model::Attributes::Dictionary do
   end
 
   describe '#read_before_type_cast' do
-    let(:field) { attribute(type: String, default: :world, enum: %w(hello 42)) }
+    let(:field) { attribute(type: String, default: :world, enum: %w[hello 42]) }
 
     specify { expect(field.tap { |r| r.write(nil) }.read_before_type_cast).to eq({}) }
     specify { expect(field.tap { |r| r.write({}) }.read_before_type_cast).to eq({}) }
@@ -93,9 +94,9 @@ describe ActiveData::Model::Attributes::Dictionary do
       end
     end
 
-    specify { expect(Post.new(options: { a: 'hello', b: 42 }).options).to eq('a' => 'hello', 'b' => '42') }
-    specify { expect(Post.new(options: { a: 'hello', b: 42 }).options_before_type_cast).to eq('a' => 'hello', 'b' => 42) }
+    specify { expect(Post.new(options: {a: 'hello', b: 42}).options).to eq('a' => 'hello', 'b' => '42') }
+    specify { expect(Post.new(options: {a: 'hello', b: 42}).options_before_type_cast).to eq('a' => 'hello', 'b' => 42) }
     specify { expect(Post.new.options?).to eq(false) }
-    specify { expect(Post.new(options: { a: 'hello', b: 42 }).options?).to eq(true) }
+    specify { expect(Post.new(options: {a: 'hello', b: 42}).options?).to eq(true) }
   end
 end

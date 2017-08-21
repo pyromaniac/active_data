@@ -1,4 +1,5 @@
 # encoding: UTF-8
+
 require 'spec_helper'
 
 describe ActiveData::Model::Associations::EmbedsMany do
@@ -25,7 +26,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
   let(:user) { User.new(name: 'User') }
   let(:association) { user.association(:projects) }
 
-  let(:existing_user) { User.instantiate name: 'Rick', projects: [{ title: 'Genesis' }] }
+  let(:existing_user) { User.instantiate name: 'Rick', projects: [{title: 'Genesis'}] }
   let(:existing_association) { existing_user.association(:projects) }
 
   context 'performers' do
@@ -35,38 +36,38 @@ describe ActiveData::Model::Associations::EmbedsMany do
       p2 = user.projects.build(title: 'Project 2')
       p3 = user.projects.build(title: 'Project 3')
       p4 = user.projects.create(title: 'Project 4')
-      expect(user.read_attribute(:projects)).to eq([{ 'title' => 'Project 4' }])
+      expect(user.read_attribute(:projects)).to eq([{'title' => 'Project 4'}])
       p2.save!
-      expect(user.read_attribute(:projects)).to eq([{ 'title' => 'Project 2' }, { 'title' => 'Project 4' }])
+      expect(user.read_attribute(:projects)).to eq([{'title' => 'Project 2'}, {'title' => 'Project 4'}])
       p2.destroy!.destroy!
-      expect(user.read_attribute(:projects)).to eq([{ 'title' => 'Project 4' }])
+      expect(user.read_attribute(:projects)).to eq([{'title' => 'Project 4'}])
       user.projects.create(title: 'Project 5')
-      expect(user.read_attribute(:projects)).to eq([{ 'title' => 'Project 4' }, { 'title' => 'Project 5' }])
+      expect(user.read_attribute(:projects)).to eq([{'title' => 'Project 4'}, {'title' => 'Project 5'}])
       p3.destroy!
       user.projects.first.destroy!
-      expect(user.read_attribute(:projects)).to eq([{ 'title' => 'Project 4' }, { 'title' => 'Project 5' }])
+      expect(user.read_attribute(:projects)).to eq([{'title' => 'Project 4'}, {'title' => 'Project 5'}])
       p4.destroy!.save!
-      expect(user.read_attribute(:projects)).to eq([{ 'title' => 'Project 4' }, { 'title' => 'Project 5' }])
+      expect(user.read_attribute(:projects)).to eq([{'title' => 'Project 4'}, {'title' => 'Project 5'}])
       expect(user.projects.count).to eq(5)
       user.projects.map(&:save!)
       expect(user.read_attribute(:projects)).to eq([
-        { 'title' => 'Project 1' }, { 'title' => 'Project 2' }, { 'title' => 'Project 3' },
-        { 'title' => 'Project 4' }, { 'title' => 'Project 5' }
+        {'title' => 'Project 1'}, {'title' => 'Project 2'}, {'title' => 'Project 3'},
+        {'title' => 'Project 4'}, {'title' => 'Project 5'}
       ])
       user.projects.map(&:destroy!)
       expect(user.read_attribute(:projects)).to eq([])
       user.projects.first(2).map(&:save!)
-      expect(user.read_attribute(:projects)).to eq([{ 'title' => 'Project 1' }, { 'title' => 'Project 2' }])
+      expect(user.read_attribute(:projects)).to eq([{'title' => 'Project 1'}, {'title' => 'Project 2'}])
       expect(user.projects.reload.count).to eq(2)
       p3 = user.projects.create!(title: 'Project 3')
       expect(user.read_attribute(:projects)).to eq([
-        { 'title' => 'Project 1' }, { 'title' => 'Project 2' }, { 'title' => 'Project 3' }
+        {'title' => 'Project 1'}, {'title' => 'Project 2'}, {'title' => 'Project 3'}
       ])
       p3.destroy!
-      expect(user.read_attribute(:projects)).to eq([{ 'title' => 'Project 1' }, { 'title' => 'Project 2' }])
+      expect(user.read_attribute(:projects)).to eq([{'title' => 'Project 1'}, {'title' => 'Project 2'}])
       user.projects.create!(title: 'Project 4')
       expect(user.read_attribute(:projects)).to eq([
-        { 'title' => 'Project 1' }, { 'title' => 'Project 2' }, { 'title' => 'Project 4' }
+        {'title' => 'Project 1'}, {'title' => 'Project 2'}, {'title' => 'Project 4'}
       ])
     end
   end
@@ -169,7 +170,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
           embeds_many :projects,
             before_add: ->(owner, object) { owner.callbacks.push([:before_add, object]) },
             after_add: ->(owner, object) { owner.callbacks.push([:after_add, object]) },
-            default: -> { { title: 'Project1' } }
+            default: -> { {title: 'Project1'} }
 
           collection :callbacks, Array
         end
@@ -212,7 +213,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
     context 'default' do
       before do
         User.class_eval do
-          embeds_many :projects, default: -> { { title: 'Project1' } }
+          embeds_many :projects, default: -> { {title: 'Project1'} }
         end
       end
 
@@ -252,7 +253,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify do
       expect { association.build(title: 'Swordfish') }
         .to change { association.reader.map(&:attributes) }
-        .from([]).to([{ 'title' => 'Swordfish' }])
+        .from([]).to([{'title' => 'Swordfish'}])
     end
 
     specify do
@@ -262,7 +263,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify do
       expect { existing_association.build(title: 'Swordfish') }
         .to change { existing_association.reader.map(&:attributes) }
-        .from([{ 'title' => 'Genesis' }]).to([{ 'title' => 'Genesis' }, { 'title' => 'Swordfish' }])
+        .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Swordfish'}])
     end
   end
 
@@ -280,12 +281,12 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify do
       expect { association.create(title: 'Swordfish') }
         .to change { user.read_attribute(:projects) }
-        .from(nil).to([{ 'title' => 'Swordfish' }])
+        .from(nil).to([{'title' => 'Swordfish'}])
     end
     specify do
       expect { association.create(title: 'Swordfish') }
         .to change { association.reader.map(&:attributes) }
-        .from([]).to([{ 'title' => 'Swordfish' }])
+        .from([]).to([{'title' => 'Swordfish'}])
     end
 
     specify do
@@ -295,12 +296,12 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify do
       expect { existing_association.create(title: 'Swordfish') }
         .to change { existing_user.read_attribute(:projects) }
-        .from([{ title: 'Genesis' }]).to([{ title: 'Genesis' }, { 'title' => 'Swordfish' }])
+        .from([{title: 'Genesis'}]).to([{title: 'Genesis'}, {'title' => 'Swordfish'}])
     end
     specify do
       expect { existing_association.create(title: 'Swordfish') }
         .to change { existing_association.reader.map(&:attributes) }
-        .from([{ 'title' => 'Genesis' }]).to([{ 'title' => 'Genesis' }, { 'title' => 'Swordfish' }])
+        .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Swordfish'}])
     end
   end
 
@@ -316,16 +317,16 @@ describe ActiveData::Model::Associations::EmbedsMany do
     end
     specify do
       expect { muffle(ActiveData::ValidationError) { association.create! } }
-        .to change { association.reader.map(&:attributes) }.from([]).to([{ 'title' => nil }])
+        .to change { association.reader.map(&:attributes) }.from([]).to([{'title' => nil}])
     end
     specify do
       expect { association.create!(title: 'Swordfish') }
-        .to change { user.read_attribute(:projects) }.from(nil).to([{ 'title' => 'Swordfish' }])
+        .to change { user.read_attribute(:projects) }.from(nil).to([{'title' => 'Swordfish'}])
     end
     specify do
       expect { association.create!(title: 'Swordfish') }
         .to change { association.reader.map(&:attributes) }
-        .from([]).to([{ 'title' => 'Swordfish' }])
+        .from([]).to([{'title' => 'Swordfish'}])
     end
 
     specify do
@@ -335,17 +336,17 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify do
       expect { muffle(ActiveData::ValidationError) { existing_association.create! } }
         .to change { existing_association.reader.map(&:attributes) }
-        .from([{ 'title' => 'Genesis' }]).to([{ 'title' => 'Genesis' }, { 'title' => nil }])
+        .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => nil}])
     end
     specify do
       expect { existing_association.create!(title: 'Swordfish') }
         .to change { existing_user.read_attribute(:projects) }
-        .from([{ title: 'Genesis' }]).to([{ title: 'Genesis' }, { 'title' => 'Swordfish' }])
+        .from([{title: 'Genesis'}]).to([{title: 'Genesis'}, {'title' => 'Swordfish'}])
     end
     specify do
       expect { existing_association.create!(title: 'Swordfish') }
         .to change { existing_association.reader.map(&:attributes) }
-        .from([{ 'title' => 'Genesis' }]).to([{ 'title' => 'Genesis' }, { 'title' => 'Swordfish' }])
+        .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Swordfish'}])
     end
   end
 
@@ -441,7 +442,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
   end
 
   describe '#default' do
-    before { User.embeds_many :projects, default: -> { { title: 'Default' } } }
+    before { User.embeds_many :projects, default: -> { {title: 'Default'} } }
     before do
       Project.class_eval do
         include ActiveData::Model::Primary
@@ -483,7 +484,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
       before { association.build(title: 'Swordfish') }
       specify do
         expect { association.reload }
-          .to change { association.reader.map(&:attributes) }.from([{ 'title' => 'Swordfish' }]).to([])
+          .to change { association.reader.map(&:attributes) }.from([{'title' => 'Swordfish'}]).to([])
       end
     end
 
@@ -492,7 +493,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
       specify do
         expect { existing_association.reload }
           .to change { existing_association.reader.map(&:attributes) }
-          .from([{ 'title' => 'Genesis' }, { 'title' => 'Swordfish' }]).to([{ 'title' => 'Genesis' }])
+          .from([{'title' => 'Genesis'}, {'title' => 'Swordfish'}]).to([{'title' => 'Genesis'}])
       end
     end
   end
@@ -504,15 +505,15 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { expect(existing_association.clear).to eq(true) }
     specify do
       expect { existing_association.clear }
-        .to change { existing_association.reader.map(&:attributes) }.from([{ 'title' => 'Genesis' }]).to([])
+        .to change { existing_association.reader.map(&:attributes) }.from([{'title' => 'Genesis'}]).to([])
     end
     specify do
       expect { existing_association.clear }
-        .to change { existing_user.read_attribute(:projects) }.from([{ title: 'Genesis' }]).to([])
+        .to change { existing_user.read_attribute(:projects) }.from([{title: 'Genesis'}]).to([])
     end
 
     context do
-      let(:existing_user) { User.instantiate name: 'Rick', projects: [{ title: 'Genesis' }, { title: 'Swordfish' }] }
+      let(:existing_user) { User.instantiate name: 'Rick', projects: [{title: 'Genesis'}, {title: 'Swordfish'}] }
       before { Project.send(:include, ActiveData::Model::Callbacks) }
       if ActiveModel.version >= Gem::Version.new('5.0.0')
         before { Project.before_destroy { throw :abort } }
@@ -572,7 +573,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { expect(association.writer([new_project1])).to eq([new_project1]) }
     specify do
       expect { association.writer([new_project1]) }
-        .to change { association.reader.map(&:attributes) }.from([]).to([{ 'title' => 'Project 1' }])
+        .to change { association.reader.map(&:attributes) }.from([]).to([{'title' => 'Project 1'}])
     end
     specify do
       expect { association.writer([new_project1]) }
@@ -629,12 +630,12 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify do
       expect { existing_association.writer([new_project1, new_project2]) }
         .to change { existing_association.reader.map(&:attributes) }
-        .from([{ 'title' => 'Genesis' }]).to([{ 'title' => 'Project 1' }, { 'title' => 'Project 2' }])
+        .from([{'title' => 'Genesis'}]).to([{'title' => 'Project 1'}, {'title' => 'Project 2'}])
     end
     specify do
       expect { existing_association.writer([new_project1, new_project2]) }
         .to change { existing_user.read_attribute(:projects) }
-        .from([{ title: 'Genesis' }]).to([{ 'title' => 'Project 1' }, { 'title' => 'Project 2' }])
+        .from([{title: 'Genesis'}]).to([{'title' => 'Project 1'}, {'title' => 'Project 2'}])
     end
   end
 
@@ -656,7 +657,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify { expect(association.concat(new_project1)).to eq([new_project1]) }
     specify do
       expect { association.concat(new_project1) }
-        .to change { association.reader.map(&:attributes) }.from([]).to([{ 'title' => 'Project 1' }])
+        .to change { association.reader.map(&:attributes) }.from([]).to([{'title' => 'Project 1'}])
     end
     specify do
       expect { association.concat(new_project1) }
@@ -667,12 +668,12 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify do
       expect { existing_association.concat(new_project1, invalid_project) }
         .to change { existing_user.read_attribute(:projects) }
-        .from([{ title: 'Genesis' }]).to([{ 'title' => 'Genesis' }, { 'title' => 'Project 1' }])
+        .from([{title: 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}])
     end
     specify do
       expect { existing_association.concat(new_project1, invalid_project) }
         .to change { existing_association.reader.map(&:attributes) }
-        .from([{ 'title' => 'Genesis' }]).to([{ 'title' => 'Genesis' }, { 'title' => 'Project 1' }, { 'title' => nil }])
+        .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}, {'title' => nil}])
     end
 
     specify do
@@ -686,7 +687,7 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify do
       expect { muffle(ActiveData::AssociationTypeMismatch) { existing_association.concat(new_project1, Dummy.new, new_project2) } }
         .to change { existing_association.reader.map(&:attributes) }
-        .from([{ 'title' => 'Genesis' }]).to([{ 'title' => 'Genesis' }, { 'title' => 'Project 1' }])
+        .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}])
     end
 
     specify do
@@ -696,12 +697,12 @@ describe ActiveData::Model::Associations::EmbedsMany do
     specify do
       expect { existing_association.concat([new_project1, new_project2]) }
         .to change { existing_association.reader.map(&:attributes) }
-        .from([{ 'title' => 'Genesis' }]).to([{ 'title' => 'Genesis' }, { 'title' => 'Project 1' }, { 'title' => 'Project 2' }])
+        .from([{'title' => 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}, {'title' => 'Project 2'}])
     end
     specify do
       expect { existing_association.concat([new_project1, new_project2]) }
         .to change { existing_user.read_attribute(:projects) }
-        .from([{ title: 'Genesis' }]).to([{ 'title' => 'Genesis' }, { 'title' => 'Project 1' }, { 'title' => 'Project 2' }])
+        .from([{title: 'Genesis'}]).to([{'title' => 'Genesis'}, {'title' => 'Project 1'}, {'title' => 'Project 2'}])
     end
   end
 end

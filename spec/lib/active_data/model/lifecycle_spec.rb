@@ -1,4 +1,5 @@
 # encoding: UTF-8
+
 require 'spec_helper'
 
 describe ActiveData::Model::Lifecycle do
@@ -11,7 +12,7 @@ describe ActiveData::Model::Lifecycle do
 
     subject { User.new }
 
-    [:save, :create, :update, :destroy].each do |action|
+    %i[save create update destroy].each do |action|
       specify { expect { subject.public_send "_#{action}_performer=", '' }.to raise_error NoMethodError }
     end
 
@@ -106,7 +107,7 @@ describe ActiveData::Model::Lifecycle do
           subject.destroy
           subject.destroy
           subject.save
-          expect(subject.actions).to eq([:destroy, :create, :update, :destroy, :destroy, :create])
+          expect(subject.actions).to eq(%i[destroy create update destroy destroy create])
         end
       end
     end

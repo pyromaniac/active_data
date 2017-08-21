@@ -52,8 +52,8 @@ module ActiveData
           reflection = reflect_on_attribute(method)
           name = reflection ? reflection.name : method
 
-          %w(changed? change will_change! was
-             previously_changed? previous_change).each do |suffix|
+          %w[changed? change will_change! was
+             previously_changed? previous_change].each do |suffix|
             target.class_eval <<-RUBY, __FILE__, __LINE__ + 1
               def #{method}_#{suffix}
                 attribute_#{suffix} '#{name}'

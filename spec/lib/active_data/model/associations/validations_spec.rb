@@ -41,7 +41,7 @@ describe ActiveData::Model::Associations::Validations do
     let(:project) { Project.new title: 'Project' }
     let(:projects) { [project] }
     let(:user) { User.new(login: 'Login', profile: profile, projects: projects) }
-    let(:author_attributes) { { name: 'Author' } }
+    let(:author_attributes) { {name: 'Author'} }
     before { project.build_author(author_attributes) }
 
     specify { expect(user.validate).to eq(true) }
@@ -80,7 +80,7 @@ describe ActiveData::Model::Associations::Validations do
     let(:project) { Project.new title: 'Project' }
     let(:projects) { [project] }
     let(:user) { User.new(login: 'Login', profile: profile, projects: projects) }
-    let(:author_attributes) { { name: 'Author' } }
+    let(:author_attributes) { {name: 'Author'} }
     before { project.build_author(author_attributes) }
 
     specify { expect(user.validate_ancestry).to eq(true) }

@@ -1,44 +1,56 @@
 inherit_from: .rubocop_todo.yml
 
+Lint/AmbiguousBlockAssociation:
+  Enabled: false
+
 Lint/EndAlignment:
   EnforcedStyleAlignWith: variable
 
-Style/AccessModifierIndentation:
+Layout/AccessModifierIndentation:
   EnforcedStyle: outdent
 
-Style/Alias:
-  EnforcedStyle: prefer_alias_method
-
-Style/AlignHash:
+Layout/AlignHash:
   EnforcedLastArgumentHashStyle: always_ignore
 
-Style/AlignParameters:
+Layout/AlignParameters:
   EnforcedStyle: with_fixed_indentation
 
-Style/AndOr:
-  EnforcedStyle: conditionals
-
-Style/CaseIndentation:
+Layout/CaseIndentation:
   EnforcedStyle: end
 
-Style/DoubleNegation:
-  Enabled: false
-
-Style/IndentArray:
+Layout/IndentArray:
   EnforcedStyle: consistent
 
-Style/MultilineMethodCallIndentation:
+Layout/IndentHash:
+  EnforcedStyle: consistent
+
+Layout/IndentHeredoc:
+  Enabled: false
+
+Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented
 
-Style/MultilineOperationIndentation:
+Layout/MultilineOperationIndentation:
   EnforcedStyle: indented
+
+Layout/SpaceInsideHashLiteralBraces:
+  EnforcedStyle: no_space
 
 Metrics/BlockLength:
   Exclude:
     - '**/*_spec.rb'
+    - '**/*_examples.rb'
     - '**/*.rake'
-    - spec/shared/**/*.rb
 
 Metrics/ModuleLength:
   Exclude:
     - '**/*_spec.rb'
+
+Style/Alias:
+  EnforcedStyle: prefer_alias_method
+
+Style/AndOr:
+  EnforcedStyle: conditionals
+
+Style/DoubleNegation:
+  Enabled: false

@@ -23,18 +23,18 @@ shared_examples 'nested attributes' do
     let(:user) { User.new }
 
     specify { expect { user.profile_attributes = {} }.to change { user.profile }.to(an_instance_of(Profile)) }
-    specify { expect { user.profile_attributes = { first_name: 'User' } }.to change { user.profile.try(:first_name) }.to('User') }
-    specify { expect { user.profile_attributes = { identifier: 42, first_name: 'User' } }.to raise_error ActiveData::ObjectNotFound }
+    specify { expect { user.profile_attributes = {first_name: 'User'} }.to change { user.profile.try(:first_name) }.to('User') }
+    specify { expect { user.profile_attributes = {identifier: 42, first_name: 'User'} }.to raise_error ActiveData::ObjectNotFound }
 
     context ':reject_if' do
       context do
         before { User.accepts_nested_attributes_for :profile, reject_if: :all_blank }
-        specify { expect { user.profile_attributes = { first_name: '' } }.not_to change { user.profile } }
+        specify { expect { user.profile_attributes = {first_name: ''} }.not_to change { user.profile } }
       end
 
       context do
         before { User.accepts_nested_attributes_for :profile, reject_if: ->(attributes) { attributes['first_name'].blank? } }
-        specify { expect { user.profile_attributes = { first_name: '' } }.not_to change { user.profile } }
+        specify { expect { user.profile_attributes = {first_name: ''} }.not_to change { user.profile } }
       end
     end
 
@@ -42,20 +42,20 @@ shared_examples 'nested attributes' do
       let(:profile) { Profile.new(first_name: 'User') }
       let(:user) { User.new profile: profile }
 
-      specify { expect { user.profile_attributes = { identifier: 42, first_name: 'User' } }.to raise_error ActiveData::ObjectNotFound }
-      specify { expect { user.profile_attributes = { identifier: profile.identifier.to_s, first_name: 'User 1' } }.to change { user.profile.first_name }.to('User 1') }
-      specify { expect { user.profile_attributes = { first_name: 'User 1' } }.to change { user.profile.first_name }.to('User 1') }
-      specify { expect { user.profile_attributes = { first_name: 'User 1', _destroy: '1' } }.not_to change { user.profile.first_name } }
+      specify { expect { user.profile_attributes = {identifier: 42, first_name: 'User'} }.to raise_error ActiveData::ObjectNotFound }
+      specify { expect { user.profile_attributes = {identifier: profile.identifier.to_s, first_name: 'User 1'} }.to change { user.profile.first_name }.to('User 1') }
+      specify { expect { user.profile_attributes = {first_name: 'User 1'} }.to change { user.profile.first_name }.to('User 1') }
+      specify { expect { user.profile_attributes = {first_name: 'User 1', _destroy: '1'} }.not_to change { user.profile.first_name } }
       specify do
         expect do
-          user.profile_attributes = { first_name: 'User 1', _destroy: '1' }
+          user.profile_attributes = {first_name: 'User 1', _destroy: '1'}
           user.save { true }
         end.not_to change { user.profile.first_name }
       end
-      specify { expect { user.profile_attributes = { identifier: profile.identifier.to_s, first_name: 'User 1', _destroy: '1' } }.to change { user.profile.first_name }.to('User 1') }
+      specify { expect { user.profile_attributes = {identifier: profile.identifier.to_s, first_name: 'User 1', _destroy: '1'} }.to change { user.profile.first_name }.to('User 1') }
       specify do
         expect do
-          user.profile_attributes = { identifier: profile.identifier.to_s, first_name: 'User 1', _destroy: '1' }
+          user.profile_attributes = {identifier: profile.identifier.to_s, first_name: 'User 1', _destroy: '1'}
           user.save { true }
         end.to change { user.profile.first_name }.to('User 1')
       end
@@ -63,17 +63,17 @@ shared_examples 'nested attributes' do
       context ':allow_destroy' do
         before { User.accepts_nested_attributes_for :profile, allow_destroy: true }
 
-        specify { expect { user.profile_attributes = { first_name: 'User 1', _destroy: '1' } }.not_to change { user.profile.first_name } }
+        specify { expect { user.profile_attributes = {first_name: 'User 1', _destroy: '1'} }.not_to change { user.profile.first_name } }
         specify do
           expect do
-            user.profile_attributes = { first_name: 'User 1', _destroy: '1' }
+            user.profile_attributes = {first_name: 'User 1', _destroy: '1'}
             user.save { true }
           end.not_to change { user.profile.first_name }
         end
-        specify { expect { user.profile_attributes = { identifier: profile.identifier.to_s, first_name: 'User 1', _destroy: '1' } }.to change { user.profile.first_name }.to('User 1') }
+        specify { expect { user.profile_attributes = {identifier: profile.identifier.to_s, first_name: 'User 1', _destroy: '1'} }.to change { user.profile.first_name }.to('User 1') }
         specify do
           expect do
-            user.profile_attributes = { identifier: profile.identifier.to_s, first_name: 'User 1', _destroy: '1' }
+            user.profile_attributes = {identifier: profile.identifier.to_s, first_name: 'User 1', _destroy: '1'}
             user.save { true }
           end.to change { user.profile }.to(nil)
         end
@@ -83,7 +83,7 @@ shared_examples 'nested attributes' do
         before { User.accepts_nested_attributes_for :profile, update_only: true }
 
         specify do
-          expect { user.profile_attributes = { identifier: 42, first_name: 'User 1' } }
+          expect { user.profile_attributes = {identifier: 42, first_name: 'User 1'} }
             .to change { user.profile.first_name }.to('User 1')
         end
       end
@@ -100,14 +100,14 @@ shared_examples 'nested attributes' do
       end
 
       specify { expect { user.profile_attributes = {} }.to change { user.profile }.to(an_instance_of(Profile)) }
-      specify { expect { user.profile_attributes = { first_name: 'User' } }.to change { user.profile.try(:first_name) }.to('User') }
+      specify { expect { user.profile_attributes = {first_name: 'User'} }.to change { user.profile.try(:first_name) }.to('User') }
 
       context do
         let(:profile) { Profile.new(first_name: 'User') }
         let(:user) { User.new profile: profile }
 
         specify do
-          expect { user.profile_attributes = { identifier: 42, first_name: 'User 1' } }
+          expect { user.profile_attributes = {identifier: 42, first_name: 'User 1'} }
             .to change { user.profile.first_name }.to('User 1')
         end
       end
@@ -135,19 +135,19 @@ shared_examples 'nested attributes' do
 
     specify { expect { user.projects_attributes = {} }.not_to change { user.projects } }
     specify do
-      expect { user.projects_attributes = [{ title: 'Project 1' }, { title: 'Project 2' }] }
+      expect { user.projects_attributes = [{title: 'Project 1'}, {title: 'Project 2'}] }
         .to change { user.projects.map(&:title) }.to(['Project 1', 'Project 2'])
     end
     specify do
-      expect { user.projects_attributes = { 1 => { title: 'Project 1' }, 2 => { title: 'Project 2' } } }
+      expect { user.projects_attributes = {1 => {title: 'Project 1'}, 2 => {title: 'Project 2'}} }
         .to change { user.projects.map(&:title) }.to(['Project 1', 'Project 2'])
     end
     specify do
-      expect { user.projects_attributes = [{ slug: 42, title: 'Project 1' }, { title: 'Project 2' }] }
+      expect { user.projects_attributes = [{slug: 42, title: 'Project 1'}, {title: 'Project 2'}] }
         .to change { user.projects.map(&:title) }.to(['Project 1', 'Project 2'])
     end
     specify do
-      expect { user.projects_attributes = [{ title: '' }, { title: 'Project 2' }] }
+      expect { user.projects_attributes = [{title: ''}, {title: 'Project 2'}] }
         .to change { user.projects.map(&:title) }.to(['', 'Project 2'])
     end
 
@@ -155,11 +155,11 @@ shared_examples 'nested attributes' do
       before { User.accepts_nested_attributes_for :projects, limit: 1 }
 
       specify do
-        expect { user.projects_attributes = [{ title: 'Project 1' }] }
+        expect { user.projects_attributes = [{title: 'Project 1'}] }
           .to change { user.projects.map(&:title) }.to(['Project 1'])
       end
       specify do
-        expect { user.projects_attributes = [{ title: 'Project 1' }, { title: 'Project 2' }] }
+        expect { user.projects_attributes = [{title: 'Project 1'}, {title: 'Project 2'}] }
           .to raise_error ActiveData::TooManyObjects
       end
     end
@@ -168,7 +168,7 @@ shared_examples 'nested attributes' do
       context do
         before { User.accepts_nested_attributes_for :projects, reject_if: :all_blank }
         specify do
-          expect { user.projects_attributes = [{ title: '' }, { title: 'Project 2' }] }
+          expect { user.projects_attributes = [{title: ''}, {title: 'Project 2'}] }
             .to change { user.projects.map(&:title) }.to(['Project 2'])
         end
       end
@@ -176,7 +176,7 @@ shared_examples 'nested attributes' do
       context do
         before { User.accepts_nested_attributes_for :projects, reject_if: ->(attributes) { attributes['title'].blank? } }
         specify do
-          expect { user.projects_attributes = [{ title: '' }, { title: 'Project 2' }] }
+          expect { user.projects_attributes = [{title: ''}, {title: 'Project 2'}] }
             .to change { user.projects.map(&:title) }.to(['Project 2'])
         end
       end
@@ -184,7 +184,7 @@ shared_examples 'nested attributes' do
       context do
         before { User.accepts_nested_attributes_for :projects, reject_if: ->(attributes) { attributes['foobar'].blank? } }
         specify do
-          expect { user.projects_attributes = [{ title: '' }, { title: 'Project 2' }] }
+          expect { user.projects_attributes = [{title: ''}, {title: 'Project 2'}] }
             .not_to change { user.projects }
         end
       end
@@ -197,8 +197,8 @@ shared_examples 'nested attributes' do
       specify do
         expect do
           user.projects_attributes = [
-            { slug: projects.first.slug.to_i, title: 'Project 3' },
-            { title: 'Project 4' }
+            {slug: projects.first.slug.to_i, title: 'Project 3'},
+            {title: 'Project 4'}
           ]
         end
           .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2', 'Project 4'])
@@ -206,17 +206,17 @@ shared_examples 'nested attributes' do
       specify do
         expect do
           user.projects_attributes = [
-            { slug: projects.first.slug.to_i, title: 'Project 3' },
-            { slug: 33, title: 'Project 4' }
+            {slug: projects.first.slug.to_i, title: 'Project 3'},
+            {slug: 33, title: 'Project 4'}
           ]
         end
-          .to change { user.projects.map(&:slug) }.to(%w(42 43 33))
+          .to change { user.projects.map(&:slug) }.to(%w[42 43 33])
       end
       specify do
         expect do
           user.projects_attributes = [
-            { slug: projects.first.slug.to_i, title: 'Project 3' },
-            { slug: 33, title: 'Project 4', _destroy: 1 }
+            {slug: projects.first.slug.to_i, title: 'Project 3'},
+            {slug: 33, title: 'Project 4', _destroy: 1}
           ]
         end
           .not_to change { user.projects.map(&:slug) }
@@ -224,8 +224,8 @@ shared_examples 'nested attributes' do
       specify do
         expect do
           user.projects_attributes = {
-            1 => { slug: projects.first.slug.to_i, title: 'Project 3' },
-            2 => { title: 'Project 4' }
+            1 => {slug: projects.first.slug.to_i, title: 'Project 3'},
+            2 => {title: 'Project 4'}
           }
         end
           .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2', 'Project 4'])
@@ -233,8 +233,8 @@ shared_examples 'nested attributes' do
       specify do
         expect do
           user.projects_attributes = [
-            { slug: projects.first.slug.to_i, title: 'Project 3', _destroy: '1' },
-            { title: 'Project 4', _destroy: '1' }
+            {slug: projects.first.slug.to_i, title: 'Project 3', _destroy: '1'},
+            {title: 'Project 4', _destroy: '1'}
           ]
         end
           .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2'])
@@ -242,8 +242,8 @@ shared_examples 'nested attributes' do
       specify do
         expect do
           user.projects_attributes = [
-            { slug: projects.first.slug.to_i, title: 'Project 3', _destroy: '1' },
-            { title: 'Project 4', _destroy: '1' }
+            {slug: projects.first.slug.to_i, title: 'Project 3', _destroy: '1'},
+            {title: 'Project 4', _destroy: '1'}
           ]
           user.save { true }
         end
@@ -256,8 +256,8 @@ shared_examples 'nested attributes' do
         specify do
           expect do
             user.projects_attributes = [
-              { slug: projects.first.slug.to_i, title: 'Project 3', _destroy: '1' },
-              { title: 'Project 4', _destroy: '1' }
+              {slug: projects.first.slug.to_i, title: 'Project 3', _destroy: '1'},
+              {title: 'Project 4', _destroy: '1'}
             ]
           end
             .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2'])
@@ -265,8 +265,8 @@ shared_examples 'nested attributes' do
         specify do
           expect do
             user.projects_attributes = [
-              { slug: projects.first.slug.to_i, title: 'Project 3', _destroy: '1' },
-              { title: 'Project 4', _destroy: '1' }
+              {slug: projects.first.slug.to_i, title: 'Project 3', _destroy: '1'},
+              {title: 'Project 4', _destroy: '1'}
             ]
             user.save { true }
           end
@@ -280,8 +280,8 @@ shared_examples 'nested attributes' do
         specify do
           expect do
             user.projects_attributes = [
-              { slug: projects.first.slug.to_i, title: 'Project 3' },
-              { title: 'Project 4' }
+              {slug: projects.first.slug.to_i, title: 'Project 3'},
+              {title: 'Project 4'}
             ]
           end
             .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2'])
@@ -290,8 +290,8 @@ shared_examples 'nested attributes' do
         specify do
           expect do
             user.projects_attributes = [
-              { slug: projects.last.slug.to_i, title: 'Project 3' },
-              { slug: projects.first.slug.to_i.pred, title: 'Project 0' }
+              {slug: projects.last.slug.to_i, title: 'Project 3'},
+              {slug: projects.first.slug.to_i.pred, title: 'Project 0'}
             ]
           end
             .to change { user.projects.map(&:title) }.to(['Project 1', 'Project 3'])

@@ -5,7 +5,7 @@ module ActiveData
         class ActiveRecord < Base
           class ReferencedProxy < ActiveData::Model::Associations::Collection::Proxy
             # You can't create data directly through ActiveRecord::Relation
-            METHODS_EXCLUDED_FROM_DELEGATION = %w(build create create!).map(&:to_sym).freeze
+            METHODS_EXCLUDED_FROM_DELEGATION = %w[build create create!].map(&:to_sym).freeze
 
             attr_reader :association
             delegate :scope, to: :@association
