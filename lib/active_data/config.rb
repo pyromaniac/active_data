@@ -17,6 +17,7 @@ module ActiveData
       @_normalizers = {}
       @_typecasters = {}
       @_persistence_adapters = {}
+      @_persistence_adapters_cache = {}
     end
 
     def normalizer(name, &block)
@@ -32,10 +33,15 @@ module ActiveData
       if block
         _persistence_adapters[klass_name] = block
       else
-        klass_const = klass_name.constantize
-        adapter = _persistence_adapters.values_at(*klass_const.ancestors.map(&:to_s)).compact.first
-        raise PersistenceAdapterMissing, klass unless adapter
-        adapter
+        @_persistence_adapters_cache[klass_name] ||= begin
+          klass_const = klass_name.constantize
+          adapter = nil
+          klass_const.ancestors.each do |ancestor_klass|
+            (adapter = _persistence_adapters[ancestor_klass.to_s]) && break
+          end
+          raise PersistenceAdapterMissing, klass unless adapter
+          adapter
+        end
       end
     end
 
