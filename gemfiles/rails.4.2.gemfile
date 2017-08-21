@@ -11,4 +11,4 @@ group :test do
   gem "guard-rspec"
 end
 
-gemspec :path => "../"
+gemspec path: "../"
