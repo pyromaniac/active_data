@@ -26,34 +26,6 @@ module ActiveData
           end
         end
         alias_method :attributes=, :assign_attributes
-
-      private
-
-        def run_validations! #:nodoc:
-          super
-          emerge_represented_attributes_errors!
-          errors.empty?
-        end
-
-        # Move represent attribute errors to the top level:
-        #
-        #   {:'role.email' => ['Some error']}
-        #
-        # to:
-        #
-        #   {email: ['Some error']}
-        #
-        def emerge_represented_attributes_errors!
-          self.class.represented_attributes.each do |attribute|
-            key = :"#{attribute.reference}.#{attribute.column}"
-            # Rails 5 pollutes messages with an empty array on key data fetch attempt
-            messages = errors.messages[key] if errors.messages.key?(key)
-            if messages.present?
-              errors[attribute.column].concat(messages)
-              errors.delete(key)
-            end
-          end
-        end
       end
 
       module ClassMethods
@@ -73,6 +45,34 @@ module ActiveData
         def represented_names_and_aliases
           @represented_names_and_aliases ||= represented_attributes.flat_map do |attribute|
             [attribute.name, *inverted_attribute_aliases[attribute.name]]
+          end
+        end
+      end
+
+    private
+
+      def run_validations! #:nodoc:
+        super
+        emerge_represented_attributes_errors!
+        errors.empty?
+      end
+
+      # Move represent attribute errors to the top level:
+      #
+      #   {:'role.email' => ['Some error']}
+      #
+      # to:
+      #
+      #   {email: ['Some error']}
+      #
+      def emerge_represented_attributes_errors!
+        self.class.represented_attributes.each do |attribute|
+          key = :"#{attribute.reference}.#{attribute.column}"
+          # Rails 5 pollutes messages with an empty array on key data fetch attempt
+          messages = errors.messages[key] if errors.messages.key?(key)
+          if messages.present?
+            errors[attribute.column].concat(messages)
+            errors.delete(key)
           end
         end
       end

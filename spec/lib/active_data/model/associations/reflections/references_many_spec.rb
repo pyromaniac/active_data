@@ -286,6 +286,7 @@ describe ActiveData::Model::Associations::Reflections::ReferencesMany do
   describe '#author_ids=' do
     specify { expect { book.author_ids = [author.id] }.to change { book.author_ids }.from([]).to([author.id]) }
     specify { expect { book.author_ids = [author.id] }.to change { book.authors }.from([]).to([author]) }
+    specify { expect { book.author_ids = [author] }.to change { book.authors }.from([]).to([author]) }
 
     specify { expect { book.author_ids = [author.id.next.to_s] }.not_to change { book.author_ids }.from([]) }
     specify { expect { book.author_ids = [author.id.next.to_s] }.not_to change { book.authors }.from([]) }
