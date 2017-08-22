@@ -130,6 +130,74 @@ describe ActiveData::Model::Attributes do
 
     specify { expect { subject.assign_attributes(attributes) }.to change { subject.id }.to(42) }
     specify { expect { subject.assign_attributes(attributes) }.to change { subject.full_name }.to('Name') }
+
+    context 'features stack and assign order' do
+      let(:model) do
+        stub_model do
+          attr_reader :logger
+
+          def self.log(a)
+            define_method("#{a}=") do |*args|
+              log(a)
+              super(*args)
+            end
+          end
+
+          def log(o)
+            (@logger ||= []).push(o)
+          end
+
+          attribute :plain1, String
+          attribute :plain2, String
+          log(:plain1)
+          log(:plain2)
+        end
+      end
+      subject { model.new }
+
+      specify do
+        expect { subject.assign_attributes(plain1: 'value', plain2: 'value') }
+          .to change { subject.logger }.to(%i[plain1 plain2])
+      end
+
+      specify do
+        expect { subject.assign_attributes(plain2: 'value', plain1: 'value') }
+          .to change { subject.logger }.to(%i[plain2 plain1])
+      end
+
+      context do
+        before do
+          model.class_eval do
+            include ActiveData::Model::Representation
+            include ActiveData::Model::Associations
+
+            embeds_one :assoc do
+              attribute :assoc_plain, String
+            end
+            accepts_nested_attributes_for :assoc
+
+            represents :assoc_plain, of: :assoc
+
+            log(:assoc_attributes)
+            log(:assoc_plain)
+
+            def assign_attributes(attrs)
+              super attrs.merge(attrs.extract!('plain2'))
+            end
+          end
+        end
+
+        specify do
+          expect { subject.assign_attributes(assoc_plain: 'value', assoc_attributes: {}, plain1: 'value', plain2: 'value') }
+            .to change { subject.logger }.to(%i[plain1 assoc_attributes assoc_plain plain2])
+        end
+
+        specify do
+          expect { subject.assign_attributes(plain1: 'value', plain2: 'value', assoc_plain: 'value', assoc_attributes: {}) }
+            .to change { subject.logger }.to(%i[plain1 assoc_attributes assoc_plain plain2])
+        end
+      end
+    end
   end
 
   describe '#inspect' do

@@ -251,6 +251,7 @@ describe ActiveData::Model::Associations::Reflections::ReferencesOne do
     let(:author) { Author.create!(name: 'Author') }
     specify { expect { book.author_id = author.id }.to change { book.author_id }.from(nil).to(author.id) }
     specify { expect { book.author_id = author.id }.to change { book.author }.from(nil).to(author) }
+    specify { expect { book.author_id = author }.to change { book.author }.from(nil).to(author) }
 
     specify { expect { book.author_id = author.id.next.to_s }.to change { book.author_id }.from(nil).to(author.id.next) }
     specify { expect { book.author_id = author.id.next.to_s }.not_to change { book.author }.from(nil) }

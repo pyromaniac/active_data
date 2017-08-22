@@ -9,7 +9,7 @@ module ActiveData
       private
 
         def read_source
-          attribute.type_casted_value
+          attribute.read_before_type_cast
         end
 
         def write_source(value)
