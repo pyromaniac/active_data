@@ -132,10 +132,6 @@ module ActiveData
       ActiveData::UUID.parse_int value
     end
   end
-
-  persistence_adapter('ActiveRecord::Base') do |data_source, primary_key, scope_proc|
-    ActiveData::Model::Associations::PersistenceAdapters::ActiveRecord.new(data_source, primary_key, scope_proc)
-  end
 end
 
 ActiveSupport.on_load :active_record do
@@ -144,4 +140,8 @@ ActiveSupport.on_load :active_record do
 
   include ActiveData::ActiveRecord::Associations
   singleton_class.prepend ActiveData::ActiveRecord::NestedAttributes
+
+  def self.active_data_persistence_adapter
+    ActiveData::Model::Associations::PersistenceAdapters::ActiveRecord
+  end
 end

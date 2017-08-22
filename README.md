@@ -154,8 +154,12 @@ ActiveData has modular architecture, so it is required to include modules to obt
 
 Adapter definition syntax:
 ```ruby
-ActiveData.persistence_adapter('ClassName') do |data_source, primary_key, scope_proc|
-  CustomAdapter.new(data_source, primary_key, scope_proc) # or anything that have similar interface to ActiveData::Model::Associations::PersistenceAdapters::Base
+class Mongoid::Document
+  # anything that have similar interface to
+  # ActiveData::Model::Associations::PersistenceAdapters::Base
+  def self.active_data_persistence_adapter
+    MongoidAdapter
+  end
 end
 ```
 Where  
@@ -166,13 +170,7 @@ Where
 
 All required interface for adapters described in `ActiveData::Model::Associations::PersistenceAdapters::Base`.
 
-Adapter for ActiveRecord is `ActiveData::Model::Associations::PersistenceAdapters::ActiveRecord`.
-```ruby
-ActiveData.persistence_adapter('ActiveRecord::Base') do |data_source, primary_key, scope_proc|
-  PersistenceAdapters::ActiveRecord.new(data_source, primary_key, scope_proc)
-end
-```
-So, all AR models will use `PersistenceAdapters::ActiveRecord` by default.
+Adapter for ActiveRecord is `ActiveData::Model::Associations::PersistenceAdapters::ActiveRecord`. So, all AR models will use `PersistenceAdapters::ActiveRecord` by default.
 
 ### Primary
 
