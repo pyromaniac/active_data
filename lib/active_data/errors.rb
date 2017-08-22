@@ -98,8 +98,10 @@ You can define it with:
 Could not find persistence adapter for #{data_source}
 You can define it with:
 
-  ActiveData.persistence_adapter('#{data_source}') do |data_source, primary_key, scope_proc|
-    # do some staff with value and options
+  class #{data_source}
+    def self.active_data_persistence_adapter
+      #{data_source}ActiveDataPersistenceAdapter
+    end
   end
       EOS
     end

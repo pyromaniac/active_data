@@ -65,30 +65,4 @@ describe ActiveData::Config do
     end
     specify { expect { subject.typecaster(Object) }.to raise_error ActiveData::TypecasterMissing }
   end
-
-  describe '#persistence_adapter' do
-    specify do
-      expect { subject.persistence_adapter('Object') {} }
-        .to change {
-          begin
-            subject.persistence_adapter(Object)
-          rescue
-            nil
-          end
-        }.from(nil).to(an_instance_of(Proc))
-    end
-    specify do
-      expect { subject.persistence_adapter('Object') {} }
-        .to change {
-          begin
-            subject.persistence_adapter('object')
-          rescue
-            nil
-          end
-        }.from(nil).to(an_instance_of(Proc))
-    end
-    specify do
-      expect { subject.persistence_adapter(Object) }.to raise_error ActiveData::PersistenceAdapterMissing
-    end
-  end
 end

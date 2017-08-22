@@ -9,6 +9,11 @@ module ActiveData
             reflection
           end
 
+          def self.persistence_adapter(klass)
+            adapter = klass.active_data_persistence_adapter if klass.respond_to?(:active_data_persistence_adapter)
+            adapter or raise PersistenceAdapterMissing, klass
+          end
+
           delegate :primary_key, to: :persistence_adapter
 
           def initialize(name, *args)
@@ -27,8 +32,8 @@ module ActiveData
           alias_method :data_source, :klass
 
           def persistence_adapter
-            @persistence_adapter ||= ActiveData.persistence_adapter(data_source)
-              .call(data_source, options[:primary_key], @scope_proc)
+            @persistence_adapter ||= self.class.persistence_adapter(klass)
+              .new(data_source, options[:primary_key], @scope_proc)
           end
 
           def read_source(object)
