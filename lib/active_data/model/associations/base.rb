@@ -8,7 +8,7 @@ module ActiveData
         def initialize(owner, reflection)
           @owner = owner
           @reflection = reflection
-          @evar_loaded = owner.persisted?
+          @evar_loaded = owner.persisted? && source_present?
           reset
         end
 
@@ -73,6 +73,10 @@ module ActiveData
         end
 
       private
+
+        def source_present?
+          reflection.source_present? owner
+        end
 
         def read_source
           reflection.read_source owner

@@ -120,6 +120,10 @@ module ActiveData
       end
       alias_method :eql?, :==
 
+      def attribute_initially_provided?(name)
+        @initial_attributes.to_h.key?(name.to_s)
+      end
+
       def attribute(name)
         reflection = self.class.reflect_on_attribute(name)
         return unless reflection

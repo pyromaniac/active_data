@@ -23,7 +23,7 @@ describe ActiveData::Model::Associations::ReferencesMany do
   let(:author) { Author.create!(name: 'Rick') }
   let(:other) { Author.create!(name: 'Ben') }
 
-  let(:book) { Book.new }
+  let(:book) { Book.new(author_ids: []) }
   let(:association) { book.association(:authors) }
 
   let(:existing_book) { Book.instantiate title: 'Genesis', author_ids: [author.id] }
@@ -375,15 +375,27 @@ describe ActiveData::Model::Associations::ReferencesMany do
 
   describe '#default' do
     before { Book.references_many :authors, default: ->(_book) { author.id } }
-    let(:existing_book) { Book.instantiate title: 'Genesis' }
 
+    # This is expected to fail
     specify { expect(association.target).to eq([author]) }
     specify { expect { association.replace([other]) }.to change { association.target }.to([other]) }
     specify { expect { association.replace([]) }.to change { association.target }.to eq([]) }
 
-    specify { expect(existing_association.target).to eq([]) }
-    specify { expect { existing_association.replace([other]) }.to change { existing_association.target }.to([other]) }
-    specify { expect { existing_association.replace([]) }.not_to change { existing_association.target } }
+    context 'when instantiated without field' do
+      let(:existing_book) { Book.instantiate title: 'Genesis' }
+
+      specify { expect(existing_association.target).to eq([author]) }
+      specify { expect { existing_association.replace([other]) }.to change { existing_association.target }.to([other]) }
+      specify { expect { existing_association.replace([]) }.to change { existing_association.target }.to([]) }
+    end
+
+    context 'when instantiated with field' do
+      let(:existing_book) { Book.instantiate title: 'Genesis', author_ids: [] }
+
+      specify { expect(existing_association.target).to eq([]) }
+      specify { expect { existing_association.replace([other]) }.to change { existing_association.target }.to([other]) }
+      specify { expect { existing_association.replace([]) }.not_to change { existing_association.target } }
+    end
   end
 
   describe '#loaded?' do

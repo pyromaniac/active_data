@@ -8,6 +8,10 @@ module ActiveData
 
       private
 
+        def source_present?
+          owner.attribute_initially_provided?(reflection.reference_key)
+        end
+
         def read_source
           attribute.read_before_type_cast
         end

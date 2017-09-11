@@ -26,6 +26,8 @@ module ActiveData
     module Associations
       extend ActiveSupport::Concern
 
+      CHECKER = ->(ref, object) { object.attribute_initially_provided?(ref.name) }
+
       included do
         include NestedAttributes
 
@@ -42,7 +44,10 @@ module ActiveData
           references_many: Reflections::ReferencesMany
         }.each do |(name, reflection_class)|
           define_singleton_method name do |*args, &block|
-            reflection = reflection_class.build self, generated_associations_methods, *args, &block
+            options = args.extract_options!
+            reflection = reflection_class.build(self, generated_associations_methods, *args,
+              options.reverse_merge(check: CHECKER),
+              &block)
             self._associations = _associations.merge(reflection.name => reflection)
             reflection
           end

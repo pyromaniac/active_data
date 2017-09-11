@@ -59,6 +59,11 @@ module ActiveData
             self.class.association_class.new object, self
           end
 
+          def source_present?(object)
+            return true unless options[:check]
+            options[:check].call(self, object)
+          end
+
           def read_source(object)
             (options[:read] || READ).call(self, object)
           end
