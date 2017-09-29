@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 require 'spec_helper'
 
 describe ActiveData::Config do
@@ -39,7 +37,7 @@ describe ActiveData::Config do
         .to change {
           begin
             subject.normalizer(:name)
-          rescue
+          rescue ActiveData::NormalizerMissing
             nil
           end
         }.from(nil).to(an_instance_of(Proc))

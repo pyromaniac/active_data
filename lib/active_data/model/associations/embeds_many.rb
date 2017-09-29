@@ -65,8 +65,8 @@ module ActiveData
         def clear
           begin
             transaction { target.all?(&:destroy!) }
-          rescue
-            ActiveData::ObjectNotDestroyed
+          rescue ActiveData::ObjectNotDestroyed
+            nil
           end
           reload.empty?
         end
