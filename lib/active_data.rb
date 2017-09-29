@@ -91,7 +91,7 @@ module ActiveData
     when String, Numeric, ActiveSupport::Duration
       value = begin
         Float(value)
-      rescue
+      rescue ArgumentError, TypeError
         value
       end
       ActiveSupport::TimeZone[value]
@@ -101,21 +101,21 @@ module ActiveData
     next unless value
     begin
       ::BigDecimal.new Float(value).to_s
-    rescue
+    rescue ArgumentError, TypeError
       nil
     end
   end
   typecaster('Float') do |value|
     begin
       Float(value)
-    rescue
+    rescue ArgumentError, TypeError
       nil
     end
   end
   typecaster('Integer') do |value|
     begin
       Float(value).to_i
-    rescue
+    rescue ArgumentError, TypeError
       nil
     end
   end

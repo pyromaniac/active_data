@@ -53,7 +53,7 @@ module ActiveData
 
   class UndefinedPrimaryAttribute < ActiveDataError
     def initialize(klass, association_name)
-      super <<-EOS
+      super <<-MESSAGE
 Undefined primary attribute for `#{association_name}` in #{klass}.
 It is required for embeds_many nested attributes proper operation.
 You can define this association as:
@@ -61,40 +61,40 @@ You can define this association as:
   embeds_many :#{association_name} do
     primary :attribute_name
   end
-      EOS
+      MESSAGE
     end
   end
 
   class NormalizerMissing < NoMethodError
     def initialize(name)
-      super <<-EOS
+      super <<-MESSAGE
 Could not find normalizer `:#{name}`
 You can define it with:
 
   ActiveData.normalizer(:#{name}) do |value, options|
     # do some staff with value and options
   end
-      EOS
+      MESSAGE
     end
   end
 
   class TypecasterMissing < NoMethodError
     def initialize(*classes)
       classes = classes.flatten
-      super <<-EOS
+      super <<-MESSAGE
 Could not find typecaster for #{classes}
 You can define it with:
 
   ActiveData.typecaster('#{classes.first}') do |value|
     # do some staff with value and options
   end
-      EOS
+      MESSAGE
     end
   end
 
   class PersistenceAdapterMissing < NoMethodError
     def initialize(data_source)
-      super <<-EOS
+      super <<-MESSAGE
 Could not find persistence adapter for #{data_source}
 You can define it with:
 
@@ -103,7 +103,7 @@ You can define it with:
       #{data_source}ActiveDataPersistenceAdapter
     end
   end
-      EOS
+      MESSAGE
     end
   end
 end

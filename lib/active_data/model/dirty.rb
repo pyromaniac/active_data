@@ -42,7 +42,7 @@ module ActiveData
         attribute_names(false).each do |name|
           define_dirty name, generated_attributes_methods
         end
-        _attribute_aliases.keys.each do |name|
+        _attribute_aliases.each_key do |name|
           define_dirty name, generated_attributes_methods
         end
       end

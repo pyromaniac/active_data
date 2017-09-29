@@ -37,7 +37,6 @@ module ActiveData
           loaded!
           @target = object
           callback(:after_add, object) if object
-          object
         end
 
         def load_target
