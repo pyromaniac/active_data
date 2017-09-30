@@ -235,28 +235,49 @@ describe ActiveData::Model::Associations::ReferencesMany do
       existing_association.build(name: 'Morty')
       expect { existing_association.apply_changes }
         .to change { existing_book.author_ids }
-        .from([author.id, nil]).to([author.id, be_a(Integer)])
+        .from([author.id, nil]).to([be_a(Integer).and(be > author.id)])
+    end
+    specify do
+      existing_association.target.first.mark_for_destruction
+      existing_association.build(name: 'Morty')
+      expect { existing_association.apply_changes }
+        .to change { existing_association.destroyed }
+        .from([]).to([author])
     end
     specify do
       existing_association.target.first.mark_for_destruction
       existing_association.build(name: 'Morty')
       expect { existing_association.apply_changes }
         .to change { existing_association.target.map(&:persisted?) }
-        .from([true, false]).to([true, true])
+        .from([true, false]).to([true])
+    end
+    specify do
+      existing_association.target.first.mark_for_destruction
+      existing_association.build(name: 'Morty')
+      expect { existing_association.apply_changes }
+        .to change { existing_association.destroyed.map(&:persisted?) }
+        .from([]).to([true])
     end
     specify do
       existing_association.target.first.destroy!
       existing_association.build(name: 'Morty')
       expect { existing_association.apply_changes }
         .to change { existing_book.author_ids }
-        .from([author.id, nil]).to([author.id, be_a(Integer)])
+        .from([author.id, nil]).to([be_a(Integer).and(be > author.id)])
     end
     specify do
       existing_association.target.first.destroy!
       existing_association.build(name: 'Morty')
       expect { existing_association.apply_changes }
         .to change { existing_association.target.map(&:persisted?) }
-        .from([false, false]).to([false, true])
+        .from([false, false]).to([true])
+    end
+    specify do
+      existing_association.target.first.destroy!
+      existing_association.build(name: 'Morty')
+      expect { existing_association.apply_changes }
+        .to change { existing_association.destroyed }
+        .from([]).to([author])
     end
 
     context ':autosave' do
@@ -301,28 +322,49 @@ describe ActiveData::Model::Associations::ReferencesMany do
         existing_association.build(name: 'Morty')
         expect { existing_association.apply_changes }
           .to change { existing_book.author_ids }
-          .from([author.id, nil]).to([author.id, be_a(Integer)])
+          .from([author.id, nil]).to([be_a(Integer).and(be > author.id)])
+      end
+      specify do
+        existing_association.target.first.mark_for_destruction
+        existing_association.build(name: 'Morty')
+        expect { existing_association.apply_changes }
+          .to change { existing_association.destroyed }
+          .from([]).to([author])
       end
       specify do
         existing_association.target.first.mark_for_destruction
         existing_association.build(name: 'Morty')
         expect { existing_association.apply_changes }
           .to change { existing_association.target.map(&:persisted?) }
-          .from([true, false]).to([false, true])
+          .from([true, false]).to([true])
+      end
+      specify do
+        existing_association.target.first.mark_for_destruction
+        existing_association.build(name: 'Morty')
+        expect { existing_association.apply_changes }
+          .to change { existing_association.destroyed.map(&:persisted?) }
+          .from([]).to([false])
       end
       specify do
         existing_association.target.first.destroy!
         existing_association.build(name: 'Morty')
         expect { existing_association.apply_changes }
           .to change { existing_book.author_ids }
-          .from([author.id, nil]).to([author.id, be_a(Integer)])
+          .from([author.id, nil]).to([be_a(Integer).and(be > author.id)])
       end
       specify do
         existing_association.target.first.destroy!
         existing_association.build(name: 'Morty')
         expect { existing_association.apply_changes }
           .to change { existing_association.target.map(&:persisted?) }
-          .from([false, false]).to([false, true])
+          .from([false, false]).to([true])
+      end
+      specify do
+        existing_association.target.first.destroy!
+        existing_association.build(name: 'Morty')
+        expect { existing_association.apply_changes }
+          .to change { existing_association.destroyed }
+          .from([]).to([author])
       end
     end
   end

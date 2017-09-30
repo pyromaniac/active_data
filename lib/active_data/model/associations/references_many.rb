@@ -18,11 +18,25 @@ module ActiveData
           object
         end
 
+        def destroyed
+          @destroyed ||= []
+        end
+
         def apply_changes
-          target.all? do |object|
+          @destroyed = []
+
+          result = target.all? do |object|
             if object
-              if object.marked_for_destruction? && reflection.autosave?
-                object.destroy
+              if object.marked_for_destruction?
+                @destroyed.push(object)
+                if reflection.autosave?
+                  object.destroy
+                else
+                  true
+                end
+              elsif object.destroyed?
+                @destroyed.push(object)
+                true
               elsif object.new_record? || (reflection.autosave? && object.changed?)
                 persist_object(object)
               else
@@ -32,6 +46,9 @@ module ActiveData
               true
             end
           end
+
+          @target -= @destroyed
+          result
         end
 
         def target=(object)
