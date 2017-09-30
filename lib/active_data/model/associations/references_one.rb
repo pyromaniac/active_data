@@ -18,8 +18,13 @@ module ActiveData
 
         def apply_changes
           if target
-            if target.marked_for_destruction? && reflection.autosave?
-              target.destroy
+            if target.marked_for_destruction?
+              if reflection.autosave?
+                target.destroy
+              else
+                replace(nil)
+                true
+              end
             elsif target.new_record? || (reflection.autosave? && target.changed?)
               persist_object(target)
             else

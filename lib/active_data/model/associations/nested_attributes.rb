@@ -71,12 +71,8 @@ module ActiveData
             association = object.association(association_name)
             existing_record = association.target
             primary_attribute_name = primary_name_for(association.reflection.klass)
-            if existing_record
-              primary_attribute = existing_record.attribute(primary_attribute_name)
-              primary_attribute_value = primary_attribute.typecast(attributes[primary_attribute_name]) if primary_attribute
-            end
 
-            if existing_record && (!primary_attribute || options[:update_only] || existing_record.primary_attribute == primary_attribute_value)
+            if existing_record && (options[:update_only] || existing_record_matches?(existing_record, primary_attribute_name, attributes))
               assign_to_or_mark_for_destruction(existing_record, attributes, options[:allow_destroy]) unless call_reject_if(object, association_name, attributes)
             elsif attributes[primary_attribute_name].present?
               raise ActiveData::ObjectNotFound.new(object, association_name, attributes[primary_attribute_name])
@@ -123,9 +119,7 @@ module ActiveData
                 end
               else
                 existing_record = association.target.detect do |record|
-                  primary_attribute_value = record.attribute(primary_attribute_name)
-                    .typecast(attributes[primary_attribute_name])
-                  record.primary_attribute == primary_attribute_value
+                  existing_record_matches?(record, primary_attribute_name, attributes)
                 end
                 if existing_record
                   unless call_reject_if(object, association_name, attributes)
@@ -188,6 +182,17 @@ module ActiveData
 
           def self.primary_name_for(klass)
             klass < ActiveData::Model ? klass.primary_name : 'id'
+          end
+
+          def self.existing_record_matches?(existing_record, primary_attribute_name, attributes)
+            if existing_record.is_a?(ActiveData::Model)
+              primary_attribute = existing_record.attribute(primary_attribute_name)
+              primary_attribute_value = primary_attribute.typecast(attributes[primary_attribute_name]) if primary_attribute
+
+              !primary_attribute || existing_record.primary_attribute == primary_attribute_value
+            else
+              attributes[primary_attribute_name].present? && existing_record.send(primary_attribute_name).to_s == attributes[primary_attribute_name].to_s
+            end
           end
         end
 

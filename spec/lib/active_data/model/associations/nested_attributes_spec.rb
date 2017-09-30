@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'shared/nested_attribute_examples'
 
 describe ActiveData::Model::Associations::NestedAttributes do
-  context '' do
+  context 'embedded nested attributes' do
     before do
       stub_model :user do
         include ActiveData::Model::Associations
@@ -19,68 +19,52 @@ describe ActiveData::Model::Associations::NestedAttributes do
       end
     end
 
-    include_examples 'nested attributes'
+    include_examples 'embedded nested attributes'
   end
 
-  xcontext 'references_one' do
-    before do
-      stub_class(:author, ActiveRecord::Base)
-      stub_class(:user, ActiveRecord::Base)
-
-      stub_model :book do
-        include ActiveData::Model::Associations
-
-        references_one :author
-        references_many :users
-
-        accepts_nested_attributes_for :author, :users
-      end
-    end
-
+  context 'referenced nested attributes' do
     context 'references_one' do
-      let(:book) { Book.new }
+      before do
+        stub_class(:author, ActiveRecord::Base)
+        stub_class(:user, ActiveRecord::Base)
 
-      specify { expect { book.author_attributes = {} }.to change { book.author }.to(an_instance_of(Author)) }
-      specify { expect { book.author_attributes = {name: 'Author'} }.to change { book.author.try(:name) }.to('Author') }
-      specify { expect { book.author_attributes = {id: 42, name: 'Author'} }.to raise_error ActiveData::ObjectNotFound }
+        stub_model :book do
+          include ActiveData::Model::Associations
+          include ActiveData::Model::Lifecycle
 
-      context ':reject_if' do
-        context do
-          before { Book.accepts_nested_attributes_for :author, reject_if: :all_blank }
-          specify { expect { book.author_attributes = {name: ''} }.not_to change { book.author } }
-        end
+          references_one :author
+          references_many :users
 
-        context do
-          before { Book.accepts_nested_attributes_for :author, reject_if: ->(attributes) { attributes['name'].blank? } }
-          specify { expect { book.author_attributes = {name: ''} }.not_to change { book.author } }
+          accepts_nested_attributes_for :author, :users
         end
       end
 
-      context 'existing' do
-        let(:author) { Author.new(name: 'Author') }
-        let(:book) { Book.new author: author }
+      context 'references_one' do
+        let(:book) { Book.new }
 
+        specify { expect { book.author_attributes = {} }.to change { book.author }.to(an_instance_of(Author)) }
+        specify { expect { book.author_attributes = {name: 'Author'} }.to change { book.author.try(:name) }.to('Author') }
         specify { expect { book.author_attributes = {id: 42, name: 'Author'} }.to raise_error ActiveData::ObjectNotFound }
-        specify { expect { book.author_attributes = {id: author.id.to_s, name: 'Author 1'} }.to change { book.author.name }.to('Author 1') }
-        specify { expect { book.author_attributes = {name: 'Author 1'} }.to change { book.author.name }.to('Author 1') }
-        specify { expect { book.author_attributes = {name: 'Author 1', _destroy: '1'} }.not_to change { book.author.name } }
-        specify do
-          expect do
-            book.author_attributes = {name: 'Author 1', _destroy: '1'}
-            book.save { true }
-          end.not_to change { book.author.name }
-        end
-        specify { expect { book.author_attributes = {id: author.id.to_s, name: 'Author 1', _destroy: '1'} }.to change { book.author.name }.to('Author 1') }
-        specify do
-          expect do
-            book.author_attributes = {id: author.id.to_s, name: 'Author 1', _destroy: '1'}
-            book.save { true }
-          end.to change { book.author.name }.to('Author 1')
+
+        context ':reject_if' do
+          context do
+            before { Book.accepts_nested_attributes_for :author, reject_if: :all_blank }
+            specify { expect { book.author_attributes = {name: ''} }.not_to change { book.author } }
+          end
+
+          context do
+            before { Book.accepts_nested_attributes_for :author, reject_if: ->(attributes) { attributes['name'].blank? } }
+            specify { expect { book.author_attributes = {name: ''} }.not_to change { book.author } }
+          end
         end
 
-        context ':allow_destroy' do
-          before { Book.accepts_nested_attributes_for :author, allow_destroy: true }
+        context 'existing' do
+          let(:author) { Author.create!(name: 'Author') }
+          let(:book) { Book.new author: author }
 
+          specify { expect { book.author_attributes = {id: 42, name: 'Author'} }.to raise_error ActiveData::ObjectNotFound }
+          specify { expect { book.author_attributes = {id: author.id.to_s, name: 'Author 1'} }.to change { book.author.name }.to('Author 1') }
+          specify { expect { book.author_attributes = {name: 'Author 1'} }.to change { book.author.name }.to('Author 1') }
           specify { expect { book.author_attributes = {name: 'Author 1', _destroy: '1'} }.not_to change { book.author.name } }
           specify do
             expect do
@@ -93,23 +77,42 @@ describe ActiveData::Model::Associations::NestedAttributes do
             expect do
               book.author_attributes = {id: author.id.to_s, name: 'Author 1', _destroy: '1'}
               book.save { true }
-            end.to change { book.author }.to(nil)
+            end.to change { book.author.name }.to('Author 1')
           end
-        end
 
-        context ':update_only' do
-          before { Book.accepts_nested_attributes_for :author, update_only: true }
+          context ':allow_destroy' do
+            before { Book.accepts_nested_attributes_for :author, allow_destroy: true }
 
-          specify do
-            expect { book.author_attributes = {id: 42, name: 'Author 1'} }
-              .to change { book.author.name }.to('Author 1')
+            specify { expect { book.author_attributes = {name: 'Author 1', _destroy: '1'} }.not_to change { book.author.name } }
+            specify do
+              expect do
+                book.author_attributes = {name: 'Author 1', _destroy: '1'}
+                book.save { true }
+              end.not_to change { book.author.name }
+            end
+            specify { expect { book.author_attributes = {id: author.id.to_s, name: 'Author 1', _destroy: '1'} }.to change { book.author.name }.to('Author 1') }
+            specify do
+              expect do
+                book.author_attributes = {id: author.id.to_s, name: 'Author 1', _destroy: '1'}
+                book.save { true }
+              end.to change { book.author }.to(nil)
+            end
+          end
+
+          context ':update_only' do
+            before { Book.accepts_nested_attributes_for :author, update_only: true }
+
+            specify do
+              expect { book.author_attributes = {id: 42, name: 'Author 1'} }
+                .to change { book.author.name }.to('Author 1')
+            end
           end
         end
       end
-    end
 
-    context 'references_many' do
-      let(:book) { Book.new }
+      context 'references_many' do
+        let(:book) { Book.new }
+      end
     end
   end
 

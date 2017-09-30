@@ -179,12 +179,14 @@ describe ActiveData::Model::Associations::ReferencesOne do
       specify do
         existing_association.target.mark_for_destruction
         expect { existing_association.send(method) }
-          .not_to change { existing_association.target.destroyed? }
+          .to change { existing_association.target }
+          .to(nil)
       end
       specify do
         existing_association.target.mark_for_destruction
         expect { existing_association.send(method) }
-          .not_to change { existing_book.author_id }
+          .to change { existing_book.author_id }
+          .to(nil)
       end
       specify do
         existing_association.target.destroy!
