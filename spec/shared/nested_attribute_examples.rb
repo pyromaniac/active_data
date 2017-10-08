@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-shared_examples 'nested attributes' do
+shared_examples 'embedded nested attributes' do
   before do
     stub_model :project do
       include ActiveData::Model::Primary
@@ -143,7 +143,7 @@ shared_examples 'nested attributes' do
         .to change { user.projects.map(&:title) }.to(['Project 1', 'Project 2'])
     end
     specify do
-      expect { user.projects_attributes = [{slug: 42, title: 'Project 1'}, {title: 'Project 2'}] }
+      expect { user.projects_attributes = [{slug: 33, title: 'Project 1'}, {title: 'Project 2'}] }
         .to change { user.projects.map(&:title) }.to(['Project 1', 'Project 2'])
     end
     specify do
@@ -200,8 +200,7 @@ shared_examples 'nested attributes' do
             {slug: projects.first.slug.to_i, title: 'Project 3'},
             {title: 'Project 4'}
           ]
-        end
-          .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2', 'Project 4'])
+        end.to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2', 'Project 4'])
       end
       specify do
         expect do
@@ -209,8 +208,7 @@ shared_examples 'nested attributes' do
             {slug: projects.first.slug.to_i, title: 'Project 3'},
             {slug: 33, title: 'Project 4'}
           ]
-        end
-          .to change { user.projects.map(&:slug) }.to(%w[42 43 33])
+        end.to change { user.projects.map(&:slug) }.to(%w[42 43 33])
       end
       specify do
         expect do
@@ -227,8 +225,7 @@ shared_examples 'nested attributes' do
             1 => {slug: projects.first.slug.to_i, title: 'Project 3'},
             2 => {title: 'Project 4'}
           }
-        end
-          .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2', 'Project 4'])
+        end.to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2', 'Project 4'])
       end
       specify do
         expect do
@@ -236,8 +233,7 @@ shared_examples 'nested attributes' do
             {slug: projects.first.slug.to_i, title: 'Project 3', _destroy: '1'},
             {title: 'Project 4', _destroy: '1'}
           ]
-        end
-          .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2'])
+        end.to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2'])
       end
       specify do
         expect do
@@ -246,8 +242,7 @@ shared_examples 'nested attributes' do
             {title: 'Project 4', _destroy: '1'}
           ]
           user.save { true }
-        end
-          .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2'])
+        end.to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2'])
       end
 
       context ':allow_destroy' do
@@ -259,8 +254,7 @@ shared_examples 'nested attributes' do
               {slug: projects.first.slug.to_i, title: 'Project 3', _destroy: '1'},
               {title: 'Project 4', _destroy: '1'}
             ]
-          end
-            .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2'])
+          end.to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2'])
         end
         specify do
           expect do
@@ -269,8 +263,7 @@ shared_examples 'nested attributes' do
               {title: 'Project 4', _destroy: '1'}
             ]
             user.save { true }
-          end
-            .to change { user.projects.map(&:title) }.to(['Project 2'])
+          end.to change { user.projects.map(&:title) }.to(['Project 2'])
         end
       end
 
@@ -283,8 +276,7 @@ shared_examples 'nested attributes' do
               {slug: projects.first.slug.to_i, title: 'Project 3'},
               {title: 'Project 4'}
             ]
-          end
-            .to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2'])
+          end.to change { user.projects.map(&:title) }.to(['Project 3', 'Project 2'])
         end
 
         specify do
@@ -293,8 +285,7 @@ shared_examples 'nested attributes' do
               {slug: projects.last.slug.to_i, title: 'Project 3'},
               {slug: projects.first.slug.to_i.pred, title: 'Project 0'}
             ]
-          end
-            .to change { user.projects.map(&:title) }.to(['Project 1', 'Project 3'])
+          end.to change { user.projects.map(&:title) }.to(['Project 1', 'Project 3'])
         end
       end
     end
