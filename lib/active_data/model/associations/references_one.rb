@@ -63,9 +63,7 @@ module ActiveData
         end
 
         def replace(object)
-          unless object.nil? || object.is_a?(reflection.persistence_adapter.data_type)
-            raise AssociationTypeMismatch.new(reflection.persistence_adapter.data_type, object.class)
-          end
+          raise_type_mismatch(object) unless object.nil? || matches_type?(object)
 
           transaction do
             attribute.pollute do

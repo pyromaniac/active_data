@@ -32,9 +32,8 @@ module ActiveData
         def add_attribute(reflection_class, *args, &block)
           reflection = reflection_class.build(self, generated_attributes_methods, *args, &block)
           self._attributes = _attributes.merge(reflection.name => reflection)
-          if dirty? && reflection_class != ActiveData::Model::Attributes::Reflections::Base
-            define_dirty reflection.name, generated_attributes_methods
-          end
+          should_define_dirty = (dirty? && reflection_class != ActiveData::Model::Attributes::Reflections::Base)
+          define_dirty(reflection.name, generated_attributes_methods) if should_define_dirty
           reflection
         end
 

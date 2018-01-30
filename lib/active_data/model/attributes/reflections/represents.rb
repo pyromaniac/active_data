@@ -9,9 +9,8 @@ module ActiveData
             reference = target.reflect_on_association(options[:of]) if target.respond_to?(:reflect_on_association)
             reference ||= target.reflect_on_attribute(options[:of]) if target.respond_to?(:reflect_on_attribute)
             options[:of] = reference.name if reference
-            if target.respond_to?(:validates_nested) && !target.validates_nested?(options[:of])
-              target.validates_nested options[:of]
-            end
+            validates_nested = target.respond_to?(:validates_nested) && !target.validates_nested?(options[:of])
+            target.validates_nested(options[:of]) if validates_nested
 
             super(target, generated_methods, name, *args, options, &block)
           end

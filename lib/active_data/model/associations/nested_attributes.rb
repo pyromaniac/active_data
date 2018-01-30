@@ -50,9 +50,8 @@ module ActiveData
               raise ArgumentError, "No association found for name `#{association_name}'. Has it been defined yet?" unless reflection
               klass.nested_attributes_options = klass.nested_attributes_options.merge(association_name.to_sym => options)
 
-              if klass.respond_to?(:validates_nested) && !klass.validates_nested?(association_name)
-                klass.validates_nested association_name
-              end
+              should_validate_nested = klass.respond_to?(:validates_nested) && !klass.validates_nested?(association_name)
+              klass.validates_nested(association_name) if should_validate_nested
 
               type = (reflection.collection? ? :collection : :one_to_one)
               klass.nested_attributes_methods_module.class_eval <<-METHOD, __FILE__, __LINE__ + 1
@@ -118,9 +117,7 @@ module ActiveData
               attributes = attributes.with_indifferent_access
 
               if attributes[primary_attribute_name].blank?
-                unless reject_new_object?(object, association_name, attributes, options)
-                  association.build(attributes.except(*unassignable_keys(object)))
-                end
+                association.build(attributes.except(*unassignable_keys(object))) unless reject_new_object?(object, association_name, attributes, options)
               else
                 existing_record = association.target.detect do |record|
                   primary_attribute_value = record.attribute(primary_attribute_name)
@@ -128,9 +125,7 @@ module ActiveData
                   record.primary_attribute == primary_attribute_value
                 end
                 if existing_record
-                  unless call_reject_if(object, association_name, attributes)
-                    assign_to_or_mark_for_destruction(existing_record, attributes, options[:allow_destroy])
-                  end
+                  assign_to_or_mark_for_destruction(existing_record, attributes, options[:allow_destroy]) unless call_reject_if(object, association_name, attributes)
                 elsif association.reflection.embedded?
                   unless reject_new_object?(object, association_name, attributes, options)
                     association.reflection.klass.with_sanitize(false) do

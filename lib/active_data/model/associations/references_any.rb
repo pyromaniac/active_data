@@ -27,6 +27,14 @@ module ActiveData
         def persist_object(object, **options)
           reflection.persistence_adapter.persist(object, **options)
         end
+
+        def matches_type?(object)
+          object.is_a?(reflection.persistence_adapter.data_type)
+        end
+
+        def raise_type_mismatch(object)
+          raise AssociationTypeMismatch.new(reflection.persistence_adapter.data_type, object.class)
+        end
       end
     end
   end

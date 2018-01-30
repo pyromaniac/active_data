@@ -99,6 +99,7 @@ describe ActiveData::Model::Attributes do
     specify { expect(model.new(column: 10).column).to be_nil }
   end
 
+  # rubocop:disable Style/DateTime
   context 'date' do
     let(:model) { stub_model { attribute :column, Date } }
     let(:date) { Date.new(2013, 6, 13) }
@@ -148,6 +149,7 @@ describe ActiveData::Model::Attributes do
       specify { expect(model.new(column: Time.new(2013, 6, 13, 23, 13)).column).to eq(Time.new(2013, 6, 13, 23, 13)) }
     end
   end
+  # rubocop:enable Style/DateTime
 
   context 'time_zone' do
     let(:model) { stub_model { attribute :column, ActiveSupport::TimeZone } }

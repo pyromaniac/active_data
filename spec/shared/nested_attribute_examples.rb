@@ -115,7 +115,7 @@ shared_examples 'nested attributes' do
 
     context 'generated method overwrites' do
       before do
-        User.class_eval <<-RUBY
+        User.class_eval <<-RUBY, __FILE__, __LINE__ + 1
           def profile_attributes=(args)
             args.reverse_merge!(first_name: 'Default Profile Name')
             super
@@ -315,7 +315,7 @@ shared_examples 'nested attributes' do
 
     context 'generated method overwrites' do
       before do
-        User.class_eval <<-RUBY
+        User.class_eval <<-RUBY, __FILE__, __LINE__ + 1
           def projects_attributes=(args)
             args << {title: 'Default Project'}
             super
