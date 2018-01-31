@@ -134,13 +134,164 @@ ActiveData has modular architecture, so it is required to include modules to obt
 
 ### Attributes
 
+ActiveData provides several types of attributes and typecasts each attribute to its defined type upon initialization.
 
+```ruby
+class Book
+  include ActiveData::Model
+
+  attribute :title, String
+  collection :author_ids, Integer
+end
+```
 
 #### Attribute
+
+```ruby
+attribute :full_name, String, default: 'John Talbot'
+```
+
+By default, if type for attribute is not set, it is defined with `Object` type, so it would be a great idea to specify type for every attribute explicitly.
+
+Type is necessary for attribute typecasting. Here is the list of pre-defined basic typecasters:
+
+```irb
+[1] pry(main)> ActiveData._typecasters.keys
+=> ["Object", "String", "Array", "Hash", "Date", "DateTime", "Time", "ActiveSupport::TimeZone", "BigDecimal", "Float", "Integer", "Boolean", "ActiveData::UUID"]
+```
+
+In addition, you can provide any class type when defining the attribute, but in that case you will be able to only assign instances of that specific class or value nil:
+
+```ruby
+attribute :template, MyCustomTemplateType
+```
+
+##### Defaults
+
+It is possible to provide default values for attributes and they will act in the same way as AR or Mongoid default values:
+
+```ruby
+attribute :check, Boolean, default: false # Simply false by default
+attribute :today, Date, default: ->{ Time.zone.now.to_date } # Dynamic default value
+attribute :today_wday, Integer, default: ->{ today.wday } # Default is evaluated in instance context
+attribute :today_wday, Integer, default: ->(instance) { instance.today.wday } # The same as previous, but instance provided explicitly
+```
+
+##### Enums
+
+Enums restrict the scope of possible values for attribute. If assigned value is not included in provided list - then it turns to nil:
+
+```ruby
+attribute :direction, String, enum: %w[north south east west]
+```
+
+##### Normalizers
+
+Normalizers are applied last, modifying typecast value. It is possible to provide a list of normalizers, they will be applied in the order. It is possible to pre-define normalizers to DRY code:
+
+```ruby
+ActiveData.normalizer(:trim) do |value, options, _attribute|
+  value.first(options[:length] || 2)
+end
+
+attribute :title, String, normalizers: [->(value) { value.strip }, trim: {length: 80}]
+```
+
+##### Readonly
+
+```ruby
+attribute :name, String, readonly: true # Readonly forever
+attribute :name, String, readonly: ->{ true } # Conditionally readonly
+attribute :name, String, readonly: ->(instance) { instance.subject.present? } # Explicit instance
+```
+
 #### Collection
+
+Collection is simply an array of equally-typed values:
+
+```ruby
+class Panda
+  include ActiveData::Model
+
+  collection :ids, Integer
+end
+```
+
+Collection typecasts each value to specified type and also no matter what are you going to pass - it will be an array.
+
+```irb
+[1] pry(main)> Panda.new
+=> #<Panda ids: []>
+[2] pry(main)> Panda.new(ids: 42)
+=> #<Panda ids: [42]>
+[3] pry(main)> Panda.new(ids: [42, '33'])
+=> #<Panda ids: [42, 33]>
+```
+
+Default and enum modifiers are applied to every value, normalizer will be applied to the whole array.
+
 #### Dictionary
+
+Dictionary field is a hash of specified type values with string keys:
+
+```ruby
+class Foo
+  include ActiveData::Model
+
+  dictionary :ordering, String
+end
+```
+
+```irb
+[1] pry(main)> Foo.new
+=> #<Foo ordering: {}>
+[2] pry(main)> Foo.new(ordering: {name: :desc})
+=> #<Foo ordering: {"name"=>"desc"}>
+```
+
+Keys list might be restricted with `:keys` option, defaults and enums are applied to every value, normalizers are applied to the whole hash.
+
 #### Localized
+
+Localized is similar to how Globalize 3 attributes work.
+
+```ruby
+localized :title, String
+```
+
 #### Represents
+
+Represents provides an easy way to expose model attributes through an interface.
+It will automatically set passed value to the represented object **before validation**.
+You can use any ActiveRecord, ActiveModel or ActiveData object as a target of representation.
+A type of an attribute will be taken from it.
+If there is no type, it will be `Object` by default. You can set the type explicitly by passing the `type: TypeClass` option.
+Represents will also add automatic validation of the target object.
+
+```ruby
+class Person
+  include ActiveData::Model
+
+  attribute :name, String
+end
+
+class Doctor
+  include ActiveData::Model
+  include ActiveData::Model::Representation
+
+  attribute :person, Object
+  represents :name, of: :person
+end
+
+person = Person.new(name: 'Walter Bishop')
+# => #<Person name: "Walter Bishop">
+Doctor.new(person: person).name
+# => "Walter Bishop"
+Doctor.new(person: person, name: 'Dr. Walter Bishop').name
+# => "Dr. Walter Bishop"
+person.name
+# => "Dr. Walter Bishop"
+```
 
 ### Associations
 
@@ -162,11 +313,11 @@ class Mongoid::Document
   end
 end
 ```
-Where  
-`ClassName` - name of model class or one of ancestors  
-`data_source` - name of data source class  
-`primary_key` - key to search data  
-`scope_proc` - additional proc for filtering  
+Where
+`ClassName` - name of model class or one of ancestors
+`data_source` - name of data source class
+`primary_key` - key to search data
+`scope_proc` - additional proc for filtering
 
 All required interface for adapters described in `ActiveData::Model::Associations::PersistenceAdapters::Base`.
 
