@@ -14,18 +14,18 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
   gem.version       = ActiveData::VERSION
 
-  gem.add_development_dependency 'rake'
+  gem.add_development_dependency 'activerecord', '>= 4.0'
   gem.add_development_dependency 'appraisal'
+  gem.add_development_dependency 'database_cleaner'
+  gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec'
   gem.add_development_dependency 'rspec-its'
+  gem.add_development_dependency 'rubocop'
   gem.add_development_dependency 'rubysl', '~> 2.0' if RUBY_ENGINE == 'rbx'
   gem.add_development_dependency 'sqlite3'
-  gem.add_development_dependency 'database_cleaner'
-  gem.add_development_dependency 'activerecord', '>= 4.0'
   gem.add_development_dependency 'uuidtools'
-  gem.add_development_dependency 'rubocop'
 
-  gem.add_runtime_dependency 'activesupport', '>= 4.0'
   gem.add_runtime_dependency 'activemodel', '>= 4.0'
+  gem.add_runtime_dependency 'activesupport', '>= 4.0'
   gem.add_runtime_dependency 'tzinfo'
 end

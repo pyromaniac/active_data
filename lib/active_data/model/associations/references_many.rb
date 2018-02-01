@@ -96,9 +96,8 @@ module ActiveData
           attribute.pollute do
             objects.each do |object|
               next if target.include?(object)
-              unless object.is_a?(reflection.persistence_adapter.data_type)
-                raise AssociationTypeMismatch.new(reflection.persistence_adapter.data_type, object.class)
-              end
+              raise_type_mismatch(object) unless matches_type?(object)
+
               target.push(object)
               write_source(identify)
             end

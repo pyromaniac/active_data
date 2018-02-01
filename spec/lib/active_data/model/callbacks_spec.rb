@@ -176,14 +176,12 @@ describe ActiveData::Model::Callbacks do
         create
         after_around_create after_create
         after_around_save after_save
-
         before_validation after_validation
         before_save before_around_save
         before_update before_around_update
         update
         after_around_update after_update
         after_around_save after_save
-
         before_destroy before_around_destroy
         destroy
         after_around_destroy after_destroy

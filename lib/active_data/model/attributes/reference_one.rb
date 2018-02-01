@@ -6,9 +6,9 @@ module ActiveData
           pollute do
             previous = type_casted_value
             result = write_value value
-            if (!value.nil? && type_casted_value.nil?) || type_casted_value != previous
-              association.reset
-            end
+            changed = (!value.nil? && type_casted_value.nil?) || type_casted_value != previous
+
+            association.reset if changed
             result
           end
         end
