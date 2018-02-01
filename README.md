@@ -295,10 +295,93 @@ person.name
 
 ### Associations
 
+ActiveData provides a set of associations. There are two types of them: referenced and embedded. The closest example of referenced association is AR `belongs_to` and as for embedded ones - Mongoid's embedded. Also these associations support `accepts_nested_attributes` call.
+
 #### EmbedsOne
+
+```ruby
+embeds_one :profile
+```
+
+Defines singular embedded object. Might be defined inline:
+
+```ruby
+embeds_one :profile do
+  attribute :first_name, String
+  attribute :last_name, String
+end
+```
+
+Possible options:
+
+* `:class_name` - association class name
+* `:validate` - true or false
+* `:default` - default value for association: attributes hash or instance of defined class
+
 #### EmbedsMany
+
+```ruby
+embeds_many :tags
+```
+
+Defines collection of embedded objects. Might be defined inline:
+
+```ruby
+embeds_many :tags do
+  attribute :identifier, String
+end
+```
+
+* `:class_name` - association class name
+* `:validate` - true or false
+* `:default` - default value for association: attributes hash collection or instances of defined class
+
 #### ReferencesOne
+
+```ruby
+references_one :user
+```
+
+This will provide several methods to the object: `#user`, `#user=`, `#user_id` and `#user_id=`, just as would occur with an ActiveRecord association.
+
+Possible options:
+
+* `:class_name` - association class name
+* `:primary_key` - associated object primary key (`:id` by default):
+
+  ```ruby
+  references_one :user, primary_key: :name
+  ```
+
+  This will create the following methods: `#user`, `#user=`, `#user_name` and `#user_name=`
+
+* `:reference_key` - redefines `#user_id` and `#user_id=` method names completely.
+* `:validate` - true or false
+* `:default` - default value for association: reference or object itself
+
 #### ReferencesMany
+
+```ruby
+references_many :users
+```
+
+This will provide several methods to the object: `#users`, `#users=`, `#user_ids` and `#user_ids=` just as an ActiveRecord relation does.
+
+Possible options:
+
+* `:class_name` - association class name
+* `:primary_key` - associated object primary key (`:id` by default):
+
+  ```ruby
+  references_many :users, primary_key: :name
+  ```
+
+  This will create the following methods: `#users`, `#users=`, `#user_names` and `#user_names=`
+
+* `:reference_key` - redefines `#user_ids` and `#user_ids=` method names completely.
+* `:validate` - true or false
+* `:default` - default value for association: reference collection or objects themselves
+
 #### Interacting with ActiveRecord
 
 ### Persistence Adapters
