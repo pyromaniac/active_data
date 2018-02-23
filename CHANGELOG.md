@@ -1,5 +1,31 @@
-* No more `ActiveData.persistence_adapter` method. Define `self.active_data_persistence_adapter` directly in the desired class.
+# master
 
-* Represented attributes are not provided by default, to add them, `include ActiveData::Model::Representation`
+# Version 1.1.0
 
-* `include ActiveData::Model::Associations::Validations` is not included by default anymore, to get `validate_ancestry!`, `valid_ancestry?` and `invalid_ancestry?` methods back you neet to include this module manually.
+## Incompatible changes
+
+* Represented attributes are not provided by default, to add them, `include ActiveData::Model::Representation` (#46)
+
+* `include ActiveData::Model::Associations::Validations` is not included by default anymore, to get `validate_ancestry!`, `valid_ancestry?` and `invalid_ancestry?` methods back you need to include this module manually
+
+## Changes
+
+* Introduce persistence adapters for associations (#24, #51)
+
+* `ActionController::Parameters` support (#43)
+
+* Nested attributes simple method overriding (#41)
+
+* Persistence for `references` associations (#28, #32)
+
+* Support `update_only` option on collection nested attributes (#30)
+
+* `embedder` accessor for embedded associations
+
+* Dynamic scopes for `references` associations (#27)
+
+## Bugfixes
+
+* Fixed multiple validations on represented attributes and associations (#44)
+
+* Proper boolean attributes defaults (#31, #33)
