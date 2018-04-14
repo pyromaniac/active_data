@@ -39,6 +39,12 @@ module ActiveData
           end
         end
 
+        unless method_defined?(:_read_attribute)
+          def _read_attribute(attr)
+            __send__(attr)
+          end
+        end
+
         attribute_names(false).each do |name|
           define_dirty name, generated_attributes_methods
         end
