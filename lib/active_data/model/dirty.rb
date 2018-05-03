@@ -18,8 +18,9 @@ module ActiveData
 
       included do
         include DIRTY_CLONE
+        include ActiveModel::AttributeMethods
 
-        unless method_defined?(:set_attribute_was)
+        if !method_defined?(:set_attribute_was) && !private_method_defined?(:set_attribute_was)
           def set_attribute_was(attr, old_value)
             changed_attributes[attr] = old_value
           end
