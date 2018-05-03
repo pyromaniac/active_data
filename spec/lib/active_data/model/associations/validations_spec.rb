@@ -53,7 +53,7 @@ describe ActiveData::Model::Associations::Validations do
       specify { expect(user.validate).to eq(false) }
       specify do
         expect { user.validate }.to change { user.errors.messages }
-          .to(:'projects.0.author.name' => ["can't be blank"])
+          .to('projects.0.author.name': ["can't be blank"])
       end
     end
 
@@ -70,7 +70,7 @@ describe ActiveData::Model::Associations::Validations do
       specify { expect(user.validate).to eq(false) }
       specify do
         expect { user.validate }.to change { user.errors.messages }
-          .to(:'projects.1.title' => ["can't be blank"])
+          .to('projects.1.title': ["can't be blank"])
       end
     end
   end
@@ -98,7 +98,7 @@ describe ActiveData::Model::Associations::Validations do
       specify { expect(user.invalid_ancestry?).to eq(true) }
       specify do
         expect { user.validate_ancestry }.to change { user.errors.messages }
-          .to(:'projects.0.author.name' => ["can't be blank"])
+          .to('projects.0.author.name': ["can't be blank"])
       end
     end
 
@@ -110,7 +110,7 @@ describe ActiveData::Model::Associations::Validations do
       specify { expect(user.invalid_ancestry?).to eq(true) }
       specify do
         expect { user.validate_ancestry }.to change { user.errors.messages }
-          .to(:'profile.first_name' => ["can't be blank"])
+          .to('profile.first_name': ["can't be blank"])
       end
     end
 
@@ -122,14 +122,14 @@ describe ActiveData::Model::Associations::Validations do
       specify { expect(user.invalid_ancestry?).to eq(true) }
       specify do
         expect { user.validate_ancestry }.to change { user.errors.messages }
-          .to(:'projects.1.title' => ["can't be blank"])
+          .to('projects.1.title': ["can't be blank"])
       end
 
       context do
         before { user.update(login: '') }
         specify do
           expect { user.validate_ancestry }.to change { user.errors.messages }
-            .to(:'projects.1.title' => ["can't be blank"], login: ["can't be blank"])
+            .to('projects.1.title': ["can't be blank"], login: ["can't be blank"])
         end
       end
     end

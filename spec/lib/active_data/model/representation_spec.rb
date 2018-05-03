@@ -120,7 +120,7 @@ describe ActiveData::Model::Representation do
 
     specify do
       expect { post.validate }.to change { post.errors.messages }
-        .to(hash_including(:'author.user.email' => ['is invalid'], name: ["can't be blank"]))
+        .to(hash_including('author.user.email': ['is invalid'], name: ["can't be blank"]))
     end
   end
 end

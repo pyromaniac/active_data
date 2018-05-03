@@ -68,7 +68,7 @@ describe ActiveData::Model::Validations::AssociatedValidator do
     it { is_expected.not_to be_valid }
     specify do
       expect { instance.validate }.to change { instance.errors.messages }
-        .to(:'validated_many.0.name' => ["can't be blank"], validated_many: ['is invalid'])
+        .to('validated_many.0.name': ["can't be blank"], validated_many: ['is invalid'])
     end
   end
 
@@ -96,7 +96,7 @@ describe ActiveData::Model::Validations::AssociatedValidator do
     it { is_expected.not_to be_valid }
     specify do
       expect { instance.validate }.to change { instance.errors.messages }
-        .to(:'validated_many.0.name' => ["can't be blank"], validated_many: ['is invalid'])
+        .to('validated_many.0.name': ["can't be blank"], validated_many: ['is invalid'])
     end
   end
 end
