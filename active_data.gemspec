@@ -20,7 +20,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec'
   gem.add_development_dependency 'rspec-its'
-  gem.add_development_dependency 'rubocop'
+  gem.add_development_dependency 'rubocop', '0.52.1'
   gem.add_development_dependency 'rubysl', '~> 2.0' if RUBY_ENGINE == 'rbx'
   gem.add_development_dependency 'sqlite3'
   gem.add_development_dependency 'uuidtools'

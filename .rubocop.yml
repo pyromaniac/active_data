@@ -1,5 +1,9 @@
 inherit_from: .rubocop_todo.yml
 
+AllCops:
+  DisplayCopNames: true
+  TargetRubyVersion: 2.2.10
+
 Lint/AmbiguousBlockAssociation:
   Enabled: false
 
@@ -53,4 +57,7 @@ Style/AndOr:
   EnforcedStyle: conditionals
 
 Style/DoubleNegation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
   Enabled: false

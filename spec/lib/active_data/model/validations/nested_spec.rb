@@ -45,7 +45,7 @@ describe ActiveData::Model::Validations::NestedValidator do
     it { is_expected.not_to be_valid }
     specify do
       expect { instance.validate }.to change { instance.errors.messages }
-        .to(:'validated_one.name' => ["can't be blank"])
+        .to('validated_one.name': ["can't be blank"])
     end
   end
 
@@ -69,7 +69,7 @@ describe ActiveData::Model::Validations::NestedValidator do
     it { is_expected.not_to be_valid }
     specify do
       expect { instance.validate }.to change { instance.errors.messages }
-        .to(:'validated_many.0.name' => ["can't be blank"])
+        .to('validated_many.0.name': ["can't be blank"])
     end
   end
 
@@ -88,7 +88,7 @@ describe ActiveData::Model::Validations::NestedValidator do
     it { is_expected.not_to be_valid }
     specify do
       expect { instance.validate }.to change { instance.errors.messages }
-        .to(:'validated_one.name' => ["can't be blank"])
+        .to('validated_one.name': ["can't be blank"])
     end
   end
 
@@ -152,7 +152,7 @@ describe ActiveData::Model::Validations::NestedValidator do
     it { is_expected.not_to be_valid }
     specify do
       expect { instance.validate }.to change { instance.errors.messages }
-        .to(:'validated_many.0.name' => ["can't be blank"])
+        .to('validated_many.0.name': ["can't be blank"])
     end
   end
 
