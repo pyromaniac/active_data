@@ -7,7 +7,7 @@ module ActiveData
             if block
               options[:class] = proc do |reflection|
                 superclass = reflection.options[:class_name].to_s.presence.try(:constantize)
-                klass = Class.new(superclass || ActiveData::Base) do
+                klass = Class.new(superclass || ActiveData.base_class) do
                   include ActiveData::Model
                   include ActiveData::Model::Associations
                   include ActiveData::Model::Lifecycle

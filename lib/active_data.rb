@@ -136,6 +136,8 @@ end
 
 require 'active_data/base'
 
+ActiveData.base_class = ActiveData::Base
+
 ActiveSupport.on_load :active_record do
   require 'active_data/active_record/associations'
   require 'active_data/active_record/nested_attributes'
