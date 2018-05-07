@@ -2,7 +2,7 @@ module ActiveData
   class Config
     include Singleton
 
-    attr_accessor :include_root_in_json, :i18n_scope, :logger, :primary_attribute, :base_class,
+    attr_accessor :include_root_in_json, :i18n_scope, :logger, :primary_attribute, :base_class, :base_concern,
       :_normalizers, :_typecasters
 
     def self.delegated

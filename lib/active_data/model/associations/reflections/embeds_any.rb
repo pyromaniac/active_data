@@ -3,22 +3,29 @@ module ActiveData
     module Associations
       module Reflections
         class EmbedsAny < Base
-          def self.build(target, generated_methods, name, options = {}, &block)
-            if block
-              options[:class] = proc do |reflection|
-                superclass = reflection.options[:class_name].to_s.presence.try(:constantize)
-                klass = Class.new(superclass || ActiveData.base_class) do
-                  include ActiveData::Model
-                  include ActiveData::Model::Associations
-                  include ActiveData::Model::Lifecycle
-                  include ActiveData::Model::Primary
+          class << self
+            def build(target, generated_methods, name, options = {}, &block)
+              if block
+                options[:class] = proc do |reflection|
+                  superclass = reflection.options[:class_name].to_s.presence.try(:constantize)
+                  klass = build_class(superclass)
+                  target.const_set(name.to_s.classify, klass)
+                  klass.class_eval(&block)
+                  klass
                 end
-                target.const_set(name.to_s.classify, klass)
-                klass.class_eval(&block)
-                klass
+              end
+              super
+            end
+
+            private def build_class(superclass)
+              Class.new(superclass || ActiveData.base_class) do
+                include ActiveData::Model
+                include ActiveData::Model::Associations
+                include ActiveData::Model::Lifecycle
+                include ActiveData::Model::Primary
+                include ActiveData.base_concern if ActiveData.base_concern
               end
             end
-            super
           end
 
           def klass
