@@ -1,5 +1,13 @@
 # master
 
+# Version 1.1.1
+
+## Changes
+
+* `ActiveData.base_class` config option (#63)
+
+* ActiveModel 5.2 compatibility (#62)
+
 # Version 1.1.0
 
 ## Incompatible changes
