@@ -1,5 +1,11 @@
 # master
 
+# Version 1.1.2
+
+## Changes
+
+* `ActiveData.base_concern` config option in addition to `ActiveData.base_class` (#64)
+
 # Version 1.1.1
 
 ## Changes
