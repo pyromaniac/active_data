@@ -26,7 +26,7 @@ module ActiveData
 
           def build_attribute(owner, raw_value = ActiveData::UNDEFINED)
             attribute = self.class.attribute_class.new(name, owner)
-            attribute.write_value(raw_value) unless raw_value == ActiveData::UNDEFINED
+            attribute.write_value(raw_value, origin: :persistence) unless raw_value == ActiveData::UNDEFINED
             attribute
           end
 

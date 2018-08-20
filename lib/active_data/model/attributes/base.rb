@@ -8,14 +8,16 @@ module ActiveData
         def initialize(name, owner)
           @name = name
           @owner = owner
+          @origin = :default
         end
 
         def reflection
           @owner.class._attributes[name]
         end
 
-        def write_value(value)
+        def write_value(value, origin: :user)
           reset
+          @origin = origin
           @value_cache = value
         end
 
@@ -34,6 +36,10 @@ module ActiveData
 
         def read_before_type_cast
           @value_cache
+        end
+
+        def came_from_user?
+          @origin == :user
         end
 
         def value_present?
