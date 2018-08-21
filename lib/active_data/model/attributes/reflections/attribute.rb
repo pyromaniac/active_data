@@ -27,6 +27,10 @@ module ActiveData
                 attribute('#{name}').read_before_type_cast
               end
 
+              def #{name}_came_from_user?
+                attribute('#{name}').came_from_user?
+              end
+
               def #{name}_default
                 attribute('#{name}').default
               end

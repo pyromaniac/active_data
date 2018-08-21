@@ -141,6 +141,10 @@ module ActiveData
         attribute(name).read_before_type_cast
       end
 
+      def attribute_came_from_user?(name)
+        attribute(name).came_from_user?
+      end
+
       def attribute_present?(name)
         attribute(name).value_present?
       end

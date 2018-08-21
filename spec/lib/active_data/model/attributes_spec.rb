@@ -249,6 +249,7 @@ describe ActiveData::Model::Attributes do
     its(:hello?) { should eq(false) }
     its(:count) { should == 10 }
     its(:count_before_type_cast) { should == '10' }
+    its(:count_came_from_user?) { should eq(false) }
     its(:count?) { should eq(true) }
     its(:calc) { should == 5 }
     its(:enum?) { should eq(false) }
@@ -256,6 +257,7 @@ describe ActiveData::Model::Attributes do
     specify { expect { subject.hello = 'worlds' }.to change { subject.hello }.from(nil).to('worlds') }
     specify { expect { subject.count = 20 }.to change { subject.count }.from(10).to(20) }
     specify { expect { subject.calc = 15 }.to change { subject.calc }.from(5).to(15) }
+    specify { expect { subject.count = '11' }.to change { subject.count_came_from_user? }.from(false).to(true) }
 
     context 'enums' do
       specify do
