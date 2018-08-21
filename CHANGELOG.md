@@ -1,5 +1,11 @@
 # master
 
+# Version 1.1.3
+
+## Changes
+
+* `came_from_user?` attribute method (#65)
+
 # Version 1.1.2
 
 ## Changes
