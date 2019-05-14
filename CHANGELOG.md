@@ -1,5 +1,11 @@
 # master
 
+# Version 1.1.4
+
+## Changes
+
+* `came_from_default?` attribute method (#66)
+
 # Version 1.1.3
 
 ## Changes
