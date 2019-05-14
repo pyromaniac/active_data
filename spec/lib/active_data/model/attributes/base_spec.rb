@@ -45,6 +45,14 @@ describe ActiveData::Model::Attributes::Base do
     specify { expect(field.tap { |r| r.write('value') }.came_from_user?).to eq(true) }
   end
 
+  describe '#came_from_default?' do
+    let(:field) { attribute(type: String, default: 'world') }
+    let(:object) { Object.new }
+
+    specify { expect(field.came_from_default?).to eq(true) }
+    specify { expect(field.tap { |r| r.write('value') }.came_from_default?).to eq(false) }
+  end
+
   describe '#value_present?' do
     let(:field) { attribute }
 
