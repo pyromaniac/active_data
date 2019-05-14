@@ -42,6 +42,10 @@ module ActiveData
           @origin == :user
         end
 
+        def came_from_default?
+          @origin == :default
+        end
+
         def value_present?
           !read.nil? && !(read.respond_to?(:empty?) && read.empty?)
         end
