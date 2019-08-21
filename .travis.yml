@@ -1,10 +1,12 @@
+dist: bionic
 sudo: false
+language: ruby
 
 rvm:
-  - 2.2.10
-  - 2.3.7
-  - 2.4.4
-  - rbx
+  - 2.3.8
+  - 2.4.6
+  - 2.5.5
+  - 2.6.2
 
 gemfile:
   - gemfiles/rails.4.0.gemfile
@@ -15,14 +17,24 @@ gemfile:
   - gemfiles/rails.5.2.gemfile
 
 matrix:
-  allow_failures:
-    - rvm: rbx
   exclude:
-    - rvm: 2.4.4
+    - rvm: 2.4.6
       gemfile: gemfiles/rails.4.0.gemfile
-    - rvm: 2.4.4
+    - rvm: 2.4.6
       gemfile: gemfiles/rails.4.1.gemfile
-    - rvm: 2.4.4
+    - rvm: 2.4.6
+      gemfile: gemfiles/rails.4.2.gemfile
+    - rvm: 2.5.5
+      gemfile: gemfiles/rails.4.0.gemfile
+    - rvm: 2.5.5
+      gemfile: gemfiles/rails.4.1.gemfile
+    - rvm: 2.5.5
+      gemfile: gemfiles/rails.4.2.gemfile
+    - rvm: 2.6.2
+      gemfile: gemfiles/rails.4.0.gemfile
+    - rvm: 2.6.2
+      gemfile: gemfiles/rails.4.1.gemfile
+    - rvm: 2.6.2
       gemfile: gemfiles/rails.4.2.gemfile
 
 before_install:
