@@ -81,7 +81,9 @@ module ActiveData
           pollute = owner.class.dirty? && !owner.send(:attribute_changed?, name)
 
           if pollute
-            previous_value = read
+            previous_value = owner.__send__(name)
+            owner.send("#{name}_will_change!")
+
             result = yield
             if previous_value != read || (
               read.respond_to?(:changed?) &&
