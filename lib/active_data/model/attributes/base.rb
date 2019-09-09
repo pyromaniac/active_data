@@ -85,9 +85,9 @@ module ActiveData
             owner.send("#{name}_will_change!")
 
             result = yield
-            # Not sure if it's needed in active_data, but it fixes some issues
-            # when using granite `represents`. Maybe it should be fixed on granite side.
-            owner.clear_attribute_changes([name]) if owner.__send__(name) == previous_value
+
+            owner.__send__(:clear_attribute_changes, [name]) if owner.__send__(name) == previous_value
+
             if previous_value != read || (
               read.respond_to?(:changed?) &&
               read.changed?
