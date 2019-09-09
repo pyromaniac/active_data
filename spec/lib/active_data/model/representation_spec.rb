@@ -39,11 +39,17 @@ describe ActiveData::Model::Representation do
     end
 
     context 'dirty' do
-      before { Post.include ActiveData::Model::Dirty }
+      before do
+        Author.include ActiveData::Model::Dirty
+        Post.include ActiveData::Model::Dirty
+      end
 
       specify do
         expect(Post.new(author: author, rate: '33').changes)
           .to eq('author' => [nil, author], 'rate' => [42, 33])
+
+        expect(Post.new(author: author, rate: '33').changes)
+          .to eq('author' => [nil, author])
       end
     end
 

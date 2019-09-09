@@ -85,6 +85,9 @@ module ActiveData
             owner.send("#{name}_will_change!")
 
             result = yield
+
+            owner.__send__(:clear_attribute_changes, [name]) if owner.__send__(name) == previous_value
+
             if previous_value != read || (
               read.respond_to?(:changed?) &&
               read.changed?
