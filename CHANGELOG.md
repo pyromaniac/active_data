@@ -1,5 +1,9 @@
 # master
 
+# Version 1.1.5
+
+* Rails 6 support (#70, #71)
+
 # Version 1.1.4
 
 ## Changes
