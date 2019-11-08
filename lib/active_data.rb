@@ -100,7 +100,7 @@ module ActiveData
   typecaster('BigDecimal') do |value|
     next unless value
     begin
-      ::BigDecimal.new Float(value).to_s
+      BigDecimal(Float(value).to_s)
     rescue ArgumentError, TypeError
       nil
     end
