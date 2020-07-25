@@ -14,6 +14,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
   gem.version       = ActiveData::VERSION
 
+  gem.add_development_dependency 'actionpack', '>= 4.0'
   gem.add_development_dependency 'activerecord', '>= 4.0'
   gem.add_development_dependency 'appraisal'
   gem.add_development_dependency 'database_cleaner'

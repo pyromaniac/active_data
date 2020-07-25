@@ -49,6 +49,7 @@ Metrics/BlockLength:
 Metrics/ModuleLength:
   Exclude:
     - '**/*_spec.rb'
+    - 'lib/active_data.rb'
 
 Style/Alias:
   EnforcedStyle: prefer_alias_method

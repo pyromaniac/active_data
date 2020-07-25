@@ -61,6 +61,16 @@ module ActiveData
       value
     end
   end
+  ActiveSupport.on_load :action_controller do
+    ActiveData.typecaster('Hash') do |value|
+      case value
+      when ActionController::Parameters
+        value.to_h if value.permitted?
+      when ::Hash then
+        value
+      end
+    end
+  end
   typecaster('Date') do |value|
     begin
       value.to_date
