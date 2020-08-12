@@ -4,6 +4,8 @@ Bundler.require
 
 require 'rspec/its'
 require 'active_record'
+require 'rack/test'
+require 'action_controller/metal/strong_parameters'
 require 'database_cleaner'
 
 require 'support/model_helpers'
