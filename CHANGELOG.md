@@ -1,5 +1,9 @@
 # master
 
+# Version 1.1.7
+
+* Add typecasting from `ActionController::Parameters` to `Hash` (#73)
+
 # Version 1.1.6
 
 * Fix Ruby 2.6 deprecations (#72)
