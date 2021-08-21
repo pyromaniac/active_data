@@ -22,7 +22,7 @@ describe ActiveData::Model::Associations::NestedAttributes do
     include_examples 'nested attributes'
   end
 
-  xcontext 'references_one' do
+  context 'references_one' do
     before do
       stub_class(:author, ActiveRecord::Base)
       stub_class(:user, ActiveRecord::Base)
