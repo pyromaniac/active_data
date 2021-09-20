@@ -35,7 +35,7 @@ module ActiveData
             end
           elsif value && yield(value)
             value.errors.each do |error|
-              record.errors.import(error, attribute: "#{name}.#{i}.#{error.attribute}")
+              record.errors.import(error, attribute: "#{name}.#{error.attribute}")
             end
           end
         end          
