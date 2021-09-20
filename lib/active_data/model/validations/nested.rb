@@ -3,6 +3,8 @@ module ActiveData
     module Validations
       class NestedValidator < ActiveModel::EachValidator
         def self.validate_nested(record, name, value)
+          return validate_nested_with_import(record, name, value, &proc) if record.errors.respond_to?(:import)
+
           if value.is_a?(Enumerable)
             value.each.with_index do |object, i|
               if yield(object)
@@ -21,6 +23,22 @@ module ActiveData
             end
           end
         end
+        
+        def self.validate_nested_with_import(record, name, value)
+          if value.is_a?(Enumerable)
+            value.each.with_index do |object, i|
+              if yield(object)
+                object.errors.each do |error|
+                  record.errors.import(error, attribute: "#{name}.#{i}.#{error.attribute}")
+                end
+              end
+            end
+          elsif value && yield(value)
+            value.errors.each do |error|
+              record.errors.import(error, attribute: "#{name}.#{i}.#{error.attribute}")
+            end
+          end
+        end          
 
         def validate_each(record, attribute, value)
           self.class.validate_nested(record, attribute, value) do |object|
