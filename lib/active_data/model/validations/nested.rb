@@ -5,19 +5,26 @@ module ActiveData
         def self.validate_nested(record, name, value)
           if value.is_a?(Enumerable)
             value.each.with_index do |object, i|
-              if yield(object)
-                object.errors.each do |key, message|
-                  key = "#{name}.#{i}.#{key}"
-                  record.errors[key] << message
-                  record.errors[key].uniq!
-                end
-              end
+              import_errors(object.errors, record.errors, "#{name}.#{i}") if yield object
             end
-          elsif value && yield(value)
-            value.errors.each do |key, message|
-              key = "#{name}.#{key}"
-              record.errors[key] << message
-              record.errors[key].uniq!
+          elsif value
+            import_errors(value.errors, record.errors, name.to_s) if yield value
+          end
+        end
+
+        def self.import_errors(from, to, prefix)
+          if ActiveData.legacy_active_model?
+            # legacy ActiveModel iterates over key/message pairs
+            from.each do |key, message|
+              key = "#{prefix}.#{key}"
+              to[key] << message
+              to[key].uniq!
+            end
+          else
+            # newer ActiveModel iterates over ActiveMode::Error instances
+            from.each do |error|
+              key = "#{prefix}.#{error.attribute}"
+              to.import(error, attribute: key) unless to.added?(key, error.type, error.options)
             end
           end
         end

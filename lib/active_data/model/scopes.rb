@@ -37,11 +37,27 @@ module ActiveData
           super || self.class._scope_model.respond_to?(method)
         end
 
-        def method_missing(method, *args, &block)
+        def method_missing(method, *args, **kwargs, &block)
           with_scope do
             model = self.class._scope_model
             if model.respond_to?(method)
-              self.class._scope_model.public_send(method, *args, &block)
+              # ruby 2.6 does not understand kwargs?
+              # Fixed in 2.7 - https://rubyreferences.github.io/rubychanges/2.7.html#keyword-argument-related-changes
+              #
+              # > empty hash splat doesn’t pass empty hash as a positional argument.
+              result = if kwargs.empty?
+                         model.public_send(method, *args, &block)
+                       else
+                         model.public_send(method, *args, **kwargs, &block)
+                       end
+
+              # ruby 3.0 returns plain arrays when subclasses receive standard methods
+              # so we need to wrap again.
+              # https://rubyreferences.github.io/rubychanges/3.0.html#array-always-returning-array
+              #
+              # > On custom classes inherited from `Array`, some methods previously were returning an instance of
+              # > this class, and others returned `Array`. Now they all do the latter.
+              result.is_a?(ActiveData::Model::Scopes) ? result : model.scope_class.new(result)
             else
               super
             end

@@ -6,7 +6,7 @@ module ActiveData
           invalid_records = Array.wrap(value).reject do |r|
             r.respond_to?(:valid?) && r.valid?(record.validation_context)
           end
-          record.errors.add(attribute, :invalid, options.merge(value: value)) if invalid_records.present?
+          record.errors.add(attribute, :invalid, **options.merge(value: value)) if invalid_records.present?
         end
       end
 

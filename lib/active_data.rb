@@ -43,6 +43,12 @@ module ActiveData
     ActiveData::Config.instance
   end
 
+  def self.legacy_active_model?
+    return @legacy_active_model if defined? @legacy_active_model
+
+    @legacy_active_model = ActiveModel.gem_version < Gem::Version.new('6.1.0')
+  end
+
   singleton_class.delegate(*ActiveData::Config.delegated, to: :config)
 
   typecaster('Object') { |value, attribute| value if value.class < attribute.type }
