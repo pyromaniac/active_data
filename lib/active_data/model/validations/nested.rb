@@ -1,3 +1,5 @@
+require 'active_model/version'
+
 module ActiveData
   module Model
     module Validations
@@ -12,19 +14,20 @@ module ActiveData
           end
         end
 
-        def self.import_errors(from, to, prefix)
-          if ActiveModel.gem_version < Gem::Version.new('6.1.0')
-            # legacy ActiveModel iterates over key/message pairs
+        case ActiveModel.version.to_s
+        when /^6\.1\./, /^7\./
+          def self.import_errors(from, to, prefix)
+            from.each do |error|
+              key = "#{prefix}.#{error.attribute}"
+              to.import(error, attribute: key) unless to.added?(key, error.type, error.options)
+            end
+          end
+        else # up to 6.0.x
+          def self.import_errors(from, to, prefix)
             from.each do |key, message|
               key = "#{prefix}.#{key}"
               to[key] << message
               to[key].uniq!
-            end
-          else
-            # newer ActiveModel iterates over ActiveMode::Error instances
-            from.each do |error|
-              key = "#{prefix}.#{error.attribute}"
-              to.import(error, attribute: key) unless to.added?(key, error.type, error.options)
             end
           end
         end

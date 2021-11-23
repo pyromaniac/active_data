@@ -1,3 +1,4 @@
+require 'active_model/version'
 require 'active_data/model/attributes/reflections/represents'
 require 'active_data/model/attributes/represents'
 
@@ -71,18 +72,20 @@ module ActiveData
         end
       end
 
-      def move_errors(from, to)
-        if ActiveModel.gem_version < Gem::Version.new('6.1.0')
-          # Rails 5 pollutes messages with an empty array on key data fetch attempt
-          return unless errors.messages.key?(from) && errors.messages[from].present?
-
-          errors[to].concat(errors.messages[from])
-          errors.delete(from)
-        else
+      case ActiveModel.version.to_s
+      when /^6\.1\./, /^7\./
+        def move_errors(from, to)
           errors[from].each do |error_message|
             errors.add(to, error_message)
             errors.delete(from)
           end
+        end
+      else # up to 6.0.x
+        def move_errors(from, to)
+          return unless errors.messages.key?(from) && errors.messages[from].present?
+
+          errors[to].concat(errors.messages[from])
+          errors.delete(from)
         end
       end
     end
