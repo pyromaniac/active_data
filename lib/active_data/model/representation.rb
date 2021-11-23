@@ -72,7 +72,7 @@ module ActiveData
       end
 
       def move_errors(from, to)
-        if ActiveData.legacy_active_model?
+        if ActiveModel.gem_version < Gem::Version.new('6.1.0')
           # Rails 5 pollutes messages with an empty array on key data fetch attempt
           return unless errors.messages.key?(from) && errors.messages[from].present?
 

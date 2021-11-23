@@ -13,7 +13,7 @@ module ActiveData
         end
 
         def self.import_errors(from, to, prefix)
-          if ActiveData.legacy_active_model?
+          if ActiveModel.gem_version < Gem::Version.new('6.1.0')
             # legacy ActiveModel iterates over key/message pairs
             from.each do |key, message|
               key = "#{prefix}.#{key}"
