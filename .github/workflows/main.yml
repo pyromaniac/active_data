@@ -8,10 +8,8 @@ jobs:
     name: Run specs in ruby v${{ matrix.ruby }} rails v${{ matrix.rails }}
     strategy:
       matrix:
-        # ruby: [ '2.6', '2.7', '3.0' ]
-        # rails: [ '6.0', '6.1' ]
-        ruby: [ '2.6' ]
-        rails: [ '5.2', '6.0' ]
+        ruby: [ '2.6', '2.7', '3.0' ]
+        rails: [ '6.0', '6.1' ]
     steps:
     - uses: actions/checkout@v2
 

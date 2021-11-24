@@ -37,13 +37,39 @@ module ActiveData
           super || self.class._scope_model.respond_to?(method)
         end
 
-        def method_missing(method, *args, &block)
-          with_scope do
-            model = self.class._scope_model
-            if model.respond_to?(method)
-              self.class._scope_model.public_send(method, *args, &block)
-            else
-              super
+        case RUBY_VERSION
+        when /\A3\./
+          def method_missing(method, *args, **kwargs, &block)
+            with_scope do
+              model = self.class._scope_model
+              if model.respond_to?(method)
+                result = model.public_send(method, *args, **kwargs, &block)
+                result.is_a?(ActiveData::Model::Scopes) ? result : model.scope_class.new(result)
+              else
+                super
+              end
+            end
+          end
+        when /\A2\.7\./
+          def method_missing(method, *args, **kwargs, &block)
+            with_scope do
+              model = self.class._scope_model
+              if model.respond_to?(method)
+                model.public_send(method, *args, **kwargs, &block)
+              else
+                super
+              end
+            end
+          end
+        else # up to 2.6.x
+          def method_missing(method, *args, &block)
+            with_scope do
+              model = self.class._scope_model
+              if model.respond_to?(method)
+                model.public_send(method, *args, &block)
+              else
+                super
+              end
             end
           end
         end

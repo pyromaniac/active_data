@@ -1,3 +1,4 @@
+require 'active_model/version'
 require 'active_data/model/attributes/reflections/represents'
 require 'active_data/model/attributes/represents'
 
@@ -67,13 +68,24 @@ module ActiveData
       #
       def emerge_represented_attributes_errors!
         self.class.represented_attributes.each do |attribute|
-          key = :"#{attribute.reference}.#{attribute.column}"
-          # Rails 5 pollutes messages with an empty array on key data fetch attempt
-          messages = errors.messages[key] if errors.messages.key?(key)
-          if messages.present?
-            errors[attribute.column].concat(messages)
-            errors.delete(key)
+          move_errors(:"#{attribute.reference}.#{attribute.column}", attribute.column)
+        end
+      end
+
+      case ActiveModel.version.to_s
+      when /^6\.1\./, /^7\./
+        def move_errors(from, to)
+          errors[from].each do |error_message|
+            errors.add(to, error_message)
+            errors.delete(from)
           end
+        end
+      else # up to 6.0.x
+        def move_errors(from, to)
+          return unless errors.messages.key?(from) && errors.messages[from].present?
+
+          errors[to].concat(errors.messages[from])
+          errors.delete(from)
         end
       end
     end
