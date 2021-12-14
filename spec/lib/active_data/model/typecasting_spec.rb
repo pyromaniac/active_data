@@ -66,11 +66,11 @@ describe ActiveData::Model::Attributes do
 
     specify { expect(model.new(column: 'hello').column).to be_nil }
     specify { expect(model.new(column: '123hello').column).to be_nil }
-    specify { expect(model.new(column: '123').column).to eq(BigDecimal.new('123.0')) }
+    specify { expect(model.new(column: '123').column).to eq(BigDecimal('123.0')) }
     specify { expect(model.new(column: '123.').column).to be_nil }
-    specify { expect(model.new(column: '123.5').column).to eq(BigDecimal.new('123.5')) }
-    specify { expect(model.new(column: 123).column).to eq(BigDecimal.new('123.0')) }
-    specify { expect(model.new(column: 123.5).column).to eq(BigDecimal.new('123.5')) }
+    specify { expect(model.new(column: '123.5').column).to eq(BigDecimal('123.5')) }
+    specify { expect(model.new(column: 123).column).to eq(BigDecimal('123.0')) }
+    specify { expect(model.new(column: 123.5).column).to eq(BigDecimal('123.5')) }
     specify { expect(model.new(column: nil).column).to be_nil }
     specify { expect(model.new(column: [123.5]).column).to be_nil }
   end
