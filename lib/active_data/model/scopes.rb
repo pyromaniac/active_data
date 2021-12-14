@@ -37,8 +37,7 @@ module ActiveData
           super || self.class._scope_model.respond_to?(method)
         end
 
-        case RUBY_VERSION
-        when /\A3\./
+        if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.0.0')
           def method_missing(method, *args, **kwargs, &block)
             with_scope do
               model = self.class._scope_model
@@ -50,7 +49,7 @@ module ActiveData
               end
             end
           end
-        when /\A2\.7\./
+        elsif Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.7.0')
           def method_missing(method, *args, **kwargs, &block)
             with_scope do
               model = self.class._scope_model

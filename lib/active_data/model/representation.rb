@@ -72,8 +72,7 @@ module ActiveData
         end
       end
 
-      case ActiveModel.version.to_s
-      when /^6\.1\./, /^7\./
+      if ActiveModel.version >= Gem::Version.new('6.1.0')
         def move_errors(from, to)
           errors[from].each do |error_message|
             errors.add(to, error_message)

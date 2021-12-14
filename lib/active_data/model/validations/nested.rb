@@ -14,8 +14,7 @@ module ActiveData
           end
         end
 
-        case ActiveModel.version.to_s
-        when /^6\.1\./, /^7\./
+        if ActiveModel.version >= Gem::Version.new('6.1.0')
           def self.import_errors(from, to, prefix)
             from.each do |error|
               key = "#{prefix}.#{error.attribute}"
