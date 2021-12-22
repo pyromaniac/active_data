@@ -1,5 +1,9 @@
 # master
 
+# Version 1.2.0
+
+* Rails 6.1 and 7 support (#80). Thanks to @ojab and @rewritten
+
 # Version 1.1.7
 
 * Add typecasting from `ActionController::Parameters` to `Hash` (#73)
