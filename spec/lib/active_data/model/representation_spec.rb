@@ -128,5 +128,10 @@ describe ActiveData::Model::Representation do
       expect { post.validate }.to change { post.errors.messages }
         .to(hash_including('author.user.email': ['is invalid'], name: ["can't be blank"]))
     end
+
+    specify do
+      expect { post.validate }.to change { post.errors.details }
+        .to(hash_including('author.user.email': [{error: 'is invalid'}], name: [{error: :blank}]))
+    end
   end
 end
