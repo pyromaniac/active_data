@@ -74,12 +74,8 @@ module ActiveData
 
       if ActiveModel.version >= Gem::Version.new('6.1.0')
         def move_errors(from, to)
-          errors.each do |error|
-            next unless error.attribute == from
-
-            errors.add(to, error.type, message: error.message)
-            errors.delete(error.attribute, error.type)
-          end
+          errors.where(from).each { |error| errors.add(to, error.type, **error.options) }
+          errors.delete(from)
         end
       else # up to 6.0.x
         def move_errors(from, to)
