@@ -72,13 +72,17 @@ module ActiveData
         end
       end
 
-      case ActiveModel.version.to_s
-      when /^6\.1\./, /^7\./
+      if ActiveModel.version >= Gem::Version.new('6.1.0')
         def move_errors(from, to)
-          errors[from].each do |error_message|
-            errors.add(to, error_message)
-            errors.delete(from)
+          errors.where(from).each do |error|
+            options = error.options
+            # If we generate message for built-in validation, we don't want to later escape it in our monkey-patch
+            options = options.merge(message: error.message.html_safe) unless options.key?(:message)
+
+            errors.add(to, error.type, **options)
           end
+
+          errors.delete(from)
         end
       else # up to 6.0.x
         def move_errors(from, to)

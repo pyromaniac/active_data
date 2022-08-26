@@ -1,3 +1,3 @@
 module ActiveData
-  VERSION = '1.1.7'.freeze
+  VERSION = '1.2.1'.freeze
 end

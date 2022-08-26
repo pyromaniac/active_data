@@ -93,7 +93,7 @@ describe ActiveData::Model::Attributes::Localized do
         before do
           require 'i18n/backend/fallbacks'
           I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
-          I18n.fallbacks.map(en: :ru)
+          I18n.fallbacks[:en] = [:ru]
         end
         after { I18n.fallbacks = false }
         its(:name) { should == 'Привет' }

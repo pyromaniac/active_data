@@ -37,8 +37,9 @@ module ActiveData
           super || self.class._scope_model.respond_to?(method)
         end
 
-        case RUBY_VERSION
-        when /\A3\./
+        # rubocop:disable Style/MethodMissing
+        # rubocop-0.52.1 doesn't understand that `#respond_to_missing?` is defined above
+        if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.0.0')
           def method_missing(method, *args, **kwargs, &block)
             with_scope do
               model = self.class._scope_model
@@ -50,7 +51,7 @@ module ActiveData
               end
             end
           end
-        when /\A2\.7\./
+        elsif Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.7.0')
           def method_missing(method, *args, **kwargs, &block)
             with_scope do
               model = self.class._scope_model
@@ -73,6 +74,7 @@ module ActiveData
             end
           end
         end
+        # rubocop:enable Style/MethodMissing
 
         def with_scope
           previous_scope = self.class._scope_model.current_scope
