@@ -77,7 +77,8 @@ module ActiveData
           errors.where(from).each do |error|
             options = error.options
             # If we generate message for built-in validation, we don't want to later escape it in our monkey-patch
-            options = options.merge(message: error.message.html_safe) unless options.key?(:message)
+            # Do it only if no message was explicitly given (possible XSS?) in options to the error (covers built-in validations)
+            options = options.merge(message: error.message.html_safe) if !options.key?(:message) && !error.options[:message]
 
             errors.add(to, error.type, **options)
           end
