@@ -18,7 +18,8 @@ module ActiveData
           def self.import_errors(from, to, prefix)
             from.each do |error|
               key = "#{prefix}.#{error.attribute}"
-              to.import(error, attribute: key) unless to.added?(key, error.type, error.options)
+              ignored_options = ActiveModel::Error::CALLBACKS_OPTIONS + ActiveModel::Error::MESSAGE_OPTIONS
+              to.import(error, attribute: key) unless to.added?(key, error.type, error.options.except(*ignored_options))
             end
           end
         else # up to 6.0.x

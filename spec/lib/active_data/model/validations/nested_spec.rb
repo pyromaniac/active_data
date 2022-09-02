@@ -10,7 +10,7 @@ describe ActiveData::Model::Validations::NestedValidator do
       primary :id, Integer
       attribute :name, String
 
-      validates_presence_of :name
+      validates_presence_of :name, message: "can't be blank"
     end
 
     stub_model(:unvalidated_assoc) do
@@ -88,6 +88,11 @@ describe ActiveData::Model::Validations::NestedValidator do
     it { is_expected.not_to be_valid }
     specify do
       expect { instance.validate }.to change { instance.errors.messages }
+        .to('validated_one.name': ["can't be blank"])
+    end
+
+    specify do
+      expect { 2.times { instance.send :run_validations! } }.to change { instance.errors.messages }
         .to('validated_one.name': ["can't be blank"])
     end
   end
